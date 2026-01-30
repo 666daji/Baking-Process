@@ -57,16 +57,16 @@ public class ModContents {
 
     // 定型面团
     public static final ShapedDoughContent TOAST_EMBRYO = new ShapedDoughContent(
-            createModId("toast_embryo"), ModItems.TOAST_DOUGH, ModBlocks.TOAST_EMBRYO_MOLD);
+            createModId("toast_embryo"), createModId("toast_dough"), createModId("toast_embryo_mold"));
 
     public static final ShapedDoughContent TOAST = new ShapedDoughContent(
-            createModId("toast"), ModItems.TOAST, ModBlocks.TOAST_EMBRYO_MOLD);
+            createModId("toast"), createModId("toast"), createModId("toast_embryo_mold"));
 
     public static final ShapedDoughContent CAKE_EMBRYO = new ShapedDoughContent(
-            createModId("cake_embryo"), ModItems.CAKE_DOUGH, ModBlocks.CAKE_EMBRYO_MOLD);
+            createModId("cake_embryo"), createModId("cake_dough"), createModId("cake_embryo_mold"));
 
     public static final ShapedDoughContent BAKED_CAKE_EMBRYO = new ShapedDoughContent(
-            createModId("baked_cake_embryo"), ModItems.BAKED_CAKE_EMBRYO, ModBlocks.CAKE_EMBRYO_MOLD);
+            createModId("baked_cake_embryo"), createModId("baked_cake_embryo"), createModId("cake_embryo_mold"));
 
     // 糖浆
     public static final AbstractContent HONEY = AbstractContent.createSimpleContent(

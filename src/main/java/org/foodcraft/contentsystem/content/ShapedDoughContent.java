@@ -6,17 +6,18 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ShapedDoughContent extends AbstractContent{
-    private static final Table<Item, Block, ShapedDoughContent> CACHES = HashBasedTable.create();
+    private static final Table<Identifier, Identifier, ShapedDoughContent> CACHES = HashBasedTable.create();
 
-    protected final Item originalDough;
-    protected final Block baseMold;
+    protected final Identifier originalDough;
+    protected final Identifier baseMold;
 
-    public ShapedDoughContent(Identifier id, Item originalDough, Block baseMold) {
+    public ShapedDoughContent(Identifier id, Identifier originalDough, Identifier baseMold) {
         super(id);
         this.originalDough = originalDough;
         this.baseMold = baseMold;
@@ -30,15 +31,18 @@ public class ShapedDoughContent extends AbstractContent{
     }
 
     public Block getBaseMold() {
-        return baseMold;
+        return Registries.BLOCK.get(baseMold);
     }
 
     public Item getOriginalDough() {
-        return originalDough;
+        return Registries.ITEM.get(originalDough);
     }
 
     @Nullable
     public static ShapedDoughContent fromBaseGet(ItemStack originalDough, BlockState baseMold) {
-        return CACHES.get(originalDough.getItem(), baseMold.getBlock());
+        Identifier originalDoughId = Registries.ITEM.getId(originalDough.getItem());
+        Identifier baseMoldId = Registries.BLOCK.getId(baseMold.getBlock());
+
+        return CACHES.get(originalDoughId, baseMoldId);
     }
 }

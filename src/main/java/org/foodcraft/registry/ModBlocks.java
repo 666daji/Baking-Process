@@ -138,18 +138,10 @@ public class ModBlocks {
             new SimpleFoodBlock(DFoodUtils.getFoodBlockSettings()
                     .sounds(BlockSoundGroup.WOOL)
                     .mapColor(MapColor.WHITE)));
-    public static final Block TOAST_EMBRYO = registerBlock("toast_embryo",
-            new SimpleFoodBlock(DFoodUtils.getFoodBlockSettings()
-                    .sounds(BlockSoundGroup.WOOL)
-                    .mapColor(MapColor.WHITE)));
     public static final Block TOAST = registerBlock("toast",
             new SimpleFoodBlock(DFoodUtils.getFoodBlockSettings()
                     .sounds(BlockSoundGroup.WOOL)
                     .mapColor(MapColor.ORANGE)));
-    public static final Block CAKE_EMBRYO = registerBlock("cake_embryo",
-            new SimpleFoodBlock(DFoodUtils.getFoodBlockSettings()
-                    .sounds(BlockSoundGroup.WOOL)
-                    .mapColor(MapColor.WHITE)));
     public static final Block BAKED_CAKE_EMBRYO = registerBlock("baked_cake_embryo",
             new SimpleFoodBlock(DFoodUtils.getFoodBlockSettings()
                     .sounds(BlockSoundGroup.WOOL)

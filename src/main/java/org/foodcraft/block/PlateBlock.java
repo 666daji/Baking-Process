@@ -14,8 +14,10 @@ import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
@@ -142,7 +144,11 @@ public class PlateBlock extends SimpleFoodBlock implements BlockEntityProvider {
         AbstractContent content = ContainerUtil.extractContent(stack);
 
         if (content != null) {
-            tooltip.add(content.getDisplayName());
+            Text text = content.getDisplayName();
+            if (text instanceof MutableText mutableText) {
+                mutableText.formatted(Formatting.ITALIC, Formatting.DARK_GRAY);
+            }
+            tooltip.add(text);
         }
     }
 
