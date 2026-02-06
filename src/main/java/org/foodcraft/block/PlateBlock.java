@@ -72,7 +72,7 @@ public class PlateBlock extends SimpleFoodBlock implements BlockEntityProvider {
             if (player.isSneaking() && state.get(IS_COVERED) &&
                     plateBlockEntity.removeCoverAndRestore()) {
                 if (!player.isCreative()) {
-                    player.setStackInHand(hand, new ItemStack(ModItems.PLATE_LID));
+                    player.giveItemStack(new ItemStack(ModItems.PLATE_LID));
                 }
                 return ActionResult.SUCCESS;
             }

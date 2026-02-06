@@ -295,34 +295,36 @@
 			}
 		}
 	],
-	"display": {
-		"thirdperson_righthand": {
-			"rotation": [40, 90, 0],
-			"translation": [0, 3.75, 2.25],
-			"scale": [0.75, 0.75, 0.75]
-		},
-		"firstperson_righthand": {
-			"rotation": [0, 90, 0],
-			"translation": [0, 5.25, 0]
-		},
-		"firstperson_lefthand": {
-			"rotation": [0, 89, 0],
-			"translation": [0, 4.25, 0]
-		},
-		"ground": {
-			"translation": [0, 3, 0],
-			"scale": [0.6, 0.6, 0.6]
-		},
-		"gui": {
-			"rotation": [30, 135, 0],
-			"translation": [0, 3.25, 0],
-			"scale": [0.75, 0.75, 0.75]
-		},
-		"fixed": {
-			"rotation": [-90, 0, 0],
-			"translation": [0, 0.75, -6.75]
-		}
-	},
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [40, 90, 0],
+      "translation": [-0.25, 3.75, 2.25],
+      "scale": [0.75, 0.74, 0.75]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, 15, 0],
+      "translation": [3, 4, 0],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 15, 0],
+      "translation": [3, 4, 0],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    "ground": {
+      "translation": [0, 2.75, 0],
+      "scale": [0.6, 0.6, 0.6]
+    },
+    "gui": {
+      "rotation": [30, 135, 0],
+      "translation": [0, 3.25, 0],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "fixed": {
+      "rotation": [-90, 0, 0],
+      "translation": [0, 0.75, -6.75]
+    }
+  },
 	"groups": [
 		{
 			"name": "蘑菇硬面包船",

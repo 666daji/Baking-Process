@@ -6,7 +6,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.util.ActionResult;
 import net.minecraft.world.World;
-import org.foodcraft.FoodCraft;
 import org.foodcraft.block.entity.PlatableBlockEntity;
 import org.foodcraft.block.process.playeraction.PlayerAction;
 import org.foodcraft.block.process.playeraction.impl.AddContentPlayerAction;
@@ -163,24 +162,21 @@ public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends
          */
         private StepResult executeAction(StepExecutionContext<T> context, PlatableBlockEntity plate,
                                          PlayerAction action, int currentStep) {
-            // 在服务器端执行操作
-            if (context.isServerSide()) {
-                // 验证是否可以在此步骤执行操作
-                if (!plate.canPerformActionAtStep(currentStep)) {
-                    resetCandidateState();
-                    return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
-                }
-
-                // 尝试执行操作
-                if (!plate.performAction(currentStep, action)) {
-                    resetCandidateState();
-                    return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
-                }
-
-                // 执行操作的消耗逻辑
-                action.consume(context);
-                plate.markDirty();
+            // 验证是否可以在此步骤执行操作
+            if (!plate.canPerformActionAtStep(currentStep)) {
+                resetCandidateState();
+                return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
             }
+
+            // 尝试执行操作
+            if (!plate.performAction(currentStep, action)) {
+                resetCandidateState();
+                return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
+            }
+
+            // 执行操作的消耗逻辑
+            action.consume(context);
+            plate.markDirty();
 
             // 检查是否有完全匹配的配方
             checkForExactMatch(plate, null);
@@ -203,11 +199,6 @@ public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends
                 return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
             }
 
-            // 如果候选列表未初始化，尝试初始化
-            if (!hasInitializedCandidates) {
-                initializeCandidates(context.world(), plate);
-            }
-
             // 检查是否有完全匹配的配方
             if (matchedRecipe == null) {
                 // 如果没有匹配的配方，但玩家手持完成物品，尝试重新检查
@@ -219,7 +210,6 @@ public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends
 
             // 执行完成逻辑
             plate.onPlatingComplete(context.world(), context.pos(), matchedRecipe, context.player(), context.hand(), context.hit());
-
             return StepResult.complete(ActionResult.SUCCESS);
         }
     }
@@ -343,6 +333,11 @@ public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends
     protected void beforeGetStep(StepExecutionContext<T> context) {
         T plate = context.blockEntity();
         ItemStack heldItem = context.getHeldItemStack();
+
+        // 如果候选列表未初始化，尝试初始化
+        if (!hasInitializedCandidates) {
+            initializeCandidates(context.world(), plate);
+        }
 
         // 检查是否是完成物品
         if (plate.isCompletionItem(heldItem) && !heldItem.isEmpty()) {
