@@ -135,7 +135,7 @@ public class GrindingStoneBlockEntity extends BlockEntity implements SidedInvent
 
     @Override
     public int getMaxCountPerStack() {
-        return 64; // 增加到64以容纳更多物品
+        return 16;
     }
 
     public Item getExpectedOutput(){

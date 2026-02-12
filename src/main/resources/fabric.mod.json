@@ -9,7 +9,9 @@
     "理神"
   ],
   "contact": {
-    "sources": "https://github.com/666daji/Food-Craft"
+    "homepage": "https://modrinth.com/mod/baking-process",
+    "sources": "https://github.com/666daji/Food-Craft",
+    "issues": "https://github.com/666daji/Food-Craft/issues"
   },
   "license": "MIT",
   "icon": "assets/foodcraft/icon.png",
