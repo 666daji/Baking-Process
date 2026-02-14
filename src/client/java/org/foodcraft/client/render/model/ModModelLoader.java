@@ -142,6 +142,9 @@ public class ModModelLoader implements ModelLoadingPlugin {
         registerCuttingModelsForItem(new Identifier("cooked_cod"), 9);
         registerCuttingModelsForItem(new Identifier("salmon"), 7);
         registerCuttingModelsForItem(new Identifier("cooked_salmon"), 7);
+        registerCuttingModelsForItem(new Identifier("potato"), 1);
+        registerCuttingModelsForItem(new Identifier("baked_potato"), 1);
+        registerCuttingModelsForItem(new Identifier(FoodCraft.MOD_ID, "hard_bread"), 1);
     }
 
     /**

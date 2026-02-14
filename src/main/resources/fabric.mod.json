@@ -4,10 +4,7 @@
   "version": "${version}",
   "name": "Tw`s Baking Process",
   "description": "A rich dietary system is added.enhance your diet!",
-  "authors": [
-    "玉隐",
-    "理神"
-  ],
+  "authors": ["Tenacious Wonder"],
   "contact": {
     "homepage": "https://modrinth.com/mod/baking-process",
     "sources": "https://github.com/666daji/Food-Craft",

@@ -19,7 +19,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import org.dfood.block.FoodBlock;
-import org.dfood.item.DoubleBlockItem;
 import org.dfood.util.DFoodUtils;
 import org.foodcraft.FoodCraft;
 import org.jetbrains.annotations.Nullable;
