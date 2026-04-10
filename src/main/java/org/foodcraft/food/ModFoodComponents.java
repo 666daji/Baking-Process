@@ -6,36 +6,87 @@ import net.minecraft.item.FoodComponent;
 
 public class ModFoodComponents {
     // 面食
-    public static final FoodComponent HARD_BREAD = createSimpleFoodComponent(10, 0.6f);
-    public static final FoodComponent SMALL_BREAD = createSimpleFoodComponent(3, 0.5f);
-    public static final FoodComponent BAGUETTE = createSimpleFoodComponent(10, 0.6f);
-    public static final FoodComponent TOAST = createSimpleFoodComponent(5, 0.6f);
+    public static final FoodComponent HARD_BREAD = new FoodComponent.Builder()
+            .hunger(8).saturationModifier(0.8f).build();
+    public static final FoodComponent SMALL_BREAD = new FoodComponent.Builder()
+            .hunger(3).saturationModifier(0.5f).build();
+    public static final FoodComponent BAGUETTE = new FoodComponent.Builder()
+            .hunger(8).saturationModifier(0.7f).build();
+    public static final FoodComponent TOAST = new FoodComponent.Builder()
+            .hunger(5).saturationModifier(0.6f).build();
 
     // 可食用容器
-    public static final FoodComponent HARD_BREAD_BOAT = createSimpleFoodComponent(2, 0.4f);
+    public static final FoodComponent HARD_BREAD_BOAT = new FoodComponent.Builder()
+            .hunger(2).saturationModifier(0.4f).build();
 
     // 切片食物
-    public static final FoodComponent CARROT_SLICES = createSimpleFoodComponent(2, 0.3f);
-    public static final FoodComponent CARROT_HEAD = createSimpleFoodComponent(3, 0.3f);
-    public static final FoodComponent COD_CUBES = createSimpleFoodComponent(3, 0.3f);
-    public static final FoodComponent COD_HEAD = createSimpleFoodComponent(3, 0.3f);
-    public static final FoodComponent COOKED_COD_CUBES = createSimpleFoodComponent(3, 0.3f);
-    public static final FoodComponent COOKED_COD_HEAD = createSimpleFoodComponent(3, 0.3f);
-    public static final FoodComponent SALMON_CUBES = createSimpleFoodComponent(3, 0.3f);
-    public static final FoodComponent COOKED_SALMON_CUBES = createSimpleFoodComponent(3, 0.3f);
+    public static final FoodComponent CARROT_SLICES = new FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.2f).build();
+    public static final FoodComponent CARROT_HEAD = new FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.2f).build();
+    public static final FoodComponent COD_CUBES = new FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.1f).build();
+    public static final FoodComponent COD_HEAD = new FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.1f).build();
+    public static final FoodComponent COOKED_COD_CUBES = new FoodComponent.Builder()
+            .hunger(2).saturationModifier(0.3f).build();
+    public static final FoodComponent COOKED_COD_HEAD = new FoodComponent.Builder()
+            .hunger(2).saturationModifier(0.3f).build();
+    public static final FoodComponent SALMON_CUBES = new FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.1f).build();
+    public static final FoodComponent COOKED_SALMON_CUBES = new FoodComponent.Builder()
+            .hunger(2).saturationModifier(0.4f).build();
+    public static final FoodComponent POTATO_CUBES = new FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.1f)
+            .statusEffect(new StatusEffectInstance(StatusEffects.POISON, 60, 0), 0.3f)
+            .build();
+    public static final FoodComponent COOKED_POTATO_CUBES = new FoodComponent.Builder()
+            .hunger(2).saturationModifier(0.3f).build();
 
     // 饮品
-    public static final FoodComponent MILK = createSimpleFoodComponent(1, 0.4f);
+    public static final FoodComponent MILK = new FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.4f).build();
 
-    // 菜肴
+    // 菜肴（生/熟对应）
     public static final FoodComponent BEEF_BERRIES = new FoodComponent.Builder()
             .hunger(2).saturationModifier(0.4f).meat()
-            .statusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 600, 0), 0.3F)
+            .statusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 600, 0), 0.3f)
             .build();
     public static final FoodComponent COOKED_BEEF_BERRIES = new FoodComponent.Builder()
-            .hunger(7).saturationModifier(0.7f).build();
+            .hunger(7).saturationModifier(0.7f).meat()
+            .build();
 
-    private static FoodComponent createSimpleFoodComponent(int hunger, float saturationModifier){
+    public static final FoodComponent ROASTED_MUSHROOMS = new FoodComponent.Builder()
+            .hunger(3).saturationModifier(0.4f)
+            .statusEffect(new StatusEffectInstance(StatusEffects.POISON, 100, 0), 0.3f)
+            .build();
+    public static final FoodComponent COOKED_ROASTED_MUSHROOMS = new FoodComponent.Builder()
+            .hunger(6).saturationModifier(0.7f)
+            .build();
+    public static final FoodComponent HONEY_ROASTED_BEEF = new FoodComponent.Builder()
+            .hunger(4).saturationModifier(0.5f).meat()
+            .build();
+    public static final FoodComponent COOKED_HONEY_ROASTED_BEEF = new FoodComponent.Builder()
+            .hunger(9).saturationModifier(0.9f).meat()
+            .build();
+    public static final FoodComponent FRY_SALMON_CUBES = new FoodComponent.Builder()
+            .hunger(4).saturationModifier(0.5f)
+            .statusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 200, 0), 1.0f)
+            .build();
+    public static final FoodComponent COOKED_FRY_SALMON_CUBES = new FoodComponent.Builder()
+            .hunger(8).saturationModifier(0.8f)
+            .statusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 300, 0), 1.0f)
+            .build();
+    public static final FoodComponent GRILLED_FISH_POTATOES = new FoodComponent.Builder()
+            .hunger(2).saturationModifier(0.3f)
+            .statusEffect(new StatusEffectInstance(StatusEffects.POISON, 200, 0), 0.6f)
+            .statusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 300, 0), 0.4f)
+            .build();
+    public static final FoodComponent COOKED_GRILLED_FISH_POTATOES = new FoodComponent.Builder()
+            .hunger(7).saturationModifier(0.7f)
+            .build();
+
+    private static FoodComponent createSimpleFoodComponent(int hunger, float saturationModifier) {
         return new FoodComponent.Builder()
                 .hunger(hunger)
                 .saturationModifier(saturationModifier)

@@ -44,6 +44,7 @@ public class ModModelLoader implements ModelLoadingPlugin {
         registerCuttingModels();
         registryDishesModels();
         registerPlatingProcessModels();
+        registryEatModels();
         registerShapedDoughAll();
         MODELS_TO_LOAD.add(BOARD_KITCHEN_KNIFE);
 
@@ -193,6 +194,17 @@ public class ModModelLoader implements ModelLoadingPlugin {
     }
 
     /**
+     * 注册所有食用过程模型。
+     */
+    private static void registryEatModels() {
+        registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_BEEF_BERRIES);
+        registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_ROASTED_MUSHROOMS);
+        registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_HONEY_ROASTED_BEEF);
+        registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_FRY_SALMON_CUBES);
+        registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_GRILLED_FISH_POTATOES);
+    }
+
+    /**
      * 注册摆盘流程模型
      */
     private void registerPlatingProcessModels() {
@@ -264,7 +276,6 @@ public class ModModelLoader implements ModelLoadingPlugin {
         // 注册配方映射和食用过程
         if (dish != null) {
             modelManager.registerRecipeModel(container, actionSequence, dish);
-            registerEatStageModels(container, dish);
         }
 
         // 生成并注册所有前缀模型

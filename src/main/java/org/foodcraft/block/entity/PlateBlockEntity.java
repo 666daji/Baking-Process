@@ -216,7 +216,7 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
     // ==================== 交互方法 ====================
 
     /**
-     * 尝试摆盘
+     * 尝试摆盘。
      */
     public ActionResult tryPlating(PlayerEntity player, Hand hand, BlockHitResult hit) {
         // 如果吃流程活跃，不允许摆盘
@@ -236,7 +236,9 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
         return platingProcess.executeStep(this, getCachedState(), world, pos, player, hand, hit);
     }
 
-    // 添加 tryEat 方法
+    /**
+     * 尝试食用。
+     */
     public ActionResult tryEat(PlayerEntity player, Hand hand, BlockHitResult hit) {
         // 如果摆盘流程活跃，不允许吃
         if (platingProcess.isActive()) {

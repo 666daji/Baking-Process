@@ -72,8 +72,8 @@ public class ModItems {
     // 切片食物
     public static final Item CARROT_SLICES = registerItem(ModBlocks.CARROT_SLICES, new Item.Settings().food(ModFoodComponents.CARROT_SLICES));
     public static final Item CARROT_HEAD = registerItem("carrot_head", new Item(new Item.Settings().food(ModFoodComponents.CARROT_HEAD)));
-    public static final Item POTATO_CUBES = registerItem(ModBlocks.POTATO_CUBES, new Item.Settings().food(FoodComponents.POTATO));
-    public static final Item BAKED_POTATO_CUBES = registerItem(ModBlocks.BAKED_POTATO_CUBES, new Item.Settings().food(FoodComponents.BAKED_POTATO));
+    public static final Item POTATO_CUBES = registerItem(ModBlocks.POTATO_CUBES, new Item.Settings().food(ModFoodComponents.POTATO_CUBES));
+    public static final Item BAKED_POTATO_CUBES = registerItem(ModBlocks.BAKED_POTATO_CUBES, new Item.Settings().food(ModFoodComponents.COOKED_POTATO_CUBES));
     public static final Item APPLE_SLICES = registerItem(ModBlocks.APPLE_SLICES, new Item.Settings().food(FoodComponents.APPLE));
     public static final Item COD_CUBES = registerItem(ModBlocks.COD_CUBES, new Item.Settings().food(ModFoodComponents.COD_CUBES));
     public static final Item COD_HEAD = registerItem("cod_head", new Item(new Item.Settings().food(ModFoodComponents.COD_HEAD)));

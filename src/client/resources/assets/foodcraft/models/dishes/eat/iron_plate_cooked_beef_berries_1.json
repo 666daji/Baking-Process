@@ -3,7 +3,9 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
-		"beef": "minecraft:block/cooked_beef"
+		"beef": "block/beef",
+		"particle": "foodcraft:block/berries_iron_plate",
+		"plate": "foodcraft:block/berries_iron_plate"
 	},
 	"elements": [
 		{
@@ -57,19 +59,49 @@
 				"up": {"uv": [4.5, 10, 4, 6.5], "texture": "#beef"},
 				"down": {"uv": [5, 6.5, 4.5, 10], "texture": "#beef"}
 			}
+		},
+		{
+			"from": [1, 1.1, 1],
+			"to": [15, 1.1, 15],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0.1, 0]},
+			"faces": {
+				"north": {"uv": [0, 0, 7, 0], "texture": "#plate"},
+				"east": {"uv": [0, 0, 7, 0], "texture": "#plate"},
+				"south": {"uv": [0, 0, 7, 0], "texture": "#plate"},
+				"west": {"uv": [0, 0, 7, 0], "texture": "#plate"},
+				"up": {"uv": [7, 7, 0, 0], "texture": "#plate"},
+				"down": {"uv": [7, 7, 0, 14], "texture": "#plate"}
+			}
 		}
 	],
 	"groups": [
 		{
 			"name": "牛排",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				{
 					"name": "group",
 					"origin": [6.25, 8, 9.5],
+					"scope": 0,
 					"color": 0,
 					"children": [0, 1, 2, 3]
+				}
+			]
+		},
+		{
+			"name": "iron_plat",
+			"origin": [8, 8, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [
+				{
+					"name": "group",
+					"origin": [8, 8, 8],
+					"scope": 0,
+					"color": 0,
+					"children": [4]
 				}
 			]
 		}

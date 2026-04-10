@@ -28,7 +28,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.foodcraft.FoodCraft;
 import org.foodcraft.block.entity.PlateBlockEntity;
 import org.foodcraft.contentsystem.api.ContainerUtil;
 import org.foodcraft.contentsystem.content.AbstractContent;
