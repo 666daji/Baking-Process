@@ -124,8 +124,6 @@ public class FlourSackItem extends BlockItem {
         return ITEM_BAR_COLOR;
     }
 
-    public record FlourSackTooltipData(Optional<ItemStack> content, int occupancy, int maxStorage) implements TooltipData {}
-
     @Override
     public Optional<TooltipData> getTooltipData(ItemStack stack) {
         Optional<ItemStack> content = getBundledStack(stack);
@@ -444,4 +442,13 @@ public class FlourSackItem extends BlockItem {
         entity.playSound(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, 0.8F,
                 0.8F + entity.getWorld().getRandom().nextFloat() * 0.4F);
     }
+
+    /**
+     * 用于绘制的物品组件信息。
+     *
+     * @param content
+     * @param occupancy
+     * @param maxStorage
+     */
+    public record FlourSackTooltipData(Optional<ItemStack> content, int occupancy, int maxStorage) implements TooltipData {}
 }

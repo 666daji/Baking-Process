@@ -19,7 +19,6 @@ public class ModItems {
     public static final Item GRINDING_STONE = registerItem(ModBlocks.GRINDING_STONE);
     public static final Item HEAT_RESISTANT_SLATE = registerItem(ModBlocks.HEAT_RESISTANT_SLATE);
     public static final Item FIREWOOD = registerItem(ModBlocks.FIREWOOD);
-    public static final Item POTTERY_TABLE = registerItem(ModBlocks.POTTERY_TABLE);
     public static final Item IRON_PLATE = registerItem(ModBlocks.IRON_PLATE);
 
     // 工具
@@ -82,7 +81,7 @@ public class ModItems {
     public static final Item COOKED_COD_HEAD = registerItem("cooked_cod_head", new Item(new Item.Settings().food(ModFoodComponents.COOKED_COD_HEAD)));
     public static final Item SALMON_CUBES = registerItem(ModBlocks.SALMON_CUBES, new Item.Settings().food(ModFoodComponents.SALMON_CUBES));
     public static final Item COOKED_SALMON_CUBES = registerItem(ModBlocks.COOKED_SALMON_CUBES, new Item.Settings().food(ModFoodComponents.COOKED_SALMON_CUBES));
-    public static final Item KITCHEN_WASTE = registerItem("kitchen_waste", new Item(new Item.Settings()));
+    public static final Item KITCHEN_WASTE = registerItem(ModBlocks.KITCHEN_WASTE);
 
     // 模具
     public static final Item CAKE_EMBRYO_MOLD = registerItem(ModBlocks.CAKE_EMBRYO_MOLD, new Item.Settings(), MoldItem::new);
@@ -98,7 +97,6 @@ public class ModItems {
     // 陶制品
     public static final Item CLAY_POTS_EMBRYO = registerItem(ModBlocks.CLAY_POTS_EMBRYO);
     public static final Item CLAY_POTS = registerItem(ModBlocks.CLAY_POTS);
-    public static final Item FLOWER_POT_EMBRYO = registerItem(ModBlocks.FLOWER_POT_EMBRYO);
 
     public static Item registerItem(String name, Item item) {
         if (item instanceof BlockItem blockItem) {
@@ -121,5 +119,5 @@ public class ModItems {
         return registerItem(Registries.BLOCK.getId(block).getPath(), blockItemCreator.apply(block, settings));
     }
 
-    public static void registerModItems() {}
+    public static void registerAll() {}
 }

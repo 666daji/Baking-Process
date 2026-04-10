@@ -10,7 +10,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import org.foodcraft.block.entity.GrindingStoneBlockEntity;
-import org.foodcraft.block.entity.PotteryTableBlockEntity;
 import org.foodcraft.registry.ModItems;
 
 public class ItemRenderers {
@@ -19,7 +18,6 @@ public class ItemRenderers {
 
     public static void registry() {
         registrySimpleBlockEntityRenderer(ModItems.GRINDING_STONE, GrindingStoneBlockEntity::new);
-        registrySimpleBlockEntityRenderer(ModItems.POTTERY_TABLE, PotteryTableBlockEntity::new);
         INSTANCE.register(ModItems.TOAST_EMBRYO_MOLD, MoldItemRenderer::renderMold);
         INSTANCE.register(ModItems.CAKE_EMBRYO_MOLD, MoldItemRenderer::renderMold);
     }

@@ -14,6 +14,8 @@ import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -26,7 +28,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.dfood.block.SimpleFoodBlock;
+import org.foodcraft.FoodCraft;
 import org.foodcraft.block.entity.PlateBlockEntity;
 import org.foodcraft.contentsystem.api.ContainerUtil;
 import org.foodcraft.contentsystem.content.AbstractContent;
@@ -39,67 +41,62 @@ import java.util.List;
 /**
  * 表示一个可以摆盘的盘子方块
  */
-public class PlateBlock extends SimpleFoodBlock implements BlockEntityProvider {
+public class PlateBlock extends Block implements BlockEntityProvider {
     /**
      * 表示当前的方块是否已经被盖子覆盖。
      * <p>请不要直接更改该属性的值。</p>
      */
     public static final BooleanProperty IS_COVERED = BooleanProperty.of("is_covered");
+    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final VoxelShape BASE_SHAPE = Block.createCuboidShape(0.5, 0, 0.5, 15.5, 2,15.5);
     public static final VoxelShape LIB_SHAPE = Block.createCuboidShape(1, 2, 1, 15, 8, 15);
 
     public PlateBlock(Settings settings) {
-        super(settings, false, BASE_SHAPE, false, null);
+        super(settings);
         this.setDefaultState(getDefaultState().with(IS_COVERED, false));
     }
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         BlockEntity entity = world.getBlockEntity(pos);
+        ItemStack handStack = player.getStackInHand(hand);
 
         if (entity instanceof PlateBlockEntity plateBlockEntity) {
-            // 尝试摆盘
-            ActionResult result = plateBlockEntity.tryPlating(player, hand, hit);
-            if (result.isAccepted()) {
-                return result;
+            // 尝试食用
+            if (plateBlockEntity.getOutcome() != null && !state.get(IS_COVERED) && handStack.isEmpty()) {
+                return plateBlockEntity.tryEat(player, hand, hit);
             }
 
-            if (plateBlockEntity.getPlatingProcess().isActive()) {
-                return result;
+            if (plateBlockEntity.getEatProcess().isActive()) {
+                return ActionResult.PASS;
             }
 
-            // 玩家潜行时尝试取下盖子
-            if (player.isSneaking() && state.get(IS_COVERED) &&
-                    plateBlockEntity.removeCoverAndRestore()) {
+            // 尝试盖盖子
+            if (plateBlockEntity.getOutcome() != null && !state.get(IS_COVERED) && handStack.isOf(ModItems.PLATE_LID)) {
+                plateBlockEntity.coverWithLid();
+                if (!player.isCreative()) {
+                    handStack.decrement(1);
+                }
+
+                return ActionResult.SUCCESS;
+            }
+
+            // 尝试取下盖子
+            if (state.get(IS_COVERED) && plateBlockEntity.removeCoverAndRestore()) {
                 if (!player.isCreative()) {
                     player.giveItemStack(new ItemStack(ModItems.PLATE_LID));
                 }
                 return ActionResult.SUCCESS;
             }
 
-            if (plateBlockEntity.getOutcome() != null && !state.get(IS_COVERED)) {
-                return ActionResult.PASS;
+            // 尝试摆盘
+            ActionResult result = plateBlockEntity.tryPlating(player, hand, hit);
+            if (result.isAccepted()) {
+                return result;
             }
         }
 
-        // 一个莫名奇妙的修复
-        if (world.isClient) {
-            playTakeSound(world, pos, player);
-            return ActionResult.SUCCESS;
-        }
-
         return super.onUse(state, world, pos, player, hand, hit);
-    }
-
-    @Override
-    public ItemStack createStack(int count, BlockState state, @Nullable BlockEntity blockEntity) {
-        ItemStack result = super.createStack(count, state, blockEntity);
-
-        if (state.get(IS_COVERED) && blockEntity instanceof PlateBlockEntity plateBlockEntity) {
-            return ContainerUtil.replaceContent(result, plateBlockEntity.getOutcome());
-        }
-
-        return result;
     }
 
     @Override
@@ -155,10 +152,10 @@ public class PlateBlock extends SimpleFoodBlock implements BlockEntityProvider {
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         if (state.get(IS_COVERED)) {
-            return VoxelShapes.union(super.getOutlineShape(state, world, pos, context), LIB_SHAPE);
+            return VoxelShapes.union(BASE_SHAPE, LIB_SHAPE);
         }
 
-        return super.getOutlineShape(state, world, pos, context);
+        return BASE_SHAPE;
     }
 
     @Override
@@ -168,7 +165,6 @@ public class PlateBlock extends SimpleFoodBlock implements BlockEntityProvider {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
-        builder.add(IS_COVERED);
+        builder.add(IS_COVERED, FACING);
     }
 }

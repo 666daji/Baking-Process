@@ -13,7 +13,6 @@
   "block.foodcraft.toast_mold": "土司胚模具",
   "block.foodcraft.heat_resistant_slate": "耐热石板",
   "block.foodcraft.firewood": "柴火",
-  "block.foodcraft.pottery_table": "陶艺台",
   "block.foodcraft.iron_plate": "铁盘",
 
   "block.foodcraft.iron_garnish_dishes": "铁饰餐盘",
@@ -70,8 +69,6 @@
   "block.foodcraft.clay_pots": "陶盆",
   "block.foodcraft.flower_pot_embryo": "花盆胚",
 
-  "container.foodcraft.pottery_table": "陶艺台",
-
   "subtitles.foodcraft.stove_baking": "炉子:烘烤",
   "subtitle.foodcraft.stone_grinding": "石磨:转动",
   "subtitle.foodcraft.combustion_firewood": "篝火:燃烧",
@@ -119,7 +116,5 @@
   "item.foodcraft.flour_sack.content": "%s x%s",
   "item.foodcraft.flour_sack.tooltip.empty": "右键点击放入粉尘",
   "item.foodcraft.flour_sack.tooltip.non_empty": "右键点击取出粉尘",
-  "item.foodcraft.flour_sack.tooltip.contents": "右键点击取出粉尘",
-
-  "tooltip.pottery_table.start_crafting": "开始制作"
+  "item.foodcraft.flour_sack.tooltip.contents": "右键点击取出粉尘"
 }

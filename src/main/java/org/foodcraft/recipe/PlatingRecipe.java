@@ -14,6 +14,7 @@ import org.foodcraft.contentsystem.content.DishesContent;
 import org.foodcraft.contentsystem.api.OccupyUtil;
 import org.foodcraft.registry.ModRecipeSerializers;
 import org.foodcraft.registry.ModRecipeTypes;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -240,6 +241,7 @@ public class PlatingRecipe implements Recipe<PlatableBlockEntity> {
     /**
      * 根据可摆盘方块实体的容器和菜肴内容查找对应的配方。
      */
+    @Nullable
     public static PlatingRecipe getRecipeFromEntity(PlatableBlockEntity entity) {
         if (entity == null) {
             return null;
@@ -257,6 +259,7 @@ public class PlatingRecipe implements Recipe<PlatableBlockEntity> {
     /**
      * 根据容器和菜肴内容查找对应的配方。
      */
+    @Nullable
     public static PlatingRecipe getRecipeByContainerAndDishes(Item container, DishesContent dishes) {
         if (container == null || dishes == null) {
             return null;
@@ -272,6 +275,7 @@ public class PlatingRecipe implements Recipe<PlatableBlockEntity> {
     /**
      * 获取下一个操作（如果有）。
      */
+    @Nullable
     public PlayerAction getNextAction(int currentStep) {
         if (currentStep < 0 || currentStep >= actions.size()) {
             return null;

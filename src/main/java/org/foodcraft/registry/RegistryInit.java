@@ -15,15 +15,14 @@ public class RegistryInit {
         registerShapes();
 
         // 原版注册
-        ModBlocks.registerModBlocks();
-        ModItems.registerModItems();
-        ModBlockEntityTypes.registerBlockEntityTypes();
-        ModEntityTypes.registerModEntityTypes();
-        ModRecipeTypes.initialize();
-        ModItemGroups.RegistryModItemGroups();
-        ModSounds.initialize();
-        ModScreenHandlerTypes.registerScreenHandlerTypes();
-        ModOreGeneration.registerOres();
+        ModBlocks.registerAll();
+        ModItems.registerAll();
+        ModBlockEntityTypes.registerAll();
+        ModEntityTypes.registerAll();
+        ModRecipeTypes.registerAll();
+        ModItemGroups.registerAll();
+        ModSounds.registerAll();
+        ModOreGeneration.registerAll();
     }
 
     /**

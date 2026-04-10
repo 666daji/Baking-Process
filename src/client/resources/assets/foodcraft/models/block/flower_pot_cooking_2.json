@@ -1,7 +1,0 @@
-{
-  "parent": "foodcraft:block/flower_pot_embryo_2",
-  "textures": {
-    "particle": "foodcraft:block/flower_pot_cooking",
-    "flower_pot_embryo": "foodcraft:block/flower_pot_cooking"
-  }
-}

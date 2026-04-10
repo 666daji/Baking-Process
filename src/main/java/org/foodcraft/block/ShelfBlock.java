@@ -15,7 +15,6 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import org.dfood.tag.ModTags;
 import org.foodcraft.block.entity.ShelfBlockEntity;
 import org.foodcraft.block.entity.UpPlaceBlockEntity;
 import org.jetbrains.annotations.Nullable;
@@ -90,7 +89,7 @@ public class ShelfBlock extends UpPlaceBlock {
     @Override
     public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         BlockPos checkPos = pos.offset(state.get(FACING));
-        return !world.getBlockState(checkPos).isIn(ModTags.FOOD_PLACE);
+        return !world.getBlockState(checkPos).isReplaceable();
     }
 
     @Override

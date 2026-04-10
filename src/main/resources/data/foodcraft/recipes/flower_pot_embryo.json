@@ -1,9 +1,0 @@
-{
-  "type": "foodcraft:pottery",
-  "ingredient": {
-    "item": "minecraft:clay_ball"
-  },
-  "inputCount": 2,
-  "craftTime": 95,
-  "result": "foodcraft:flower_pot_embryo"
-}

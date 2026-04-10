@@ -13,5 +13,5 @@ public class ModEntityTypes {
         return Registry.register(Registries.ENTITY_TYPE, new Identifier(FoodCraft.MOD_ID, id), type.build(id));
     }
 
-    public static void registerModEntityTypes() {}
+    public static void registerAll() {}
 }

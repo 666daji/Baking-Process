@@ -19,6 +19,7 @@ import org.foodcraft.block.PlateBlock;
 import org.foodcraft.block.entity.PlateBlockEntity;
 import org.foodcraft.client.render.model.ModModelLoader;
 import org.foodcraft.client.render.model.PlatingModelManager;
+import org.foodcraft.contentsystem.content.DishesContent;
 
 public class PlateBlockEntityRenderer implements BlockEntityRenderer<PlateBlockEntity> {
     private final BakedModelManager modelManager;
@@ -42,6 +43,17 @@ public class PlateBlockEntityRenderer implements BlockEntityRenderer<PlateBlockE
 
         if (entity.getOutcome() != null) {
             renderModelId = ModModelLoader.createDishesModel(item, entity.getOutcome());
+        }
+
+        if (entity.getEatProcess().isActive()) {
+            DishesContent outcome = entity.getOutcome();
+            if (outcome != null) {
+                int eaten = entity.getEatProcess().getEatenCount();
+                int total = entity.getEatProcess().getTotalEats();
+                if (eaten >= 0 && eaten < total) {
+                    renderModelId = ModModelLoader.createEatStageModel(item, outcome, eaten);
+                }
+            }
         }
 
         // 获取模型

@@ -16,7 +16,6 @@ import org.foodcraft.contentsystem.content.DishesContent;
 import org.foodcraft.contentsystem.content.ShapedDoughContent;
 import org.foodcraft.registry.ModContents;
 import org.foodcraft.item.FlourItem;
-import org.foodcraft.registry.ModBlocks;
 import org.foodcraft.registry.ModItems;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -66,7 +65,6 @@ public class ModModelLoader implements ModelLoadingPlugin {
         registerCookingModelsForBlock(FoodBlocks.COOKED_MUTTON, 2);
         registerCookingModelsForBlock(FoodBlocks.PORKCHOP, 2);
         registerCookingModelsForBlock(FoodBlocks.COOKED_PORKCHOP, 2);
-        registerCookingModelsForBlock(ModBlocks.FLOWER_POT_EMBRYO, 4);
     }
 
     /**
@@ -263,9 +261,10 @@ public class ModModelLoader implements ModelLoadingPlugin {
                                                      @Nullable DishesContent dish) {
         PlatingModelManager modelManager = PlatingModelManager.getInstance();
 
-        // 如果提供了菜肴，注册配方映射
+        // 注册配方映射和食用过程
         if (dish != null) {
             modelManager.registerRecipeModel(container, actionSequence, dish);
+            registerEatStageModels(container, dish);
         }
 
         // 生成并注册所有前缀模型
@@ -273,6 +272,20 @@ public class ModModelLoader implements ModelLoadingPlugin {
 
         for (Identifier modelId : prefixModels) {
             if (modelId != null && !MODELS_TO_LOAD.contains(modelId)) {
+                MODELS_TO_LOAD.add(modelId);
+            }
+        }
+    }
+
+    /**
+     * 注册一个菜肴在容器中的所有食用过程模型。
+     * @param container 容器
+     * @param dish 菜肴
+     */
+    public static void registerEatStageModels(Item container, DishesContent dish) {
+        for (int eaten = 1; eaten < dish.getEatCount(); eaten++) {
+            Identifier modelId = createEatStageModel(container, dish, eaten);
+            if (!MODELS_TO_LOAD.contains(modelId)) {
                 MODELS_TO_LOAD.add(modelId);
             }
         }
@@ -289,6 +302,18 @@ public class ModModelLoader implements ModelLoadingPlugin {
         String dishesId = dishes.getId().getPath();
 
         return new Identifier(FoodCraft.MOD_ID, "dishes/" + containerId + "_" + dishesId);
+    }
+    /**
+     * 创建已食用菜肴的放置模型标识符。
+     * @param container 基础容器
+     * @param dish 菜肴
+     * @param eatenCount 已食用次数
+     * @return 对应的放置模型标识符
+     */
+    public static Identifier createEatStageModel(Item container, DishesContent dish, int eatenCount) {
+        String containerPath = Registries.ITEM.getId(container).getPath();
+        String dishPath = dish.getId().getPath();
+        return new Identifier(FoodCraft.MOD_ID, "dishes/eat/" + containerPath + "_" + dishPath + "_" + eatenCount);
     }
 
     // =========== 定型面团 ===========

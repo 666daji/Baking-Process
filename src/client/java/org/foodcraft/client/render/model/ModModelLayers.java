@@ -5,11 +5,9 @@ import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 import org.foodcraft.FoodCraft;
 import org.foodcraft.client.render.block.blockentity.GrindingStoneBlockEntityRenderer;
-import org.foodcraft.client.render.block.blockentity.PotteryTableBlockEntityRenderer;
 
 public class ModModelLayers {
     public static final EntityModelLayer GRINDING_STONE = registerMain("grinding_stone", GrindingStoneBlockEntityRenderer::getTexturedModelData);
-    public static final EntityModelLayer POTTERY_TABLE = registerMain("pottery_table", PotteryTableBlockEntityRenderer::getTexturedModelData);
 
     private static EntityModelLayer registerMain(String id, EntityModelLayerRegistry.TexturedModelDataProvider provider) {
         return register(id, "main", provider);

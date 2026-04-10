@@ -16,12 +16,6 @@ public class ModBlockEntityTypes {
                     ModBlocks.GRINDING_STONE
             )
     );
-    public static final BlockEntityType<PotteryTableBlockEntity> POTTERY_TABLE = create("pottery_table",
-            BlockEntityType.Builder.create(
-                    PotteryTableBlockEntity::new,
-                    ModBlocks.POTTERY_TABLE
-            )
-    );
     public static final BlockEntityType<PotsBlockEntity> POTS = create("pots",
             BlockEntityType.Builder.create(
                     PotsBlockEntity::new,
@@ -89,5 +83,5 @@ public class ModBlockEntityTypes {
         return Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(FoodCraft.MOD_ID, id), builder.build(null));
     }
 
-    public static void registerBlockEntityTypes() {}
+    public static void registerAll() {}
 }

@@ -26,34 +26,34 @@ public class ModContents {
 
     // 菜肴
     public static final DishesContent BEEF_BERRIES = new DishesContent(
-            createModId("beef_berries"), ModFoodComponents.BEEF_BERRIES);
+            createModId("beef_berries"), ModFoodComponents.BEEF_BERRIES, 3);
 
     public static final DishesContent COOKED_BEEF_BERRIES = new DishesContent(
-            createModId("cooked_beef_berries"), ModFoodComponents.COOKED_BEEF_BERRIES);
+            createModId("cooked_beef_berries"), ModFoodComponents.COOKED_BEEF_BERRIES, 3);
 
     public static final DishesContent ROASTED_MUSHROOMS = new DishesContent(
-            createModId("roasted_mushrooms"), ModFoodComponents.BEEF_BERRIES);
+            createModId("roasted_mushrooms"), ModFoodComponents.BEEF_BERRIES, 3);
 
     public static final DishesContent COOKED_ROASTED_MUSHROOMS = new DishesContent(
-            createModId("cooked_roasted_mushrooms"), ModFoodComponents.BEEF_BERRIES);
+            createModId("cooked_roasted_mushrooms"), ModFoodComponents.BEEF_BERRIES, 3);
 
     public static final DishesContent HONEY_ROASTED_BEEF = new DishesContent(
-            createModId("honey_roasted_beef"), ModFoodComponents.BEEF_BERRIES);
+            createModId("honey_roasted_beef"), ModFoodComponents.BEEF_BERRIES, 3);
 
     public static final DishesContent COOKED_HONEY_ROASTED_BEEF = new DishesContent(
-            createModId("cooked_honey_roasted_beef"), ModFoodComponents.BEEF_BERRIES);
+            createModId("cooked_honey_roasted_beef"), ModFoodComponents.BEEF_BERRIES, 3);
 
     public static final DishesContent FRY_SALMON_CUBES = new DishesContent(
-            createModId("fry_salmon_cubes"), ModFoodComponents.COOKED_BEEF_BERRIES);
+            createModId("fry_salmon_cubes"), ModFoodComponents.COOKED_BEEF_BERRIES, 3);
 
     public static final DishesContent COOKED_FRY_SALMON_CUBES = new DishesContent(
-            createModId("cooked_fry_salmon_cubes"), ModFoodComponents.COOKED_BEEF_BERRIES);
+            createModId("cooked_fry_salmon_cubes"), ModFoodComponents.COOKED_BEEF_BERRIES, 3);
 
     public static final DishesContent GRILLED_FISH_POTATOES = new DishesContent(
-            createModId("grilled_fish_potatoes"), ModFoodComponents.BEEF_BERRIES);
+            createModId("grilled_fish_potatoes"), ModFoodComponents.BEEF_BERRIES, 3);
 
     public static final DishesContent COOKED_GRILLED_FISH_POTATOES = new DishesContent(
-            createModId("cooked_grilled_fish_potatoes"), ModFoodComponents.BEEF_BERRIES);
+            createModId("cooked_grilled_fish_potatoes"), ModFoodComponents.BEEF_BERRIES, 3);
 
     // 定型面团
     public static final ShapedDoughContent TOAST_EMBRYO = new ShapedDoughContent(

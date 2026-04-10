@@ -32,7 +32,6 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
     private static final int INVENTORY_SIZE = 2;
     private static final int MAX_STACK_SIZE = 1;
 
-    // 使用独立的字符串字段存储花信息
     private String flowerSlot0 = "";  // 槽位0的花ID，空字符串表示没有花
     private String flowerSlot1 = "";  // 槽位1的花ID，空字符串表示没有花
 
@@ -137,12 +136,10 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
             String flowerId = getFlowerId(index);
             if (!flowerId.isEmpty()) {
                 Block flowerBlock = Registries.BLOCK.get(new Identifier(flowerId));
-                if (flowerBlock != null) {
-                    Map<Block, Block> contentToPotted = FlowerPotBlockAccessor.getContentToPotted();
-                    Block pottedBlock = contentToPotted.get(flowerBlock);
-                    if (pottedBlock != null) {
-                        return pottedBlock.getDefaultState();
-                    }
+                Map<Block, Block> contentToPotted = FlowerPotBlockAccessor.getContentToPotted();
+                Block pottedBlock = contentToPotted.get(flowerBlock);
+                if (pottedBlock != null) {
+                    return pottedBlock.getDefaultState();
                 }
             }
         }

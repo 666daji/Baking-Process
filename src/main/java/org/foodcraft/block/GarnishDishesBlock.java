@@ -18,7 +18,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import org.dfood.tag.ModTags;
 import org.foodcraft.block.entity.DishesBlockEntity;
 import org.foodcraft.block.entity.UpPlaceBlockEntity;
 import org.jetbrains.annotations.Nullable;
@@ -158,7 +157,7 @@ public class GarnishDishesBlock extends UpPlaceBlock {
     @Override
     public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         BlockPos downPos = pos.down();
-        return !world.getBlockState(downPos).isIn(ModTags.FOOD_PLACE);
+        return !world.getBlockState(downPos).isReplaceable();
     }
 
     @Override

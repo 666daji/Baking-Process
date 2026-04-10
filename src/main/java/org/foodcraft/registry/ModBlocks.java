@@ -43,13 +43,9 @@ public class ModBlocks {
                             .sounds(BlockSoundGroup.STONE).strength(0.5F, 2.0F)
                             .nonOpaque().requiresTool().pistonBehavior(PistonBehavior.BLOCK))
                     .build());
-    public static final Block POTTERY_TABLE = registerBlock("pottery_table",
-            new PotteryTableBlock(AbstractBlock.Settings.create().requiresTool()
-                    .sounds(BlockSoundGroup.STONE).strength(1.2F, 6.0F)
-                    .nonOpaque().pistonBehavior(PistonBehavior.BLOCK)));
     public static final Block IRON_PLATE = registerBlock("iron_plate",
             new PlateBlock(AbstractBlock.Settings.create().sounds(BlockSoundGroup.METAL)
-                    .strength(1.2F, 6.0F)
+                    .strength(0.2F, 0.6F)
                     .nonOpaque().pistonBehavior(PistonBehavior.BLOCK)));
 
     // 工具
@@ -212,6 +208,9 @@ public class ModBlocks {
                     .settings(DFoodUtils.getFoodBlockSettings()
                             .sounds(ModSoundGroups.FISH))
                     .build());
+    public static final Block KITCHEN_WASTE = registerBlock("kitchen_waste",
+            new SimpleFoodBlock(DFoodUtils.getFoodBlockSettings()
+                    .sounds(ModSoundGroups.FISH)));
 
     // 模具
     public static final Block CAKE_EMBRYO_MOLD = registerBlock("cake_embryo_mold",
@@ -237,18 +236,6 @@ public class ModBlocks {
     public static final Block CLAY_POTS = registerBlock("clay_pots",
             new PotsBlock(AbstractBlock.Settings.create()
                     .sounds(BlockSoundGroup.STONE).strength(0.5F, 0.6F).nonOpaque()));
-    public static final Block FLOWER_POT_EMBRYO = registerBlock("flower_pot_embryo",
-            FoodBlock.Builder.create()
-                    .maxFood(4)
-                    .useItemTranslationKey(false)
-                    .settings(DFoodUtils.getFoodBlockSettings().mapColor(MapColor.BROWN))
-                    .build());
-    public static final Block FLOWER_POT_COOKING = registerBlock("flower_pot_cooking",
-            FoodBlock.Builder.create()
-                .maxFood(4)
-                .useItemTranslationKey(false)
-                .settings(DFoodUtils.getFoodBlockSettings())
-                .build());
 
     // ===================== 注册方法 =====================
 
@@ -264,5 +251,5 @@ public class ModBlocks {
         return registerBlock(name, block);
     }
 
-    public static void registerModBlocks() {}
+    public static void registerAll() {}
 }

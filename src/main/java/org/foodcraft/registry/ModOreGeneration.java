@@ -10,7 +10,7 @@ import org.foodcraft.FoodCraft;
 
 public class ModOreGeneration {
 
-    public static void registerOres() {
+    public static void registerAll() {
         // 注册盐矿生成
         BiomeModifications.addFeature(
                 BiomeSelectors.foundInOverworld(),

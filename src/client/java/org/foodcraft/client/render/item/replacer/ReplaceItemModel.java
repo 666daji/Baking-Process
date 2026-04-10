@@ -4,6 +4,7 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
@@ -73,7 +74,7 @@ public interface ReplaceItemModel {
             BakedModelManager modelManager = context.modelManager();
             if (modelManager != null) {
                 BakedModel newModel = modelManager.getModel(
-                        net.minecraft.client.util.ModelIdentifier.ofVanilla(
+                        ModelIdentifier.ofVanilla(
                                 modelId.getPath(), "inventory"
                         )
                 );
@@ -96,7 +97,7 @@ public interface ReplaceItemModel {
                 BakedModelManager modelManager = context.modelManager();
                 if (modelManager != null) {
                     BakedModel newModel = modelManager.getModel(
-                            net.minecraft.client.util.ModelIdentifier.ofVanilla(
+                            ModelIdentifier.ofVanilla(
                                     modelId.getPath(), "inventory"
                             )
                     );

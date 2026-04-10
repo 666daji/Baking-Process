@@ -33,7 +33,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.dfood.block.FoodBlock;
-import org.dfood.tag.ModTags;
 import org.foodcraft.block.entity.CombustionFirewoodBlockEntity;
 import org.foodcraft.registry.ModBlockEntityTypes;
 import org.foodcraft.registry.ModItems;
@@ -218,7 +217,7 @@ public class CombustionFirewoodBlock extends BlockWithEntity {
     public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         BlockPos downPos = pos.down();
         BlockState checkState = world.getBlockState(downPos);
-        return !checkState.isIn(ModTags.FOOD_PLACE) && !(checkState.getBlock() instanceof FoodBlock);
+        return !checkState.isReplaceable() && !(checkState.getBlock() instanceof FoodBlock);
     }
 
     @Override

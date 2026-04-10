@@ -20,6 +20,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.foodcraft.block.PlateBlock;
+import org.foodcraft.block.process.EatDishesProcess;
 import org.foodcraft.block.process.PlatingProcess;
 import org.foodcraft.block.process.playeraction.PlayerAction;
 import org.foodcraft.contentsystem.content.AbstractContent;
@@ -47,12 +48,15 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
     private final List<PlayerAction> performedActions = new ArrayList<>();
     /** 摆盘流程 */
     private final PlatingProcess<PlateBlockEntity> platingProcess;
+    /** 食用流程 */
+    private final EatDishesProcess<PlateBlockEntity> eatProcess;
     /** 摆盘配方的最终产物 */
     @Nullable
     private DishesContent outcome;
 
     public PlateBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.PLATE, pos, state);
+        this.eatProcess = new EatDishesProcess<>();
         this.platingProcess = new PlatingProcess<>();
     }
 
@@ -215,6 +219,11 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
      * 尝试摆盘
      */
     public ActionResult tryPlating(PlayerEntity player, Hand hand, BlockHitResult hit) {
+        // 如果吃流程活跃，不允许摆盘
+        if (eatProcess.isActive()) {
+            return ActionResult.PASS;
+        }
+
         // 已经存在菜肴时不可以开始摆盘
         if (outcome != null) {
             return ActionResult.PASS;
@@ -227,6 +236,20 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
         return platingProcess.executeStep(this, getCachedState(), world, pos, player, hand, hit);
     }
 
+    // 添加 tryEat 方法
+    public ActionResult tryEat(PlayerEntity player, Hand hand, BlockHitResult hit) {
+        // 如果摆盘流程活跃，不允许吃
+        if (platingProcess.isActive()) {
+            return ActionResult.PASS;
+        }
+
+        if (!eatProcess.isActive()) {
+            eatProcess.start(world, this);
+        }
+
+        return eatProcess.executeStep(this, getCachedState(), world, pos, player, hand, hit);
+    }
+
     // ==================== NBT 序列化 ====================
 
     @Override
@@ -235,7 +258,14 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
 
         // 清除当前状态
         this.performedActions.clear();
-        platingProcess.readFromNbt(nbt);
+
+        if (nbt.contains("eat_process")) {
+            platingProcess.readFromNbt(nbt.getCompound("plating_process"));
+        }
+
+        if (nbt.contains("eat_process")) {
+            eatProcess.readFromNbt(nbt.getCompound("eat_process"));
+        }
 
         // 读取菜肴
         if (nbt.contains(OUTCOME_KEY, NbtElement.STRING_TYPE)) {
@@ -252,7 +282,13 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
     protected void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
 
-        platingProcess.writeToNbt(nbt);
+        NbtCompound platingNbt = new NbtCompound();
+        platingProcess.writeToNbt(platingNbt);
+        nbt.put("plating_process", platingNbt);
+
+        NbtCompound eatNbt = new NbtCompound();
+        eatProcess.writeToNbt(eatNbt);
+        nbt.put("eat_process", eatNbt);
 
         if (outcome != null) {
             nbt.putString(OUTCOME_KEY, outcome.getId().toString());
@@ -291,6 +327,11 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
     }
 
     @Override
+    public void onEatComplete(World world, BlockPos pos, PlayerEntity player, Hand hand, HitResult hit) {
+        setOutcome(null);
+    }
+
+    @Override
     public @Nullable DishesContent getOutcome() {
         return outcome;
     }
@@ -321,6 +362,10 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
      */
     public PlatingProcess<PlateBlockEntity> getPlatingProcess() {
         return platingProcess;
+    }
+
+    public EatDishesProcess<PlateBlockEntity> getEatProcess() {
+        return eatProcess;
     }
 
     public String getDebugInfo() {

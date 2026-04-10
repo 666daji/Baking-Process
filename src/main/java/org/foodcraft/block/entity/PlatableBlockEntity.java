@@ -196,6 +196,19 @@ public interface PlatableBlockEntity extends Inventory {
      */
     void onPlatingComplete(World world, BlockPos pos, PlatingRecipe recipe, PlayerEntity player, Hand hand, HitResult hit);
 
+    /**
+     * 当盘子中的食物被吃完时调用。
+     *
+     * <p>与 {@link #onPlatingComplete}调用时机类似</p>
+     *
+     * @param world 世界实例
+     * @param pos 方块位置
+     * @param player 操作的玩家
+     * @param hand 玩家的手
+     * @param hit 操作的上下文
+     */
+    void onEatComplete(World world, BlockPos pos, PlayerEntity player, Hand hand, HitResult hit);
+
     // ==================== Inventory 接口适配 ====================
 
     /**

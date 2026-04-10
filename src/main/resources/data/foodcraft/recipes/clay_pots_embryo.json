@@ -1,5 +1,5 @@
 {
-  "type": "foodcraft:pottery",
+  "type": "gardening:pottery",
   "ingredient": {
     "item": "minecraft:clay_ball"
   },
