@@ -19,8 +19,8 @@ import org.foodcraft.food.SimpleFoodComponent;
 public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> extends AbstractProcess<T> {
     public static final String STEP_EAT = "eat";
 
-    private int remainingEats;   // 剩余可吃次数
-    private int totalEats;       // 总可吃次数（用于计算比例）
+    private int remainingEats;
+    private int totalEats;
 
     public EatDishesProcess() {
         registerStep(STEP_EAT, new EatStep());
@@ -75,7 +75,6 @@ public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> exten
         nbt.putInt("total_eats", totalEats);
     }
 
-    // 内部步骤类
     private class EatStep implements Step<T> {
         @Override
         public StepResult execute(StepExecutionContext<T> context) {
@@ -92,6 +91,12 @@ public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> exten
             // 计算本次应得的食物比例
             if (totalEats <= 0) {
                 return StepResult.fail(null, ActionResult.FAIL);
+            }
+
+            // 检查食用条件
+            boolean canEat = (context.player().getAbilities().invulnerable || outcome.getFoodComponent().isAlwaysEdible() || context.player().getHungerManager().isNotFull());
+            if (!canEat) {
+                return StepResult.fail(STEP_EAT, ActionResult.PASS);
             }
 
             // 开始食用

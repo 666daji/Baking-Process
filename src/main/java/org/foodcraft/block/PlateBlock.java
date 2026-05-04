@@ -81,10 +81,25 @@ public class PlateBlock extends Block implements BlockEntityProvider {
             }
 
             // 尝试取下盖子
-            if (state.get(IS_COVERED) && plateBlockEntity.removeCoverAndRestore()) {
+            if (state.get(IS_COVERED) && player.isSneaking() && plateBlockEntity.removeCoverAndRestore()) {
                 if (!player.isCreative()) {
                     player.giveItemStack(new ItemStack(ModItems.PLATE_LID));
                 }
+                return ActionResult.SUCCESS;
+            }
+
+            // 直接取下整个盘子
+            if (state.get(IS_COVERED) && plateBlockEntity.getOutcome() != null && !player.isSneaking() && handStack.isEmpty()) {
+                // 构建带有菜肴数据的盘子物品
+                ItemStack plateStack = new ItemStack(this.asItem());
+                DishesContent outcome = plateBlockEntity.getOutcome();
+                ContainerUtil.replaceContent(plateStack, outcome);
+
+                // 给予玩家物品
+                player.giveItemStack(plateStack);
+
+                // 移除方块
+                world.removeBlock(pos, false);
                 return ActionResult.SUCCESS;
             }
 

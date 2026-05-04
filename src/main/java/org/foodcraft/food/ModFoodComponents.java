@@ -55,7 +55,6 @@ public class ModFoodComponents {
     public static final FoodComponent COOKED_BEEF_BERRIES = new FoodComponent.Builder()
             .hunger(7).saturationModifier(0.7f).meat()
             .build();
-
     public static final FoodComponent ROASTED_MUSHROOMS = new FoodComponent.Builder()
             .hunger(3).saturationModifier(0.4f)
             .statusEffect(new StatusEffectInstance(StatusEffects.POISON, 100, 0), 0.3f)
@@ -71,11 +70,9 @@ public class ModFoodComponents {
             .build();
     public static final FoodComponent FRY_SALMON_CUBES = new FoodComponent.Builder()
             .hunger(4).saturationModifier(0.5f)
-            .statusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 200, 0), 1.0f)
             .build();
     public static final FoodComponent COOKED_FRY_SALMON_CUBES = new FoodComponent.Builder()
             .hunger(8).saturationModifier(0.8f)
-            .statusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 300, 0), 1.0f)
             .build();
     public static final FoodComponent GRILLED_FISH_POTATOES = new FoodComponent.Builder()
             .hunger(2).saturationModifier(0.3f)

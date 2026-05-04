@@ -237,8 +237,6 @@ public class ModBlocks {
             new PotsBlock(AbstractBlock.Settings.create()
                     .sounds(BlockSoundGroup.STONE).strength(0.5F, 0.6F).nonOpaque()));
 
-    // ===================== 注册方法 =====================
-
     public static Block registerBlock(String name, Block block) {
         return Registry.register(Registries.BLOCK, new Identifier(FoodCraft.MOD_ID, name), block);
     }
