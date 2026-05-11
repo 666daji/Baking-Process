@@ -125,8 +125,8 @@ public class HeatResistantSlateBlock extends UpPlaceBlock {
                         pos.getZ() + 0.5,
                         ModSounds.COOKING_SOUND,
                         SoundCategory.BLOCKS,
-                        0.3F,
-                        0.3F,
+                        1.0F,
+                        1.0F,
                         true
                 );
             }
