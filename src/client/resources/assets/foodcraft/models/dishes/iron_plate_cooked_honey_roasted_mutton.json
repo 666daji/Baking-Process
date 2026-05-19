@@ -1,0 +1,7 @@
+{
+  "parent": "foodcraft:dishes/iron_plate_honey_roasted_mutton",
+  "textures": {
+    "carrot": "foodcraft:block/roasted_carrot",
+    "mutton": "minecraft:block/cooked_mutton"
+  }
+}

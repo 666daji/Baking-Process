@@ -4,7 +4,6 @@
 	"texture_size": [32, 32],
 	"textures": {
 		"beef": "block/beef",
-		"particle": "foodcraft:block/berries_iron_plate",
 		"plate": "foodcraft:block/berries_iron_plate"
 	},
 	"elements": [

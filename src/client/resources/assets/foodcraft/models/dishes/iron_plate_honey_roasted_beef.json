@@ -3,10 +3,10 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
-		"3": "foodcraft:block/honey",
-		"4": "foodcraft:block/salt_iron_plate",
+		"honey": "foodcraft:block/beef_honey",
+		"plate": "foodcraft:block/salt_iron_plate",
 		"beef": "block/beef",
-		"carrot": "foodcraft:block/cooked_carrot"
+		"carrot": "minecraft:block/carrot"
 	},
 	"elements": [
 		{
@@ -67,12 +67,12 @@
 			"to": [7.1, 1.05, 12.45],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8.15, 1.1, 18.5]},
 			"faces": {
-				"north": {"uv": [6, 2, 8, 3], "texture": "#3"},
-				"east": {"uv": [7, 6, 7.5, 7], "texture": "#3"},
-				"south": {"uv": [6, 3, 8, 4], "texture": "#3"},
-				"west": {"uv": [7, 7, 7.5, 8], "texture": "#3"},
-				"up": {"uv": [8, 4.5, 6, 4], "texture": "#3"},
-				"down": {"uv": [7, 6.5, 5, 7], "texture": "#3"}
+				"north": {"uv": [6, 2, 8, 3], "texture": "#honey"},
+				"east": {"uv": [7, 6, 7.5, 7], "texture": "#honey"},
+				"south": {"uv": [6, 3, 8, 4], "texture": "#honey"},
+				"west": {"uv": [7, 7, 7.5, 8], "texture": "#honey"},
+				"up": {"uv": [8, 4.5, 6, 4], "texture": "#honey"},
+				"down": {"uv": [7, 6.5, 5, 7], "texture": "#honey"}
 			}
 		},
 		{
@@ -81,12 +81,12 @@
 			"to": [12.2, 1.05, 3.45],
 			"rotation": {"angle": 0, "axis": "y", "origin": [14.25, 1.1, 8.5]},
 			"faces": {
-				"north": {"uv": [0, 7.5, 0.5, 8.5], "texture": "#3"},
-				"east": {"uv": [0, 5.5, 3.5, 6.5], "texture": "#3"},
-				"south": {"uv": [0.5, 7.5, 1, 8.5], "texture": "#3"},
-				"west": {"uv": [3.5, 5.5, 7, 6.5], "texture": "#3"},
-				"up": {"uv": [4.5, 10, 4, 6.5], "texture": "#3"},
-				"down": {"uv": [5, 6.5, 4.5, 10], "texture": "#3"}
+				"north": {"uv": [0, 7.5, 0.5, 8.5], "texture": "#honey"},
+				"east": {"uv": [0, 5.5, 3.5, 6.5], "texture": "#honey"},
+				"south": {"uv": [0.5, 7.5, 1, 8.5], "texture": "#honey"},
+				"west": {"uv": [3.5, 5.5, 7, 6.5], "texture": "#honey"},
+				"up": {"uv": [4.5, 10, 4, 6.5], "texture": "#honey"},
+				"down": {"uv": [5, 6.5, 4.5, 10], "texture": "#honey"}
 			}
 		},
 		{
@@ -95,12 +95,12 @@
 			"to": [6.1, 1.05, 3.45],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8.15, 1.1, 8.5]},
 			"faces": {
-				"north": {"uv": [6, 0, 9, 1], "texture": "#3"},
-				"east": {"uv": [0, 4.5, 4.5, 5.5], "texture": "#3"},
-				"south": {"uv": [6, 1, 9, 2], "texture": "#3"},
-				"west": {"uv": [4.5, 4.5, 9, 5.5], "texture": "#3"},
-				"up": {"uv": [3, 4.5, 0, 0], "texture": "#3"},
-				"down": {"uv": [6, 0, 3, 4.5], "texture": "#3"}
+				"north": {"uv": [6, 0, 9, 1], "texture": "#honey"},
+				"east": {"uv": [0, 4.5, 4.5, 5.5], "texture": "#honey"},
+				"south": {"uv": [6, 1, 9, 2], "texture": "#honey"},
+				"west": {"uv": [4.5, 4.5, 9, 5.5], "texture": "#honey"},
+				"up": {"uv": [3, 4.5, 0, 0], "texture": "#honey"},
+				"down": {"uv": [6, 0, 3, 4.5], "texture": "#honey"}
 			}
 		},
 		{
@@ -109,12 +109,12 @@
 			"to": [8.1, 1.05, 2.45],
 			"rotation": {"angle": 0, "axis": "y", "origin": [9.15, 1.1, 8.5]},
 			"faces": {
-				"north": {"uv": [0, 6.5, 2, 7.5], "texture": "#3"},
-				"east": {"uv": [1, 7.5, 1.5, 8.5], "texture": "#3"},
-				"south": {"uv": [2, 6.5, 4, 7.5], "texture": "#3"},
-				"west": {"uv": [1.5, 7.5, 2, 8.5], "texture": "#3"},
-				"up": {"uv": [7, 7.5, 5, 7], "texture": "#3"},
-				"down": {"uv": [9, 5.5, 7, 6], "texture": "#3"}
+				"north": {"uv": [0, 6.5, 2, 7.5], "texture": "#honey"},
+				"east": {"uv": [1, 7.5, 1.5, 8.5], "texture": "#honey"},
+				"south": {"uv": [2, 6.5, 4, 7.5], "texture": "#honey"},
+				"west": {"uv": [1.5, 7.5, 2, 8.5], "texture": "#honey"},
+				"up": {"uv": [7, 7.5, 5, 7], "texture": "#honey"},
+				"down": {"uv": [9, 5.5, 7, 6], "texture": "#honey"}
 			}
 		},
 		{
@@ -204,7 +204,7 @@
 				"east": {"uv": [0, 0, 7, 0], "texture": "#missing"},
 				"south": {"uv": [0, 0, 7, 0], "texture": "#missing"},
 				"west": {"uv": [0, 0, 7, 0], "texture": "#missing"},
-				"up": {"uv": [7, 7, 0, 0], "texture": "#4"},
+				"up": {"uv": [7, 7, 0, 0], "texture": "#plate"},
 				"down": {"uv": [7, 7, 0, 14], "texture": "#missing"}
 			}
 		}
@@ -233,11 +233,13 @@
 		{
 			"name": "牛排",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				{
 					"name": "group",
 					"origin": [6.25, 8, 9.5],
+					"scope": 0,
 					"color": 0,
 					"children": [0, 1, 2, 3]
 				}
@@ -246,29 +248,34 @@
 		{
 			"name": "1",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [4, 5, 6, 7]
 		},
 		{
 			"name": "切胡萝卜10",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				{
 					"name": "group",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [8, 9, 10]
 				},
 				{
 					"name": "group",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [11, 12, 13]
 				},
 				{
 					"name": "group",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": []
 				}
@@ -277,11 +284,13 @@
 		{
 			"name": "iron_plat",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				{
 					"name": "group",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [14]
 				}

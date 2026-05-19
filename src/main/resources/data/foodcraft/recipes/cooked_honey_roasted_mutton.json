@@ -1,0 +1,6 @@
+{
+  "type": "foodcraft:stove",
+  "ingredient": "content|foodcraft:honey_roasted_mutton",
+  "result": "content|foodcraft:cooked_honey_roasted_mutton",
+  "stoveTime": 12000
+}

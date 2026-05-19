@@ -191,6 +191,10 @@ public class ModModelLoader implements ModelLoadingPlugin {
         MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.COOKED_FRY_SALMON_CUBES));
         MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.GRILLED_FISH_POTATOES));
         MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.COOKED_GRILLED_FISH_POTATOES));
+        MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.DELUXE_ROASTED_RABBIT));
+        MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.COOKED_DELUXE_ROASTED_RABBIT));
+        MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.HONEY_ROASTED_MUTTON));
+        MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.COOKED_HONEY_ROASTED_MUTTON));
     }
 
     /**
@@ -202,6 +206,8 @@ public class ModModelLoader implements ModelLoadingPlugin {
         registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_HONEY_ROASTED_BEEF);
         registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_FRY_SALMON_CUBES);
         registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_GRILLED_FISH_POTATOES);
+        registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_DELUXE_ROASTED_RABBIT);
+        registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_HONEY_ROASTED_MUTTON);
     }
 
     /**
@@ -259,6 +265,18 @@ public class ModModelLoader implements ModelLoadingPlugin {
                         new AddItemPlayerAction(Items.COD)
                 ),
                 ModContents.GRILLED_FISH_POTATOES);
+
+        registerPlatingSequenceModels(
+                ModItems.IRON_PLATE,
+                Arrays.asList(
+                        new AddItemPlayerAction(Items.MUTTON),
+                        new AddItemPlayerAction(ModItems.SALT_FLOUR),
+                        new AddContentPlayerAction(ModContents.HONEY),
+                        new AddItemPlayerAction(ModItems.CARROT_SLICES),
+                        new AddItemPlayerAction(ModItems.CARROT_SLICES),
+                        new AddItemPlayerAction(ModItems.CARROT_HEAD)
+                ),
+                ModContents.HONEY_ROASTED_MUTTON);
     }
 
     /**
@@ -294,6 +312,11 @@ public class ModModelLoader implements ModelLoadingPlugin {
      * @param dish 菜肴
      */
     public static void registerEatStageModels(Item container, DishesContent dish) {
+        if (!dish.canEat()) {
+            LOGGER.warn("{} is inedible", dish);
+            return;
+        }
+
         for (int eaten = 1; eaten < dish.getEatCount(); eaten++) {
             Identifier modelId = createEatStageModel(container, dish, eaten);
             if (!MODELS_TO_LOAD.contains(modelId)) {
@@ -314,6 +337,7 @@ public class ModModelLoader implements ModelLoadingPlugin {
 
         return new Identifier(FoodCraft.MOD_ID, "dishes/" + containerId + "_" + dishesId);
     }
+
     /**
      * 创建已食用菜肴的放置模型标识符。
      * @param container 基础容器

@@ -43,7 +43,7 @@ public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> exten
     @Override
     protected void onStart(World world, T blockEntity) {
         DishesContent outcome = blockEntity.getOutcome();
-        if (outcome == null) {
+        if (outcome == null || !outcome.canEat()) {
             reset();
             return;
         }

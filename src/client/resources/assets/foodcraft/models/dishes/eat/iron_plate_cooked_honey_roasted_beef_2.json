@@ -3,10 +3,10 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
-		"4": "foodcraft:block/salt_iron_plate",
-		"honey": "foodcraft:block/honey",
+		"plate": "foodcraft:block/salt_iron_plate",
+		"honey": "foodcraft:block/beef_honey",
 		"beef": "block/cooked_beef",
-		"carrot": "foodcraft:block/cooked_carrot"
+		"carrot": "foodcraft:block/roasted_carrot"
 	},
 	"elements": [
 		{
@@ -94,12 +94,12 @@
 			"to": [15, 1.1, 15],
 			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0.1, 0]},
 			"faces": {
-				"north": {"uv": [0, 0, 7, 0], "texture": "#4"},
-				"east": {"uv": [0, 0, 7, 0], "texture": "#4"},
-				"south": {"uv": [0, 0, 7, 0], "texture": "#4"},
-				"west": {"uv": [0, 0, 7, 0], "texture": "#4"},
-				"up": {"uv": [7, 7, 0, 0], "texture": "#4"},
-				"down": {"uv": [7, 7, 0, 14], "texture": "#4"}
+				"north": {"uv": [0, 0, 7, 0], "texture": "#plate"},
+				"east": {"uv": [0, 0, 7, 0], "texture": "#plate"},
+				"south": {"uv": [0, 0, 7, 0], "texture": "#plate"},
+				"west": {"uv": [0, 0, 7, 0], "texture": "#plate"},
+				"up": {"uv": [7, 7, 0, 0], "texture": "#plate"},
+				"down": {"uv": [7, 7, 0, 14], "texture": "#plate"}
 			}
 		}
 	],
