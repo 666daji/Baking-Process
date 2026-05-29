@@ -67,6 +67,12 @@ public class ModContents {
     public static final DishesContent COOKED_HONEY_ROASTED_MUTTON = new DishesContent(
             createModId("cooked_honey_roasted_mutton"), ModFoodComponents.COOKED_HONEY_ROASTED_MUTTON, 4);
 
+    public static final DishesContent DELUXE_ROAST_CHICKEN = new DishesContent(
+                createModId("deluxe_roast_chicken"));
+
+    public static final DishesContent COOKED_DELUXE_ROAST_CHICKEN = new DishesContent(
+            createModId("cooked_deluxe_roast_chicken"), ModFoodComponents.COOKED_DELUXE_ROAST_CHICKEN, 4);
+
     // 定型面团
     public static final ShapedDoughContent TOAST_EMBRYO = new ShapedDoughContent(
             createModId("toast_embryo"), createModId("toast_dough"), createModId("toast_embryo_mold"));

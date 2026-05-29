@@ -195,6 +195,8 @@ public class ModModelLoader implements ModelLoadingPlugin {
         MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.COOKED_DELUXE_ROASTED_RABBIT));
         MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.HONEY_ROASTED_MUTTON));
         MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.COOKED_HONEY_ROASTED_MUTTON));
+        MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.DELUXE_ROAST_CHICKEN));
+        MODELS_TO_LOAD.add(createDishesModel(ModItems.IRON_PLATE, ModContents.COOKED_DELUXE_ROAST_CHICKEN));
     }
 
     /**
@@ -208,6 +210,7 @@ public class ModModelLoader implements ModelLoadingPlugin {
         registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_GRILLED_FISH_POTATOES);
         registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_DELUXE_ROASTED_RABBIT);
         registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_HONEY_ROASTED_MUTTON);
+        registerEatStageModels(ModItems.IRON_PLATE, ModContents.COOKED_DELUXE_ROAST_CHICKEN);
     }
 
     /**
@@ -277,6 +280,18 @@ public class ModModelLoader implements ModelLoadingPlugin {
                         new AddItemPlayerAction(ModItems.CARROT_HEAD)
                 ),
                 ModContents.HONEY_ROASTED_MUTTON);
+        registerPlatingSequenceModels(
+                ModItems.IRON_PLATE,
+                Arrays.asList(
+                        new AddItemPlayerAction(Items.CHICKEN),
+                        new AddItemPlayerAction(Items.SWEET_BERRIES),
+                        new AddItemPlayerAction(ModItems.CARROT_SLICES),
+                        new AddItemPlayerAction(ModItems.CARROT_SLICES),
+                        new AddItemPlayerAction(ModItems.SALT_FLOUR),
+                        new AddContentPlayerAction(ModContents.HONEY),
+                        new AddItemPlayerAction(ModItems.CARROT_HEAD)
+                ),
+                ModContents.DELUXE_ROAST_CHICKEN);
     }
 
     /**

@@ -69,4 +69,7 @@ public class ModFoodComponents {
     public static final FoodComponent COOKED_HONEY_ROASTED_MUTTON = new FoodComponent.Builder()
             .hunger(7).saturationModifier(0.7f)
             .build();
+    public static final FoodComponent COOKED_DELUXE_ROAST_CHICKEN = new FoodComponent.Builder()
+            .hunger(7).saturationModifier(0.7f)
+            .build();
 }

@@ -20,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.foodcraft.FoodCraft;
 import org.foodcraft.block.entity.CuttingBoardBlockEntity;
 import org.foodcraft.block.entity.UpPlaceBlockEntity;
 import org.jetbrains.annotations.Nullable;
@@ -53,11 +54,8 @@ public class CuttingBoardBlock extends UpPlaceBlock {
             }
         }
 
-        Item contentItem = blockEntity.getContentItem();
-
         // 如果玩家手持物品为空或者与容器中物品不同，允许取出
-        return handStack.isEmpty() ||
-                (contentItem != null && handStack.getItem() != contentItem) || blockEntity.isFull();
+        return !handStack.isEmpty();
     }
 
     @Override

@@ -85,7 +85,7 @@ public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> exten
             }
 
             if (!context.getHeldItemStack().isEmpty()) {
-                return StepResult.fail(null, ActionResult.FAIL);
+                return StepResult.fail(null, ActionResult.PASS);
             }
 
             // 计算本次应得的食物比例
@@ -96,6 +96,10 @@ public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> exten
             // 检查食用条件
             boolean canEat = (context.player().getAbilities().invulnerable || outcome.getFoodComponent().isAlwaysEdible() || context.player().getHungerManager().isNotFull());
             if (!canEat) {
+                if (remainingEats == totalEats) {
+                    return StepResult.complete(ActionResult.PASS);
+                }
+
                 return StepResult.fail(STEP_EAT, ActionResult.PASS);
             }
 
