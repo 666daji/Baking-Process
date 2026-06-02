@@ -1,4 +1,4 @@
-package org.foodcraft.block.multi;
+package org.foodcraft.block.pile;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -13,10 +13,10 @@ import org.slf4j.Logger;
 import java.util.Objects;
 
 /**
- * 客户端多方块引用实现
+ * 客户端方块堆引用实现。
  * 只包含显示所需的信息，不包含实际功能，数据完全从服务器同步
  */
-public class ClientMultiBlockReference implements MultiBlockReference {
+public class ClientCubeBlockPileReference implements CubeBlockPileReference {
     private static final Logger LOGGER = FoodCraft.LOGGER;
 
     private final BlockPos masterWorldPos;
@@ -28,7 +28,7 @@ public class ClientMultiBlockReference implements MultiBlockReference {
     private final int structureDepth;
     private boolean disposed = false;
 
-    public ClientMultiBlockReference(@NotNull NbtCompound nbt) {
+    public ClientCubeBlockPileReference(@NotNull NbtCompound nbt) {
         // 从NBT反序列化
         this.masterWorldPos = NbtHelper.toBlockPos(nbt.getCompound(MASTER_POS_KEY));
         this.relativePos = NbtHelper.toBlockPos(nbt.getCompound(RELATIVE_POS_KEY));
@@ -47,15 +47,12 @@ public class ClientMultiBlockReference implements MultiBlockReference {
                 masterWorldPos.getY() + relativePos.getY(),
                 masterWorldPos.getZ() + relativePos.getZ()
         );
-
-        LOGGER.debug("Created ClientMultiBlockReference: master={}, relative={}, block={}, size={}x{}x{}",
-                masterWorldPos, relativePos, baseBlock, structureWidth, structureHeight, structureDepth);
     }
 
     /**
      * 从服务端引用创建客户端引用
      */
-    public static ClientMultiBlockReference fromServerReference(@NotNull MultiBlockReference serverReference) {
+    public static ClientCubeBlockPileReference fromServerReference(@NotNull CubeBlockPileReference serverReference) {
         if (serverReference.isDisposed()) {
             throw new IllegalArgumentException("Cannot create client reference from disposed server reference");
         }
@@ -68,7 +65,7 @@ public class ClientMultiBlockReference implements MultiBlockReference {
             nbt.putInt(STRUCTURE_DEPTH_KEY, serverReference.getStructureDepth());
         }
 
-        return new ClientMultiBlockReference(nbt);
+        return new ClientCubeBlockPileReference(nbt);
     }
 
     @Override
@@ -93,9 +90,6 @@ public class ClientMultiBlockReference implements MultiBlockReference {
         nbt.putInt(STRUCTURE_WIDTH_KEY, structureWidth);
         nbt.putInt(STRUCTURE_HEIGHT_KEY, structureHeight);
         nbt.putInt(STRUCTURE_DEPTH_KEY, structureDepth);
-
-        LOGGER.debug("Serialized ClientMultiBlockReference: master={}, relative={}, block={}",
-                masterWorldPos, relativePos, baseBlock);
 
         return nbt;
     }
@@ -198,7 +192,6 @@ public class ClientMultiBlockReference implements MultiBlockReference {
     @Override
     public void dispose() {
         disposed = true;
-        LOGGER.debug("ClientMultiBlockReference disposed at relative position {}", relativePos);
     }
 
     @Override
@@ -235,7 +228,7 @@ public class ClientMultiBlockReference implements MultiBlockReference {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        ClientMultiBlockReference that = (ClientMultiBlockReference) obj;
+        ClientCubeBlockPileReference that = (ClientCubeBlockPileReference) obj;
         return Objects.equals(masterWorldPos, that.masterWorldPos) &&
                 Objects.equals(relativePos, that.relativePos) &&
                 Objects.equals(baseBlock, that.baseBlock);

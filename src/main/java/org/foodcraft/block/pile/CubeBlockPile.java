@@ -1,4 +1,4 @@
-package org.foodcraft.block.multi;
+package org.foodcraft.block.pile;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
@@ -11,9 +11,9 @@ import org.slf4j.Logger;
 import java.util.*;
 
 /**
- * 管理由同种方块组成的立方体区域的多方块结构实例。
+ * 管理由同种方块组成的立方体区域的方块堆结构实例。
  *
- * <p>该类代表世界中一个具体的多方块结构，自动处理结构的完整性检查、拆分和合并。
+ * <p>该类代表世界中一个具体的方块堆结构，自动处理结构的完整性检查、拆分和合并。
  * 当结构中的方块被破坏时，会自动拆分成更小的完整结构；当相邻结构满足条件时，会自动合并。</p>
  *
  * <h2>核心特性</h2>
@@ -31,7 +31,7 @@ import java.util.*;
  * <h2>使用示例</h2>
  * <pre>{@code
  * // 创建3x3x3的石头方块堆
- * MultiBlock stonePile = MultiBlock.builder()
+ * CubeBlockPile stonePile = CubeBlockPile.builder()
  *     .world(world)
  *     .baseBlock(Blocks.STONE)
  *     .range(startPos, 3, 3, 3)
@@ -39,18 +39,18 @@ import java.util.*;
  *
  * // 检查完整性
  * if (!stonePile.checkIntegrity()) {
- *     List<MultiBlock> newPiles = stonePile.checkAndSplitIntegrity();
+ *     List<CubeBlockPile> newPiles = stonePile.checkAndSplitIntegrity();
  * }
  * }</pre>
  *
- * @see MultiBlockManager
- * @see MultiBlockHelper
+ * @see CubeBlockPileManager
+ * @see CubeBlockPileHelper
  */
-public class MultiBlock implements AutoCloseable {
+public class CubeBlockPile implements AutoCloseable {
     private static final Logger LOGGER = FoodCraft.LOGGER;
 
     /** 最大方块堆尺寸限制 */
-    public static final int MAX_SIZE = 10;
+    public static final int MAX_SIZE = 100;
 
     protected final WorldView world;
     protected final Block baseBlock;
@@ -59,7 +59,7 @@ public class MultiBlock implements AutoCloseable {
     protected boolean disposed = false;
 
     /**
-     * 创建多方块结构实例。
+     * 创建方块堆结构实例。
      *
      * @param world     世界视图
      * @param baseBlock 基础方块类型
@@ -67,7 +67,7 @@ public class MultiBlock implements AutoCloseable {
      * @throws IllegalArgumentException 如果尺寸超过最大限制
      * @throws IllegalStateException    如果注册失败
      */
-    protected MultiBlock(WorldView world, Block baseBlock, PatternRange range) {
+    protected CubeBlockPile(WorldView world, Block baseBlock, PatternRange range) {
         this.world = Objects.requireNonNull(world, "World cannot be null");
         this.baseBlock = Objects.requireNonNull(baseBlock, "Base block cannot be null");
         this.range = Objects.requireNonNull(range, "Range cannot be null");
@@ -75,9 +75,6 @@ public class MultiBlock implements AutoCloseable {
 
         validateSize(range);
         registerToManager();
-
-        LOGGER.debug("Created new MultiBlock at {} with base block {} and size {}x{}x{}",
-                masterPos, baseBlock, range.getWidth(), range.getHeight(), range.getDepth());
     }
 
     /**
@@ -86,28 +83,28 @@ public class MultiBlock implements AutoCloseable {
     private void validateSize(PatternRange range) {
         if (range.getWidth() > MAX_SIZE || range.getHeight() > MAX_SIZE || range.getDepth() > MAX_SIZE) {
             throw new IllegalArgumentException(
-                    String.format("MultiBlock size %dx%dx%d exceeds maximum allowed size %dx%dx%d",
+                    String.format("CubeBlockPile size %dx%dx%d exceeds maximum allowed size %dx%dx%d",
                             range.getWidth(), range.getHeight(), range.getDepth(),
                             MAX_SIZE, MAX_SIZE, MAX_SIZE));
         }
     }
 
     /**
-     * 将多方块结构注册到管理器。
+     * 将方块堆结构注册到管理器。
      */
     private void registerToManager() {
-        if (!MultiBlockManager.registerMultiBlock(this)) {
-            MultiBlock existing = MultiBlockManager.findMultiBlock(world, masterPos);
+        if (!CubeBlockPileManager.registerCubeBlockPile(this)) {
+            CubeBlockPile existing = CubeBlockPileManager.findCubeBlockPile(world, masterPos);
             String errorMsg = existing != null
-                    ? String.format("Failed to register MultiBlock at position %s. Position already occupied by MultiBlock with base block %s",
+                    ? String.format("Failed to register CubeBlockPile at position %s. Position already occupied by CubeBlockPile with base block %s",
                     masterPos, existing.getBaseBlock())
-                    : String.format("Failed to register MultiBlock at position %s for unknown reason", masterPos);
+                    : String.format("Failed to register CubeBlockPile at position %s for unknown reason", masterPos);
             throw new IllegalStateException(errorMsg);
         }
     }
 
     /**
-     * 多方块结构构建器，提供流畅的API创建实例。
+     * 方块堆结构构建器，提供流畅的API创建实例。
      */
     public static class Builder {
         private WorldView world;
@@ -158,10 +155,10 @@ public class MultiBlock implements AutoCloseable {
         }
 
         /**
-         * 构建多方块结构实例。
+         * 构建方块堆结构实例。
          */
-        public MultiBlock build() {
-            return new MultiBlock(world, baseBlock, range);
+        public CubeBlockPile build() {
+            return new CubeBlockPile(world, baseBlock, range);
         }
     }
 
@@ -177,27 +174,20 @@ public class MultiBlock implements AutoCloseable {
      *
      * @return 拆分后的新方块堆列表，如果结构完整则返回空列表
      */
-    public List<MultiBlock> checkAndSplitIntegrity() {
+    public List<CubeBlockPile> checkAndSplitIntegrity() {
         if (disposed) {
-            LOGGER.warn("Attempted to check integrity of disposed MultiBlock at {}", masterPos);
+            LOGGER.warn("Attempted to check integrity of disposed CubeBlockPile at {}", masterPos);
             return Collections.emptyList();
         }
 
         List<BlockPos> validBlocks = findValidBlocks();
 
         if (validBlocks.size() == getVolume()) {
-            LOGGER.debug("MultiBlock at {} is intact, no need to split", masterPos);
             return Collections.emptyList();
         }
 
-        LOGGER.info("MultiBlock at {} is incomplete. Valid blocks: {}/{}. Splitting...",
-                masterPos, validBlocks.size(), getVolume());
-
         dispose();
-        List<MultiBlock> newMultiBlocks = splitMultiBlock(validBlocks);
-
-        LOGGER.info("Split MultiBlock at {} into {} new MultiBlocks", masterPos, newMultiBlocks.size());
-        return newMultiBlocks;
+        return splitCubeBlockPile(validBlocks);
     }
 
     /**
@@ -207,13 +197,12 @@ public class MultiBlock implements AutoCloseable {
      */
     public boolean checkIntegrity() {
         if (disposed) {
-            LOGGER.warn("Attempted to check integrity of disposed MultiBlock at {}", masterPos);
+            LOGGER.warn("Attempted to check integrity of disposed CubeBlockPile at {}", masterPos);
             return false;
         }
 
         BlockPos start = range.getStart();
         BlockPos end = getEndPos();
-        LOGGER.debug("Checking integrity of MultiBlock at {} to {}", start, end);
 
         int invalidCount = 0;
         for (int x = start.getX(); x <= end.getX(); x++) {
@@ -232,11 +221,10 @@ public class MultiBlock implements AutoCloseable {
         }
 
         if (invalidCount > 0) {
-            LOGGER.warn("MultiBlock at {} has {} invalid blocks out of {}", masterPos, invalidCount, getVolume());
+            LOGGER.warn("CubeBlockPile at {} has {} invalid blocks out of {}", masterPos, invalidCount, getVolume());
             return false;
         }
 
-        LOGGER.debug("MultiBlock at {} integrity check passed", masterPos);
         return true;
     }
 
@@ -264,15 +252,15 @@ public class MultiBlock implements AutoCloseable {
     /**
      * 将不完整的方块堆拆分为多个完整的小方块堆。
      */
-    private List<MultiBlock> splitMultiBlock(List<BlockPos> validBlocks) {
+    private List<CubeBlockPile> splitCubeBlockPile(List<BlockPos> validBlocks) {
         if (validBlocks.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<MultiBlock> result = splitMultiBlockOptimized(validBlocks);
+        List<CubeBlockPile> result = splitCubeBlockPileOptimized(validBlocks);
         if (result.isEmpty()) {
             LOGGER.warn("Optimized decomposition failed, falling back to original algorithm");
-            result = splitMultiBlockFallback(validBlocks);
+            result = splitCubeBlockPileFallback(validBlocks);
         }
         return result;
     }
@@ -280,39 +268,34 @@ public class MultiBlock implements AutoCloseable {
     /**
      * 使用三维立方体分解算法进行优化拆分。
      */
-    private List<MultiBlock> splitMultiBlockOptimized(List<BlockPos> validBlocks) {
-        LOGGER.debug("Starting optimized cube decomposition for {} valid blocks", validBlocks.size());
+    private List<CubeBlockPile> splitCubeBlockPileOptimized(List<BlockPos> validBlocks) {
         List<CubeDecomposition> decomposedCubes = decomposeIntoSolidCubes(validBlocks);
-        List<MultiBlock> result = new ArrayList<>();
+        List<CubeBlockPile> result = new ArrayList<>();
 
         for (CubeDecomposition cube : decomposedCubes) {
             if (cube.isValid()) {
-                MultiBlock newMultiBlock = createMultiBlockFromCube(cube);
-                if (newMultiBlock != null) {
-                    result.add(newMultiBlock);
-                    LOGGER.debug("Created optimized MultiBlock: {} with size {}x{}x{}",
-                            cube.start, cube.width, cube.height, cube.depth);
+                CubeBlockPile newCubeBlockPile = createCubeBlockPileFromCube(cube);
+                if (newCubeBlockPile != null) {
+                    result.add(newCubeBlockPile);
                 }
             }
         }
 
-        LOGGER.info("Optimized decomposition created {} MultiBlocks from {} blocks",
-                result.size(), validBlocks.size());
         return result;
     }
 
     /**
      * 回退拆分算法：使用三维连通组件算法。
      */
-    private List<MultiBlock> splitMultiBlockFallback(List<BlockPos> validBlocks) {
+    private List<CubeBlockPile> splitCubeBlockPileFallback(List<BlockPos> validBlocks) {
         List<List<BlockPos>> connectedComponents = findConnectedComponents(validBlocks);
-        List<MultiBlock> result = new ArrayList<>();
+        List<CubeBlockPile> result = new ArrayList<>();
 
         for (List<BlockPos> component : connectedComponents) {
             if (!component.isEmpty()) {
-                MultiBlock newMultiBlock = createMultiBlockFromComponent(component);
-                if (newMultiBlock != null) {
-                    result.add(newMultiBlock);
+                CubeBlockPile newCubeBlockPile = createCubeBlockPileFromComponent(component);
+                if (newCubeBlockPile != null) {
+                    result.add(newCubeBlockPile);
                 }
             }
         }
@@ -444,7 +427,7 @@ public class MultiBlock implements AutoCloseable {
     /**
      * 从连通的方块组件创建新的方块堆。
      */
-    private MultiBlock createMultiBlockFromComponent(List<BlockPos> component) {
+    private CubeBlockPile createCubeBlockPileFromComponent(List<BlockPos> component) {
         if (component.isEmpty()) {
             return null;
         }
@@ -464,29 +447,29 @@ public class MultiBlock implements AutoCloseable {
 
         // 检查是否为完整矩形区域
         if (isRectangularRegionValid(component, minX, minY, minZ, maxX, maxY, maxZ)) {
-            return createRectangularMultiBlock(minX, minY, minZ, maxX, maxY, maxZ);
+            return createRectangularCubeBlockPile(minX, minY, minZ, maxX, maxY, maxZ);
         } else {
-            return createMinimalMultiBlock(component, minX, minY, minZ, maxX, maxY, maxZ);
+            return createMinimalCubeBlockPile(component, minX, minY, minZ, maxX, maxY, maxZ);
         }
     }
 
     /**
-     * 创建完整的矩形多方块结构。
+     * 创建完整的矩形方块堆结构。
      */
-    private MultiBlock createRectangularMultiBlock(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+    private CubeBlockPile createRectangularCubeBlockPile(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         BlockPos newStart = new BlockPos(minX, minY, minZ);
         int width = maxX - minX + 1;
         int height = maxY - minY + 1;
         int depth = maxZ - minZ + 1;
 
         try {
-            return MultiBlock.builder()
+            return CubeBlockPile.builder()
                     .world(world)
                     .baseBlock(baseBlock)
                     .range(newStart, width, height, depth)
                     .build();
         } catch (Exception e) {
-            LOGGER.error("Failed to create MultiBlock from component: {}", e.getMessage());
+            LOGGER.error("Failed to create CubeBlockPile from component: {}", e.getMessage());
             return null;
         }
     }
@@ -494,25 +477,25 @@ public class MultiBlock implements AutoCloseable {
     /**
      * 创建包含所有方块的最小矩形方块堆。
      */
-    private MultiBlock createMinimalMultiBlock(List<BlockPos> component, int minX, int minY, int minZ,
-                                               int maxX, int maxY, int maxZ) {
+    private CubeBlockPile createMinimalCubeBlockPile(List<BlockPos> component, int minX, int minY, int minZ,
+                                                  int maxX, int maxY, int maxZ) {
         BlockPos newStart = new BlockPos(minX, minY, minZ);
         int width = maxX - minX + 1;
         int height = maxY - minY + 1;
         int depth = maxZ - minZ + 1;
 
         try {
-            MultiBlock multiBlock = MultiBlock.builder()
+            CubeBlockPile cubeBlockPile = CubeBlockPile.builder()
                     .world(world)
                     .baseBlock(baseBlock)
                     .range(newStart, width, height, depth)
                     .build();
 
-            LOGGER.warn("Created non-solid MultiBlock at {} with size {}x{}x{} containing {} blocks",
+            LOGGER.warn("Created non-solid CubeBlockPile at {} with size {}x{}x{} containing {} blocks",
                     newStart, width, height, depth, component.size());
-            return multiBlock;
+            return cubeBlockPile;
         } catch (Exception e) {
-            LOGGER.error("Failed to create minimal MultiBlock: {}", e.getMessage());
+            LOGGER.error("Failed to create minimal CubeBlockPile: {}", e.getMessage());
             return null;
         }
     }
@@ -547,7 +530,7 @@ public class MultiBlock implements AutoCloseable {
      */
     public BlockPos getWorldPos(int relativeX, int relativeY, int relativeZ) {
         if (disposed) {
-            throw new IllegalStateException("MultiBlock at " + masterPos + " has been disposed");
+            throw new IllegalStateException("CubeBlockPile at " + masterPos + " has been disposed");
         }
 
         if (relativeX < 0 || relativeX >= range.getWidth() ||
@@ -591,24 +574,23 @@ public class MultiBlock implements AutoCloseable {
     /**
      * 将当前方块堆与另一个方块堆拼接。
      */
-    public MultiBlock combineWith(@NotNull MultiBlock other) {
+    public CubeBlockPile combineWith(@NotNull CubeBlockPile other) {
         if (disposed) {
-            throw new IllegalStateException("This MultiBlock at " + masterPos + " has been disposed");
+            throw new IllegalStateException("This CubeBlockPile at " + masterPos + " has been disposed");
         }
         if (other.disposed) {
-            throw new IllegalStateException("Other MultiBlock at " + other.masterPos + " has been disposed");
+            throw new IllegalStateException("Other CubeBlockPile at " + other.masterPos + " has been disposed");
         }
 
-        LOGGER.debug("Attempting to combine MultiBlock at {} with MultiBlock at {}", this.masterPos, other.masterPos);
         return combine(this, other);
     }
 
     /**
      * 拼接两个方块堆。
      */
-    public static MultiBlock combine(@NotNull MultiBlock first, @NotNull MultiBlock second) {
+    public static CubeBlockPile combine(@NotNull CubeBlockPile first, @NotNull CubeBlockPile second) {
         if (first.disposed || second.disposed) {
-            throw new IllegalStateException("Cannot combine disposed MultiBlocks");
+            throw new IllegalStateException("Cannot combine disposed CubeBlockPiles");
         }
 
         validateCombineConditions(first, second);
@@ -616,13 +598,10 @@ public class MultiBlock implements AutoCloseable {
         MergeDirection direction = findMergeDirection(first.range, second.range);
 
         if (direction == null) {
-            LOGGER.debug("MultiBlocks are not adjacent or overlapping in a valid way. First: {}, Second: {}",
-                    first.range, second.range);
             return null;
         }
 
-        LOGGER.debug("Merging MultiBlocks in direction: {}", direction);
-        return createCombinedMultiBlock(first, second, newRange);
+        return createCombinedCubeBlockPile(first, second, newRange);
     }
 
     /**
@@ -632,9 +611,9 @@ public class MultiBlock implements AutoCloseable {
      * @param splitPosition 在指定轴上的拆分位置（相对坐标）
      * @return 拆分后的两个方块堆，如果拆分失败返回空列表
      */
-    public List<MultiBlock> splitAlongPlane(char axis, int splitPosition) {
+    public List<CubeBlockPile> splitAlongPlane(char axis, int splitPosition) {
         if (disposed) {
-            LOGGER.warn("Attempted to split disposed MultiBlock at {}", masterPos);
+            LOGGER.warn("Attempted to split disposed CubeBlockPile at {}", masterPos);
             return Collections.emptyList();
         }
 
@@ -649,23 +628,23 @@ public class MultiBlock implements AutoCloseable {
             int height = range.getHeight();
             int depth = range.getDepth();
 
-            MultiBlock firstPart, secondPart;
+            CubeBlockPile firstPart, secondPart;
 
             switch (axis) {
                 case 'x':
-                    firstPart = createSubMultiBlock(start, splitPosition, height, depth);
+                    firstPart = createSubCubeBlockPile(start, splitPosition, height, depth);
                     BlockPos secondStart = new BlockPos(start.getX() + splitPosition, start.getY(), start.getZ());
-                    secondPart = createSubMultiBlock(secondStart, width - splitPosition, height, depth);
+                    secondPart = createSubCubeBlockPile(secondStart, width - splitPosition, height, depth);
                     break;
                 case 'y':
-                    firstPart = createSubMultiBlock(start, width, splitPosition, depth);
+                    firstPart = createSubCubeBlockPile(start, width, splitPosition, depth);
                     BlockPos secondStartY = new BlockPos(start.getX(), start.getY() + splitPosition, start.getZ());
-                    secondPart = createSubMultiBlock(secondStartY, width, height - splitPosition, depth);
+                    secondPart = createSubCubeBlockPile(secondStartY, width, height - splitPosition, depth);
                     break;
                 case 'z':
-                    firstPart = createSubMultiBlock(start, width, height, splitPosition);
+                    firstPart = createSubCubeBlockPile(start, width, height, splitPosition);
                     BlockPos secondStartZ = new BlockPos(start.getX(), start.getY(), start.getZ() + splitPosition);
-                    secondPart = createSubMultiBlock(secondStartZ, width, height, depth - splitPosition);
+                    secondPart = createSubCubeBlockPile(secondStartZ, width, height, depth - splitPosition);
                     break;
                 default:
                     LOGGER.error("Invalid axis: {}", axis);
@@ -674,11 +653,10 @@ public class MultiBlock implements AutoCloseable {
 
             if (firstPart != null && secondPart != null) {
                 dispose();
-                LOGGER.info("Split MultiBlock at {} along {} axis at position {}", masterPos, axis, splitPosition);
                 return Arrays.asList(firstPart, secondPart);
             }
         } catch (Exception e) {
-            LOGGER.error("Error splitting MultiBlock: {}", e.getMessage());
+            LOGGER.error("Error splitting CubeBlockPile: {}", e.getMessage());
         }
         return Collections.emptyList();
     }
@@ -686,14 +664,14 @@ public class MultiBlock implements AutoCloseable {
     /**
      * 为当前方块堆中的特定相对位置创建引用。
      */
-    public MultiBlockReference createReference(BlockPos relativePos) {
-        return ServerMultiBlockReference.fromRelativePos(this, relativePos);
+    public CubeBlockPileReference createReference(BlockPos relativePos) {
+        return ServerCubeBlockPileReference.fromRelativePos(this, relativePos);
     }
 
     /**
      * 为当前方块堆中的特定相对位置创建引用。
      */
-    public MultiBlockReference createReference(int relativeX, int relativeY, int relativeZ) {
+    public CubeBlockPileReference createReference(int relativeX, int relativeY, int relativeZ) {
         return createReference(new BlockPos(relativeX, relativeY, relativeZ));
     }
 
@@ -701,12 +679,12 @@ public class MultiBlock implements AutoCloseable {
      * 为当前方块堆中的世界位置创建引用。
      */
     @Nullable
-    public MultiBlockReference createReferenceFromWorldPos(BlockPos worldPos) {
-        return ServerMultiBlockReference.fromWorldPos(this, worldPos);
+    public CubeBlockPileReference createReferenceFromWorldPos(BlockPos worldPos) {
+        return ServerCubeBlockPileReference.fromWorldPos(this, worldPos);
     }
 
     /**
-     * 安全地销毁这个MultiBlock实例。
+     * 安全地销毁这个CubeBlockPile实例。
      */
     @Override
     public void close() {
@@ -714,12 +692,11 @@ public class MultiBlock implements AutoCloseable {
     }
 
     /**
-     * 安全地销毁这个MultiBlock实例。
+     * 安全地销毁这个CubeBlockPile实例。
      */
     public void dispose() {
         if (!disposed) {
-            LOGGER.debug("Disposing MultiBlock at {}", masterPos);
-            MultiBlockManager.unregisterMultiBlock(this);
+            CubeBlockPileManager.unregisterCubeBlockPile(this);
             disposed = true;
         }
     }
@@ -775,7 +752,7 @@ public class MultiBlock implements AutoCloseable {
      */
     private void checkDisposed() {
         if (disposed) {
-            throw new IllegalStateException("MultiBlock at " + masterPos + " has been disposed");
+            throw new IllegalStateException("CubeBlockPile at " + masterPos + " has been disposed");
         }
     }
 
@@ -794,18 +771,18 @@ public class MultiBlock implements AutoCloseable {
     /**
      * 创建子方块堆。
      */
-    private MultiBlock createSubMultiBlock(BlockPos start, int width, int height, int depth) {
+    private CubeBlockPile createSubCubeBlockPile(BlockPos start, int width, int height, int depth) {
         if (width <= 0 || height <= 0 || depth <= 0) {
             return null;
         }
         try {
-            return MultiBlock.builder()
+            return CubeBlockPile.builder()
                     .world(world)
                     .baseBlock(baseBlock)
                     .range(start, width, height, depth)
                     .build();
         } catch (Exception e) {
-            LOGGER.error("Failed to create sub MultiBlock: {}", e.getMessage());
+            LOGGER.error("Failed to create sub CubeBlockPile: {}", e.getMessage());
             return null;
         }
     }
@@ -851,14 +828,14 @@ public class MultiBlock implements AutoCloseable {
     /**
      * 验证合并条件。
      */
-    private static void validateCombineConditions(MultiBlock first, MultiBlock second) {
+    private static void validateCombineConditions(CubeBlockPile first, CubeBlockPile second) {
         if (first.world != second.world) {
-            String errorMsg = "MultiBlocks must be in the same world";
+            String errorMsg = "CubeBlockPiles must be in the same world";
             LOGGER.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }
         if (first.baseBlock != second.baseBlock) {
-            String errorMsg = String.format("MultiBlocks must have the same base block: %s vs %s",
+            String errorMsg = String.format("CubeBlockPiles must have the same base block: %s vs %s",
                     first.baseBlock, second.baseBlock);
             LOGGER.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
@@ -868,7 +845,7 @@ public class MultiBlock implements AutoCloseable {
     /**
      * 计算合并后的范围。
      */
-    private static PatternRange calculateCombinedRange(MultiBlock first, MultiBlock second) {
+    private static PatternRange calculateCombinedRange(CubeBlockPile first, CubeBlockPile second) {
         BlockPos newStart = new BlockPos(
                 Math.min(first.range.getStart().getX(), second.range.getStart().getX()),
                 Math.min(first.range.getStart().getY(), second.range.getStart().getY()),
@@ -888,7 +865,7 @@ public class MultiBlock implements AutoCloseable {
 
         if (newWidth > MAX_SIZE || newHeight > MAX_SIZE || newDepth > MAX_SIZE) {
             String errorMsg = String.format(
-                    "Combined MultiBlock size %dx%dx%d would exceed maximum allowed size %dx%dx%d",
+                    "Combined CubeBlockPile size %dx%dx%d would exceed maximum allowed size %dx%dx%d",
                     newWidth, newHeight, newDepth, MAX_SIZE, MAX_SIZE, MAX_SIZE);
             LOGGER.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
@@ -898,35 +875,32 @@ public class MultiBlock implements AutoCloseable {
     }
 
     /**
-     * 创建合并后的多方块结构。
+     * 创建合并后的方块堆结构。
      */
-    private static MultiBlock createCombinedMultiBlock(MultiBlock first, MultiBlock second, PatternRange newRange) {
+    private static CubeBlockPile createCombinedCubeBlockPile(CubeBlockPile first, CubeBlockPile second, PatternRange newRange) {
         first.dispose();
         second.dispose();
 
         try {
-            MultiBlock combined = new MultiBlock(first.world, first.baseBlock, newRange);
-            LOGGER.info("Successfully combined MultiBlocks at {} and {} into new MultiBlock at {}",
-                    first.masterPos, second.masterPos, combined.masterPos);
-            return combined;
+            return new CubeBlockPile(first.world, first.baseBlock, newRange);
         } catch (Exception e) {
-            LOGGER.error("Failed to create combined MultiBlock: {}", e.getMessage());
+            LOGGER.error("Failed to create combined CubeBlockPile: {}", e.getMessage());
             return null;
         }
     }
 
     /**
-     * 从立方体分解创建MultiBlock。
+     * 从立方体分解创建CubeBlockPile。
      */
-    private MultiBlock createMultiBlockFromCube(CubeDecomposition cube) {
+    private CubeBlockPile createCubeBlockPileFromCube(CubeDecomposition cube) {
         try {
-            return MultiBlock.builder()
+            return CubeBlockPile.builder()
                     .world(world)
                     .baseBlock(baseBlock)
                     .range(cube.start, cube.width, cube.height, cube.depth)
                     .build();
         } catch (Exception e) {
-            LOGGER.error("Failed to create MultiBlock from cube {}: {}", cube.start, e.getMessage());
+            LOGGER.error("Failed to create CubeBlockPile from cube {}: {}", cube.start, e.getMessage());
             return null;
         }
     }
@@ -1009,7 +983,7 @@ public class MultiBlock implements AutoCloseable {
     }
 
     /**
-     * 表示多方块结构的范围。
+     * 表示方块堆结构的范围。
      */
     public static final class PatternRange {
         private final BlockPos start;

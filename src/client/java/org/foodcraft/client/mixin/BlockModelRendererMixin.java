@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.BlockRenderView;
 import org.dfood.block.FoodBlock;
-import org.foodcraft.block.entity.HeatResistantSlateBlockEntity;
+import org.foodcraft.block.entity.HeatResistantSlateBlockPileEntity;
 import org.foodcraft.client.util.RenderUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,7 +25,7 @@ public class BlockModelRendererMixin {
             argsOnly = true)
     public BakedModel renderCookingModel(BakedModel model, BlockRenderView world, BakedModel bakedModel, BlockState state, BlockPos pos, MatrixStack matrices) {
         if (state.getBlock() instanceof FoodBlock foodBlock &&
-                world.getBlockEntity(pos) instanceof HeatResistantSlateBlockEntity) {
+                world.getBlockEntity(pos) instanceof HeatResistantSlateBlockPileEntity) {
             int foodValue = state.get(foodBlock.NUMBER_OF_FOOD);
 
             if (foodValue > 1) {

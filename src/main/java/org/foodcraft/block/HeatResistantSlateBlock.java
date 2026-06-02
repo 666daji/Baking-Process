@@ -25,9 +25,9 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.foodcraft.block.entity.CombustionFirewoodBlockEntity;
-import org.foodcraft.block.entity.HeatResistantSlateBlockEntity;
+import org.foodcraft.block.entity.HeatResistantSlateBlockPileEntity;
 import org.foodcraft.block.entity.UpPlaceBlockEntity;
-import org.foodcraft.block.multi.MultiBlockHelper;
+import org.foodcraft.block.pile.CubeBlockPileHelper;
 import org.foodcraft.registry.ModBlockEntityTypes;
 import org.foodcraft.registry.ModItems;
 import org.foodcraft.registry.ModSounds;
@@ -53,7 +53,7 @@ public class HeatResistantSlateBlock extends UpPlaceBlock {
 
         if (!world.isClient) {
             // 处理方块放置
-            MultiBlockHelper.onBlockPlaced(world, pos, this);
+            CubeBlockPileHelper.onBlockPlaced(world, pos, this);
         }
     }
 
@@ -63,7 +63,7 @@ public class HeatResistantSlateBlock extends UpPlaceBlock {
 
         if (!world.isClient) {
             // 处理相邻方块更新，检查多方块结构完整性
-            MultiBlockHelper.onNeighborUpdate(world, pos, this);
+            CubeBlockPileHelper.onNeighborUpdate(world, pos, this);
         }
     }
 
@@ -77,7 +77,7 @@ public class HeatResistantSlateBlock extends UpPlaceBlock {
             }
 
             // 处理方块破坏
-            MultiBlockHelper.onBlockBroken(world, pos, this);
+            CubeBlockPileHelper.onBlockBroken(world, pos, this);
         }
 
         super.onStateReplaced(state, world, pos, newState, moved);
@@ -91,7 +91,7 @@ public class HeatResistantSlateBlock extends UpPlaceBlock {
         ActionResult result = super.onUse(state, world, pos, player, hand, hit);
 
         // 如果交互失败，则尝试交互绑定的篝火
-        if (!result.isAccepted() && blockEntity instanceof HeatResistantSlateBlockEntity heatResistantSlateBlockEntity) {
+        if (!result.isAccepted() && blockEntity instanceof HeatResistantSlateBlockPileEntity heatResistantSlateBlockEntity) {
             for (CombustionFirewoodBlockEntity firewoodEntity : heatResistantSlateBlockEntity.getFirewoodEntities()) {
                 BlockState firewoodState = firewoodEntity.getCachedState();
                 ActionResult firewoodResult = firewoodState.getBlock().onUse(firewoodState, world, firewoodEntity.getPos(), player, hand, hit);
@@ -107,7 +107,7 @@ public class HeatResistantSlateBlock extends UpPlaceBlock {
     @Override
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof HeatResistantSlateBlockEntity heatResistantSlateBlockEntity
+        if (blockEntity instanceof HeatResistantSlateBlockPileEntity heatResistantSlateBlockEntity
                     && heatResistantSlateBlockEntity.isBaking()) {
             if (random.nextInt(5) == 0) {
                 for(int i = 0; i < random.nextInt(1) + 1; ++i) {
@@ -169,12 +169,12 @@ public class HeatResistantSlateBlock extends UpPlaceBlock {
 
     @Override
     public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new HeatResistantSlateBlockEntity(pos, state);
+        return new HeatResistantSlateBlockPileEntity(pos, state);
     }
 
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient ? null : checkType(type, (BlockEntityType<? extends HeatResistantSlateBlockEntity>) ModBlockEntityTypes.HEAT_RESISTANT_SLATE, HeatResistantSlateBlockEntity::tick);
+        return world.isClient ? null : checkType(type, (BlockEntityType<? extends HeatResistantSlateBlockPileEntity>) ModBlockEntityTypes.HEAT_RESISTANT_SLATE, HeatResistantSlateBlockPileEntity::tick);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.foodcraft.block.multi;
+package org.foodcraft.block.pile;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -9,30 +9,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 多方块引用接口 - 表示单个方块在多方块结构中的位置信息
+ * 方块堆引用接口 - 表示单个方块在方块堆结构中的位置信息
  *
- * <p>该接口为多方块结构中的每个方块提供身份标识，记录方块所属的多方块结构以及在该结构中的相对位置。
- * 每个参与多方块的方块实体都应该持有此引用。</p>
+ * <p>该接口为方块堆结构中的每个方块提供身份标识，记录方块所属的方块堆结构以及在该结构中的相对位置。
+ * 每个参与方块堆的方块实体都应该持有此引用。</p>
  *
  * <h2>实现类型</h2>
  * <ul>
- *   <li><strong>服务端实现</strong> - {@link ServerMultiBlockReference}：包含完整的逻辑和状态管理</li>
- *   <li><strong>客户端实现</strong> - {@link ClientMultiBlockReference}：只读视图，用于渲染和显示</li>
+ *   <li><strong>服务端实现</strong> - {@link ServerCubeBlockPileReference}：包含完整的逻辑和状态管理</li>
+ *   <li><strong>客户端实现</strong> - {@link ClientCubeBlockPileReference}：只读视图，用于渲染和显示</li>
  * </ul>
  *
  * <h2>核心功能</h2>
  * <ul>
- *   <li><strong>位置标识</strong> - 记录方块在多方块结构中的相对位置</li>
- *   <li><strong>完整性检查</strong> - 检查所属多方块结构是否完整</li>
+ *   <li><strong>位置标识</strong> - 记录方块在方块堆结构中的相对位置</li>
+ *   <li><strong>完整性检查</strong> - 检查所属方块堆结构是否完整</li>
  *   <li><strong>数据序列化</strong> - 支持NBT序列化，确保游戏重启后数据不丢失</li>
- *   <li><strong>类型验证</strong> - 验证方块类型是否与多方块基础方块匹配</li>
+ *   <li><strong>类型验证</strong> - 验证方块类型是否与方块堆基础方块匹配</li>
  * </ul>
  *
- * @see ServerMultiBlockReference
- * @see ClientMultiBlockReference
- * @see MultiBlock
+ * @see ServerCubeBlockPileReference
+ * @see ClientCubeBlockPileReference
+ * @see CubeBlockPile
  */
-public interface MultiBlockReference {
+public interface CubeBlockPileReference {
     // 序列化键名
     String MASTER_POS_KEY = "MasterPos";
     String RELATIVE_POS_KEY = "RelativePos";
@@ -58,7 +58,7 @@ public interface MultiBlockReference {
     NbtCompound toNbt();
 
     /**
-     * 检查传入的方块是否与多方块结构的基础方块相同。
+     * 检查传入的方块是否与方块堆结构的基础方块相同。
      *
      * @param block 要检查的方块
      * @return 如果方块类型匹配返回true，否则返回false
@@ -66,7 +66,7 @@ public interface MultiBlockReference {
     boolean matchesBlock(@Nullable Block block);
 
     /**
-     * 检查传入的方块状态对应的方块是否与多方块结构的基础方块相同。
+     * 检查传入的方块状态对应的方块是否与方块堆结构的基础方块相同。
      *
      * @param blockState 要检查的方块状态
      * @return 如果方块类型匹配返回true，否则返回false
@@ -74,7 +74,7 @@ public interface MultiBlockReference {
     boolean matchesBlockState(@Nullable BlockState blockState);
 
     /**
-     * 检查传入的方块实体对应的方块是否与多方块结构的基础方块相同。
+     * 检查传入的方块实体对应的方块是否与方块堆结构的基础方块相同。
      *
      * @param blockEntity 要检查的方块实体
      * @return 如果方块类型匹配返回true，否则返回false
@@ -82,9 +82,9 @@ public interface MultiBlockReference {
     boolean matchesBlockEntity(@Nullable BlockEntity blockEntity);
 
     /**
-     * 判断当前引用位置是否为主方块（多方块结构的起始坐标位置）。
+     * 判断当前引用位置是否为主方块（方块堆结构的起始坐标位置）。
      *
-     * <p>主方块通常是多方块结构的控制核心，可能具有特殊功能。</p>
+     * <p>主方块通常是方块堆结构的控制核心，可能具有特殊功能。</p>
      *
      * @return 如果是主方块返回true，否则返回false
      */
@@ -93,7 +93,7 @@ public interface MultiBlockReference {
     /**
      * 获取主方块的世界坐标。
      *
-     * <p>主方块坐标是多方块结构的唯一标识，用于查找和管理结构。</p>
+     * <p>主方块坐标是方块堆结构的唯一标识，用于查找和管理结构。</p>
      *
      * @return 主方块的世界坐标
      */
@@ -109,7 +109,7 @@ public interface MultiBlockReference {
     BlockPos getWorldPos();
 
     /**
-     * 获取当前方块在多方块结构中的相对坐标。
+     * 获取当前方块在方块堆结构中的相对坐标。
      *
      * <p>相对坐标以主方块位置为原点(0,0,0)。</p>
      *
@@ -119,7 +119,7 @@ public interface MultiBlockReference {
     BlockPos getRelativePos();
 
     /**
-     * 获取多方块结构的基础方块类型。
+     * 获取方块堆结构的基础方块类型。
      *
      * @return 基础方块类型
      */
@@ -127,14 +127,14 @@ public interface MultiBlockReference {
     Block getBaseBlock();
 
     /**
-     * 获取多方块结构的体积（包含的方块数量）。
+     * 获取方块堆结构的体积（包含的方块数量）。
      *
      * @return 结构体积
      */
     int getVolume();
 
     /**
-     * 检查多方块结构是否包含指定的世界坐标。
+     * 检查方块堆结构是否包含指定的世界坐标。
      *
      * @param worldPos 要检查的世界坐标
      * @return 如果包含该坐标返回true，否则返回false
@@ -142,11 +142,11 @@ public interface MultiBlockReference {
     boolean containsWorldPos(@NotNull BlockPos worldPos);
 
     /**
-     * 检查多方块结构的完整性。
+     * 检查方块堆结构的完整性。
      *
      * <p><strong>完整性条件：</strong></p>
      * <ul>
-     *   <li>多方块结构未被销毁</li>
+     *   <li>方块堆结构未被销毁</li>
      *   <li>所有位置都是正确的基础方块</li>
      *   <li>结构在世界中实际存在</li>
      * </ul>
@@ -156,7 +156,7 @@ public interface MultiBlockReference {
     boolean checkIntegrity();
 
     /**
-     * 检查多方块结构是否已被销毁。
+     * 检查方块堆结构是否已被销毁。
      *
      * <p>被销毁的结构不能再使用，应该创建新的引用。</p>
      *
@@ -170,7 +170,7 @@ public interface MultiBlockReference {
      * <p><strong>有效性条件：</strong></p>
      * <ul>
      *   <li>引用未被销毁</li>
-     *   <li>关联的多方块结构存在且完整</li>
+     *   <li>关联的方块堆结构存在且完整</li>
      *   <li>当前位置包含在结构中</li>
      * </ul>
      *
@@ -207,21 +207,21 @@ public interface MultiBlockReference {
     int getRelativeZ();
 
     /**
-     * 获取多方块结构的宽度（X轴方向）。
+     * 获取方块堆结构的宽度（X轴方向）。
      *
      * @return 结构宽度
      */
     int getStructureWidth();
 
     /**
-     * 获取多方块结构的高度（Y轴方向）。
+     * 获取方块堆结构的高度（Y轴方向）。
      *
      * @return 结构高度
      */
     int getStructureHeight();
 
     /**
-     * 获取多方块结构的深度（Z轴方向）。
+     * 获取方块堆结构的深度（Z轴方向）。
      *
      * @return 结构深度
      */

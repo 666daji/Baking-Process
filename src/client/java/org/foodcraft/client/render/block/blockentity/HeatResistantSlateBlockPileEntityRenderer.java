@@ -4,17 +4,17 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import org.foodcraft.block.entity.HeatResistantSlateBlockEntity;
-import org.foodcraft.block.multi.MultiBlockReference;
+import org.foodcraft.block.entity.HeatResistantSlateBlockPileEntity;
+import org.foodcraft.block.pile.CubeBlockPileReference;
 
-public class HeatResistantSlateBlockEntityRenderer extends UpPlaceBlockEntityRenderer<HeatResistantSlateBlockEntity> implements MultiBlockDebugRenderer<HeatResistantSlateBlockEntity> {
+public class HeatResistantSlateBlockPileEntityRenderer extends UpPlaceBlockEntityRenderer<HeatResistantSlateBlockPileEntity> implements CubeBlockPileDebugRenderer<HeatResistantSlateBlockPileEntity> {
 
-    public HeatResistantSlateBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
+    public HeatResistantSlateBlockPileEntityRenderer(BlockEntityRendererFactory.Context ctx) {
         super(ctx);
     }
 
     @Override
-    public void render(HeatResistantSlateBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(HeatResistantSlateBlockPileEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         if (entity.isEmpty()) {
             return;
         }
@@ -34,12 +34,12 @@ public class HeatResistantSlateBlockEntityRenderer extends UpPlaceBlockEntityRen
     }
 
     @Override
-    public MultiBlockReference getReference(HeatResistantSlateBlockEntity entity) {
-        return entity.getMultiBlockReference();
+    public CubeBlockPileReference getReference(HeatResistantSlateBlockPileEntity entity) {
+        return entity.getCubeBlockPileReference();
     }
 
     @Override
-    public void otherDebugRender(HeatResistantSlateBlockEntity entity, MultiBlockReference reference, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void otherDebugRender(HeatResistantSlateBlockPileEntity entity, CubeBlockPileReference reference, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         // 如果炉子结构有效，显示额外信息
         if (entity.isStoveValid()) {
             String stoveType = "Stove: " + entity.getCurrentStoveStructureType();

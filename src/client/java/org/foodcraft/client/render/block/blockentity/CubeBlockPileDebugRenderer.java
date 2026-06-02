@@ -5,14 +5,14 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import org.foodcraft.block.multi.*;
+import org.foodcraft.block.pile.*;
 
 /**
- * 对应用了{@link MultiBlock}的方块添加显示方块堆信息的效果
+ * 对应用了{@link CubeBlockPile}的方块添加显示方块堆信息的效果
  * <p>该渲染类会在方块的上方渲染出方块堆的信息便于调试</p>
  * @param <T> 对应的方块实体
  */
-public interface MultiBlockDebugRenderer<T extends BlockEntity> {
+public interface CubeBlockPileDebugRenderer<T extends BlockEntity> {
 
     /**
      * 获取用于渲染的文本渲染器。
@@ -25,7 +25,7 @@ public interface MultiBlockDebugRenderer<T extends BlockEntity> {
      * 获取方块的多方块引用
      * @param entity 对应的方块实体
      */
-    MultiBlockReference getReference(T entity);
+    CubeBlockPileReference getReference(T entity);
 
     /**
      * 进行其他的调试渲染
@@ -34,14 +34,14 @@ public interface MultiBlockDebugRenderer<T extends BlockEntity> {
      * @param matrices 变换矩阵，注意，此时的矩阵已经被变换到了渲染文字的地方。
      *                 如果需要一个新的矩阵，请再对矩阵进行一次推送
      */
-    default void otherDebugRender(T entity, MultiBlockReference reference,float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {}
+    default void otherDebugRender(T entity, CubeBlockPileReference reference, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {}
 
     /**
      * 渲染多方块调试信息。
      */
     default void renderDebugInfo(T entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         // 获取多方块引用
-        MultiBlockReference multiBlockRef = getReference(entity);
+        CubeBlockPileReference multiBlockRef = getReference(entity);
         if (multiBlockRef == null || multiBlockRef.isDisposed()) {
             return;
         }

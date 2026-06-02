@@ -22,7 +22,7 @@ public abstract class BlockEntityRendererFactoriesMixin {
         register(ModBlockEntityTypes.GRINDING_STONE, GrindingStoneBlockEntityRenderer::new);
         register(ModBlockEntityTypes.GARNISH_DISHES, GarnishDishesBlockEntityRenderer::new);
         register(ModBlockEntityTypes.SHELF, ShelfBlockEntityRenderer::new);
-        register(ModBlockEntityTypes.HEAT_RESISTANT_SLATE, HeatResistantSlateBlockEntityRenderer::new);
+        register(ModBlockEntityTypes.HEAT_RESISTANT_SLATE, HeatResistantSlateBlockPileEntityRenderer::new);
         register(ModBlockEntityTypes.MOLD, MoldBlockEntityRenderer::new);
         register(ModBlockEntityTypes.CUTTING_BOARD, CuttingBoardBlockEntityRenderer::new);
         register(ModBlockEntityTypes.POTS, PotsBlockEntityRenderer::new);

@@ -36,7 +36,7 @@ import org.foodcraft.FoodCraft;
 import org.foodcraft.block.CombustionFirewoodBlock;
 import org.foodcraft.block.FirewoodBlock;
 import org.foodcraft.block.HeatResistantSlateBlock;
-import org.foodcraft.block.multi.*;
+import org.foodcraft.block.pile.*;
 import org.foodcraft.item.ModSharpKitchenwareItem;
 import org.foodcraft.recipe.StoveRecipe;
 import org.foodcraft.registry.ModBlockEntityTypes;
@@ -48,14 +48,14 @@ import org.slf4j.Logger;
 
 import java.util.*;
 
-public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements MultiBlockEntity, SidedInventory, RecipeUnlocker, RecipeInputProvider {
+public class HeatResistantSlateBlockPileEntity extends UpPlaceBlockEntity implements CubeBlockPileEntity, SidedInventory, RecipeUnlocker, RecipeInputProvider {
     protected static final int MIN_CHECK_INTERVAL = 10;
-    protected static final String MULTIBLOCK_REF_KEY = "MultiBlockRef";
+    protected static final String PILE_REF_KEY = "CubeBlockPileRef";
     protected static final double INPUT_OFFSET_Y = 0.1;
     protected static final int MIN_BAKING_TIME = 100; // 最小烘烤时间
     protected static final Logger LOGGER = FoodCraft.LOGGER;
 
-    protected MultiBlockReference multiBlockRef;
+    protected CubeBlockPileReference cubeBlockPileRef;
     @Nullable
     protected BlockPattern.Result currentStoveResult;
     @Nullable
@@ -67,7 +67,7 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
     protected Set<BlockPos> firewoodPos = new HashSet<>(); // 绑定的柴火堆位置集合
     protected Set<CombustionFirewoodBlockEntity> firewoodEntities = new HashSet<>(); // 缓存的柴火堆方块实体集合
 
-    /**@see HeatResistantSlateBlockEntity#getBakingSpeed() */
+    /**@see HeatResistantSlateBlockPileEntity#getBakingSpeed() */
     protected int bakingTime;
     protected int bakingTimeTotal;
 
@@ -79,7 +79,7 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
     public int age;
     protected int lastCheckTime = 0;
 
-    public HeatResistantSlateBlockEntity(BlockPos pos, BlockState state) {
+    public HeatResistantSlateBlockPileEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.HEAT_RESISTANT_SLATE, pos, state, 1);
         this.matchGetter = RecipeManager.createCachedMatchGetter(ModRecipeTypes.STOVE);
         this.bakingTime = 0;
@@ -91,8 +91,8 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
         super.writeNbt(nbt);
 
         // 保存多方块引用信息
-        if (multiBlockRef != null && !multiBlockRef.isDisposed()) {
-            nbt.put(MULTIBLOCK_REF_KEY, multiBlockRef.toNbt());
+        if (cubeBlockPileRef != null && !cubeBlockPileRef.isDisposed()) {
+            nbt.put(PILE_REF_KEY, cubeBlockPileRef.toNbt());
         }
 
         nbt.putBoolean("IsStoveValid", isValidStove);
@@ -121,22 +121,22 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
         super.readNbt(nbt);
 
         // 保存nbt数据用于重建引用
-        if (nbt.contains(MULTIBLOCK_REF_KEY)) {
-            this.refNbt = nbt.getCompound(MULTIBLOCK_REF_KEY);
+        if (nbt.contains(PILE_REF_KEY)) {
+            this.refNbt = nbt.getCompound(PILE_REF_KEY);
         }
 
-        // 只在服务端重建功能性的MultiBlockReference
+        // 只在服务端重建功能性的CubeBlockPileReference
         if (world != null && !world.isClient) {
             if (this.refNbt != null) {
-                MultiBlockReference ref = ServerMultiBlockReference.fromNbt(world, refNbt);
+                CubeBlockPileReference ref = ServerCubeBlockPileReference.fromNbt(world, refNbt);
                 if (ref != null) {
-                    this.multiBlockRef = ref;
+                    this.cubeBlockPileRef = ref;
                 }
             }
         } else {
             // 在客户端，只重建显示信息
             if (this.refNbt != null) {
-                this.multiBlockRef = new ClientMultiBlockReference(refNbt);
+                this.cubeBlockPileRef = new ClientCubeBlockPileReference(refNbt);
             }
         }
 
@@ -270,18 +270,18 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
      * 设置多方块引用，并标记需要同步
      */
     @Override
-    public void setMultiBlockReference(@Nullable MultiBlockReference ref) {
+    public void setCubeBlockPileReference(@Nullable CubeBlockPileReference ref) {
         // 客户端不允许直接设置引用
-        if (world != null && (world.isClient || ref instanceof ClientMultiBlockReference)) {
+        if (world != null && (world.isClient || ref instanceof ClientCubeBlockPileReference)) {
             return;
         }
 
         // 先清理旧的引用
-        if (this.multiBlockRef != null) {
-            this.multiBlockRef.dispose();
+        if (this.cubeBlockPileRef != null) {
+            this.cubeBlockPileRef.dispose();
         }
 
-        this.multiBlockRef = ref;
+        this.cubeBlockPileRef = ref;
 
         // 重置结构检查状态
         this.currentStoveResult = null;
@@ -302,12 +302,12 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
      */
     @Nullable
     @Override
-    public MultiBlockReference getMultiBlockReference() {
-        return multiBlockRef;
+    public CubeBlockPileReference getCubeBlockPileReference() {
+        return cubeBlockPileRef;
     }
 
     @Override
-    public BlockPos getMultiBlockPos() {
+    public BlockPos getCubeBlockPilePos() {
         return this.pos;
     }
 
@@ -315,16 +315,16 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
      * 检查是否为多方块结构的主方块
      */
     public boolean isMasterBlock() {
-        return multiBlockRef != null && multiBlockRef.isMasterBlock();
+        return cubeBlockPileRef != null && cubeBlockPileRef.isMasterBlock();
     }
 
     @Override
     public void markRemoved() {
         super.markRemoved();
         // 清理引用
-        if (multiBlockRef != null) {
-            multiBlockRef.dispose();
-            multiBlockRef = null;
+        if (cubeBlockPileRef != null) {
+            cubeBlockPileRef.dispose();
+            cubeBlockPileRef = null;
         }
     }
 
@@ -332,11 +332,11 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
      * 检查方块堆是否符合炉子结构要求
      */
     public boolean isValidStoveStructure() {
-        if (multiBlockRef == null || multiBlockRef.isDisposed()) {
+        if (cubeBlockPileRef == null || cubeBlockPileRef.isDisposed()) {
             return false;
         }
-        if (multiBlockRef instanceof ServerMultiBlockReference multiBlockReference){
-            MultiBlock.PatternRange range = multiBlockReference.getMultiBlock().getRange();
+        if (cubeBlockPileRef instanceof ServerCubeBlockPileReference multiBlockReference){
+            CubeBlockPile.PatternRange range = multiBlockReference.getCubeBlockPile().getRange();
 
             int width = range.getWidth();
             int height = range.getHeight();
@@ -366,8 +366,8 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
             return -1;
         }
 
-        if (multiBlockRef instanceof ServerMultiBlockReference multiBlockReference){
-            MultiBlock.PatternRange range = multiBlockReference.getMultiBlock().getRange();
+        if (cubeBlockPileRef instanceof ServerCubeBlockPileReference multiBlockReference){
+            CubeBlockPile.PatternRange range = multiBlockReference.getCubeBlockPile().getRange();
             int width = range.getWidth();
             int depth = range.getDepth();
 
@@ -461,7 +461,7 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
 
     private void bindFirewoodFromStructure(World world, BlockPattern.Result result, int patternType) {
         // 获取所有'~'字符对应的位置
-        Set<BlockPos> newFirewoodPositions = FoodCraftUtils.findTargetPositionsFromPattern(result, HeatResistantSlateBlockEntity::isFirewoodPositionPredicate);
+        Set<BlockPos> newFirewoodPositions = FoodCraftUtils.findTargetPositionsFromPattern(result, HeatResistantSlateBlockPileEntity::isFirewoodPositionPredicate);
 
         if (!newFirewoodPositions.isEmpty()) {
             this.firewoodPos = newFirewoodPositions;
@@ -723,7 +723,7 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
         return this.lastRecipe;
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, @NotNull HeatResistantSlateBlockEntity blockEntity) {
+    public static void tick(World world, BlockPos pos, BlockState state, @NotNull HeatResistantSlateBlockPileEntity blockEntity) {
         // 每tick增加方块寿命
         blockEntity.age++;
         if (blockEntity.age == Integer.MAX_VALUE) {
@@ -758,23 +758,23 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
         this.isValidStove = false;
 
         if (world != null && !world.isClient &&
-                (this.multiBlockRef == null || this.multiBlockRef instanceof ClientMultiBlockReference)){
+                (this.cubeBlockPileRef == null || this.cubeBlockPileRef instanceof ClientCubeBlockPileReference)){
             // 如果因为某些意外导致引用为空或者实现了客户端引用，则尝试重构引用
-            MultiBlockReference ref = ServerMultiBlockReference.fromNbt(world, refNbt);
+            CubeBlockPileReference ref = ServerCubeBlockPileReference.fromNbt(world, refNbt);
             if (ref != null) {
-                setMultiBlockReference(ref);
+                setCubeBlockPileReference(ref);
             }
         }
 
         // 如果没有多方块引用，不进行检查
-        if (multiBlockRef == null || multiBlockRef.isDisposed()) {
+        if (cubeBlockPileRef == null || cubeBlockPileRef.isDisposed()) {
             return;
         }
 
         // 直接同步主方块的数据
-        if (!multiBlockRef.isMasterBlock()){
+        if (!cubeBlockPileRef.isMasterBlock()){
             if (world != null &&
-                    world.getBlockEntity(this.multiBlockRef.getMasterWorldPos()) instanceof HeatResistantSlateBlockEntity masterBlockEntity) {
+                    world.getBlockEntity(this.cubeBlockPileRef.getMasterWorldPos()) instanceof HeatResistantSlateBlockPileEntity masterBlockEntity) {
                 // 同步主方块的柴火堆信息
                 this.firewoodPos = new HashSet<>(masterBlockEntity.firewoodPos);
                 this.firewoodEntities = new HashSet<>(masterBlockEntity.firewoodEntities);
@@ -790,7 +790,7 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
         }
 
         // 检查多方块结构是否有效
-        if (!multiBlockRef.checkIntegrity()) {
+        if (!cubeBlockPileRef.checkIntegrity()) {
             return;
         }
 
@@ -813,7 +813,7 @@ public class HeatResistantSlateBlockEntity extends UpPlaceBlockEntity implements
 
         // 在周围搜索匹配的炉子结构
         // 使用主方块位置作为搜索起点
-        BlockPos searchPos = multiBlockRef.getMasterWorldPos();
+        BlockPos searchPos = cubeBlockPileRef.getMasterWorldPos();
         pattern.searchAround(world, searchPos);
         BlockPattern.Result result = searchAround(world, searchPos, patternType, pattern);
 
