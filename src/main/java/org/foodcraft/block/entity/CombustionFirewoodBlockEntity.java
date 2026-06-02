@@ -32,29 +32,96 @@ public class CombustionFirewoodBlockEntity extends BlockEntity {
             this.isFirstCycle = true;
             this.cycleCount = 0;
         }
-        updateHeatLevel(); // 初始化热量等级
+        updateHeatLevel();
     }
 
-    @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        nbt.putInt("Energy", energy);
-        nbt.putInt("CycleCount", cycleCount);
-        nbt.putBoolean("IsFirstCycle", isFirstCycle);
-        nbt.putInt("HeatLevel", heatLevel); // 保存热量等级
-    }
+    public static void tick(World world, BlockPos pos, BlockState state, CombustionFirewoodBlockEntity blockEntity) {
+        // 每tick消耗1点能量
+        blockEntity.consumeEnergy();
+        blockEntity.checkClearSpaceAbove(world, pos, state);
 
-    @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        energy = nbt.getInt("Energy");
-        cycleCount = nbt.getInt("CycleCount");
-        isFirstCycle = nbt.getBoolean("IsFirstCycle");
-        heatLevel = nbt.getInt("HeatLevel"); // 读取热量等级
-        // 如果NBT中没有热量等级，根据能量计算
-        if (!nbt.contains("HeatLevel")) {
-            updateHeatLevel();
+        // 如果能量耗尽且处于燃烧状态，更新到燃尽状态
+        if (blockEntity.energy <= 0 && state.get(CombustionFirewoodBlock.COMBUSTION_STATE).isBurning()) {
+            blockEntity.updateCombustionState();
         }
+    }
+
+    /**
+     * 强制熄灭当前燃烧的柴火堆
+     * 根据当前方块状态决定熄灭后的状态
+     * @return 是否成功熄灭（如果已经熄灭则返回false）
+     */
+    public boolean extinguish() {
+        if (world == null || world.isClient()) {
+            return false;
+        }
+
+        BlockState currentState = getCachedState();
+        CombustionFirewoodBlock.CombustionState currentCombustionState =
+                currentState.get(CombustionFirewoodBlock.COMBUSTION_STATE);
+
+        // 如果已经处于熄灭状态，不需要再次熄灭
+        if (!currentCombustionState.isBurning()) {
+            return false;
+        }
+
+        CombustionFirewoodBlock.CombustionState extinguishedState = switch (currentCombustionState) {
+            case FIRST_IGNITED, FIRST_HALF -> CombustionFirewoodBlock.CombustionState.FIRST_EXTINGUISHED;
+            case AGAIN_IGNITED, AGAIN_HALF, REIGNITED -> CombustionFirewoodBlock.CombustionState.AGAIN_EXTINGUISHED;
+            default ->
+                // 默认情况下，如果是首次燃烧则熄灭为首次燃尽，否则为非首次燃尽
+                    isFirstCycle ?
+                            CombustionFirewoodBlock.CombustionState.FIRST_EXTINGUISHED :
+                            CombustionFirewoodBlock.CombustionState.AGAIN_EXTINGUISHED;
+        };
+
+        this.energy = 0;
+        world.setBlockState(pos, currentState.with(CombustionFirewoodBlock.COMBUSTION_STATE, extinguishedState));
+        world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 1.0f);
+        spawnExtinguishParticles(world, pos);
+
+        markDirty();
+        return true;
+    }
+
+    /**
+     * 添柴操作 - 任何能量不满的状态都可以添柴
+     * @return 是否成功添柴
+     */
+    public boolean addFirewood() {
+        if (energy >= MAX_ENERGY || isCompletelyExtinguished()) {
+            return false; // 能量已满或完全燃尽，无法添柴
+        }
+
+        CombustionFirewoodBlock.CombustionState currentState = getCachedState().get(CombustionFirewoodBlock.COMBUSTION_STATE);
+        CombustionFirewoodBlock.CombustionState newState;
+
+        // 根据当前状态决定添柴后的状态
+        switch (currentState) {
+            case FIRST_IGNITED:
+            case FIRST_HALF:
+            case FIRST_EXTINGUISHED, REIGNITED, AGAIN_EXTINGUISHED:
+                newState = CombustionFirewoodBlock.CombustionState.AGAIN_IGNITED;
+                break;
+
+            case AGAIN_IGNITED:
+            case AGAIN_HALF:
+                newState = CombustionFirewoodBlock.CombustionState.REIGNITED;
+                break;
+
+            default:
+                return false;
+        }
+
+        // 增加50%能量
+        addEnergy(FIREWOOD_ENERGY);
+
+        // 更新方块状态
+        if (world != null) {
+            world.setBlockState(pos, getCachedState().with(CombustionFirewoodBlock.COMBUSTION_STATE, newState));
+        }
+        markDirty();
+        return true;
     }
 
     /**
@@ -163,44 +230,6 @@ public class CombustionFirewoodBlockEntity extends BlockEntity {
     }
 
     /**
-     * 强制熄灭当前燃烧的柴火堆
-     * 根据当前方块状态决定熄灭后的状态
-     * @return 是否成功熄灭（如果已经熄灭则返回false）
-     */
-    public boolean extinguish() {
-        if (world == null || world.isClient()) {
-            return false;
-        }
-
-        BlockState currentState = getCachedState();
-        CombustionFirewoodBlock.CombustionState currentCombustionState =
-                currentState.get(CombustionFirewoodBlock.COMBUSTION_STATE);
-
-        // 如果已经处于熄灭状态，不需要再次熄灭
-        if (!currentCombustionState.isBurning()) {
-            return false;
-        }
-
-        CombustionFirewoodBlock.CombustionState extinguishedState = switch (currentCombustionState) {
-            case FIRST_IGNITED, FIRST_HALF -> CombustionFirewoodBlock.CombustionState.FIRST_EXTINGUISHED;
-            case AGAIN_IGNITED, AGAIN_HALF, REIGNITED -> CombustionFirewoodBlock.CombustionState.AGAIN_EXTINGUISHED;
-            default ->
-                // 默认情况下，如果是首次燃烧则熄灭为首次燃尽，否则为非首次燃尽
-                    isFirstCycle ?
-                            CombustionFirewoodBlock.CombustionState.FIRST_EXTINGUISHED :
-                            CombustionFirewoodBlock.CombustionState.AGAIN_EXTINGUISHED;
-        };
-
-        this.energy = 0;
-        world.setBlockState(pos, currentState.with(CombustionFirewoodBlock.COMBUSTION_STATE, extinguishedState));
-        world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 1.0f);
-        spawnExtinguishParticles(world, pos);
-
-        markDirty();
-        return true;
-    }
-
-    /**
      * 生成熄灭粒子效果
      */
     private void spawnExtinguishParticles(World world, BlockPos pos) {
@@ -218,17 +247,6 @@ public class CombustionFirewoodBlockEntity extends BlockEntity {
                         0.05,
                         (random.nextDouble() - 0.5) * 0.05);
             }
-        }
-    }
-
-    public static void tick(World world, BlockPos pos, BlockState state, CombustionFirewoodBlockEntity blockEntity) {
-        // 每tick消耗1点能量
-        blockEntity.consumeEnergy();
-        blockEntity.checkClearSpaceAbove(world, pos, state);
-
-        // 如果能量耗尽且处于燃烧状态，更新到燃尽状态
-        if (blockEntity.energy <= 0 && state.get(CombustionFirewoodBlock.COMBUSTION_STATE).isBurning()) {
-            blockEntity.updateCombustionState();
         }
     }
 
@@ -298,46 +316,6 @@ public class CombustionFirewoodBlockEntity extends BlockEntity {
                         (random.nextDouble() - 0.5) * 0.1);
             }
         }
-    }
-
-    /**
-     * 添柴操作 - 任何能量不满的状态都可以添柴
-     * @return 是否成功添柴
-     */
-    public boolean addFirewood() {
-        if (energy >= MAX_ENERGY || isCompletelyExtinguished()) {
-            return false; // 能量已满或完全燃尽，无法添柴
-        }
-
-        CombustionFirewoodBlock.CombustionState currentState = getCachedState().get(CombustionFirewoodBlock.COMBUSTION_STATE);
-        CombustionFirewoodBlock.CombustionState newState;
-
-        // 根据当前状态决定添柴后的状态
-        switch (currentState) {
-            case FIRST_IGNITED:
-            case FIRST_HALF:
-            case FIRST_EXTINGUISHED, REIGNITED, AGAIN_EXTINGUISHED:
-                newState = CombustionFirewoodBlock.CombustionState.AGAIN_IGNITED;
-                break;
-
-            case AGAIN_IGNITED:
-            case AGAIN_HALF:
-                newState = CombustionFirewoodBlock.CombustionState.REIGNITED;
-                break;
-
-            default:
-                return false;
-        }
-
-        // 增加50%能量
-        addEnergy(FIREWOOD_ENERGY);
-
-        // 更新方块状态
-        if (world != null) {
-            world.setBlockState(pos, getCachedState().with(CombustionFirewoodBlock.COMBUSTION_STATE, newState));
-        }
-        markDirty();
-        return true;
     }
 
     /**
@@ -492,5 +470,27 @@ public class CombustionFirewoodBlockEntity extends BlockEntity {
      */
     public int getHalfEnergy() {
         return HALF_ENERGY;
+    }
+
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        nbt.putInt("Energy", energy);
+        nbt.putInt("CycleCount", cycleCount);
+        nbt.putBoolean("IsFirstCycle", isFirstCycle);
+        nbt.putInt("HeatLevel", heatLevel); // 保存热量等级
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        energy = nbt.getInt("Energy");
+        cycleCount = nbt.getInt("CycleCount");
+        isFirstCycle = nbt.getBoolean("IsFirstCycle");
+        heatLevel = nbt.getInt("HeatLevel"); // 读取热量等级
+        // 如果NBT中没有热量等级，根据能量计算
+        if (!nbt.contains("HeatLevel")) {
+            updateHeatLevel();
+        }
     }
 }

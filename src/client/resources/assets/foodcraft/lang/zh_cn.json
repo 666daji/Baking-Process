@@ -1,5 +1,6 @@
 {
-  "itemgroup.foodcraft": "Tw的烘培工艺",
+  "itemgroup.foodcraft": "TW的烘培工艺",
+  "jade.modName.foodcraft": "TW的烘培工艺",
 
   "item.foodcraft.wheat_flour": "小麦粉",
   "item.foodcraft.lapis_lazuli_flour": "青金石粉",
@@ -12,6 +13,7 @@
   "block.foodcraft.grinding_stone": "石磨",
   "block.foodcraft.toast_mold": "土司胚模具",
   "block.foodcraft.heat_resistant_slate": "耐热石板",
+  "block.foodcraft.combustion_firewood": "柴火",
   "block.foodcraft.firewood": "柴火",
   "block.foodcraft.iron_plate": "铁盘",
 
@@ -52,7 +54,7 @@
   "item.foodcraft.cooked_cod_head": "熟鳕鱼头",
   "block.foodcraft.salmon_cubes": "鲑鱼块",
   "block.foodcraft.cooked_salmon_cubes": "熟鲑鱼块",
-  "item.foodcraft.kitchen_waste": "厨余废弃物",
+  "block.foodcraft.kitchen_waste": "厨余废弃物",
 
   "block.foodcraft.cake_embryo_mold": "蛋糕胚模具",
   "block.foodcraft.toast_embryo_mold": "吐司模具",
@@ -120,5 +122,9 @@
   "item.foodcraft.flour_sack.content": "%s x%s",
   "item.foodcraft.flour_sack.tooltip.empty": "右键点击放入粉尘",
   "item.foodcraft.flour_sack.tooltip.non_empty": "右键点击取出粉尘",
-  "item.foodcraft.flour_sack.tooltip.contents": "右键点击取出粉尘"
+  "item.foodcraft.flour_sack.tooltip.contents": "右键点击取出粉尘",
+
+  "modmenu.nameTranslation.baking-process": "TW的烘培工艺",
+  "modmenu.descriptionTranslation.baking-process": "添加了丰富的饮食，提高了饮食体验!",
+  "modmenu.summaryTranslation.baking-process": "添加了丰富的饮食，提高了饮食体验!"
 }

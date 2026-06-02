@@ -8,7 +8,6 @@ import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
@@ -24,11 +23,11 @@ import org.foodcraft.recipe.CutRecipe;
 import org.foodcraft.registry.ModItems;
 import org.foodcraft.registry.ModRecipeTypes;
 import org.foodcraft.registry.ModSounds;
-import org.foodcraft.tag.ItemTags;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * 切菜流程处理器，支持特定物品在特定切割次数的特殊交互。
@@ -85,6 +84,9 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
      */
     private static final Map<Item, Map<Integer, String>> SPECIAL_STEP_TRIGGERS = new HashMap<>();
 
+    /** 特殊步骤实例映射：步骤ID -> 步骤实例 */
+    private static final Map<String, Function<CuttingProcess<?>, Step<UpPlaceBlockEntity>>> SPECIAL_STEP_INSTANCES = new HashMap<>();
+
     static {
         // 配置胡萝卜的特殊切割步骤
         Map<Integer, String> carrotTriggers = new HashMap<>();
@@ -119,6 +121,58 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
         SPECIAL_STEP_TRIGGERS.put(Items.COOKED_COD, cookedCodTriggers);
         SPECIAL_STEP_TRIGGERS.put(Items.SALMON, salmonTriggers);
         SPECIAL_STEP_TRIGGERS.put(Items.COOKED_SALMON, cookedSalmonTriggers);
+
+        registerGiveStep(
+                Items.COD,
+                7,
+                STEP_COD_8,
+                new ItemStack(ModItems.COD_CUBES, 1)
+        );
+        registerGiveStep(
+                Items.COD,
+                8,
+                STEP_COD_9,
+                new ItemStack(ModItems.COD_CUBES, 1)
+        );
+
+        registerGiveStep(
+                Items.COOKED_COD,
+                7,
+                STEP_COOKED_COD_8,
+                new ItemStack(ModItems.COOKED_COD_CUBES, 1)
+        );
+        registerGiveStep(
+                Items.COOKED_COD,
+                8,
+                STEP_COOKED_COD_9,
+                new ItemStack(ModItems.COOKED_COD_CUBES, 1)
+        );
+
+        registerGiveStep(
+                Items.SALMON,
+                5,
+                STEP_SALMON_6,
+                new ItemStack(ModItems.SALMON_CUBES, 1)
+        );
+        registerGiveStep(
+                Items.SALMON,
+                6,
+                STEP_SALMON_7,
+                new ItemStack(ModItems.SALMON_CUBES, 1)
+        );
+
+        registerGiveStep(
+                Items.COOKED_SALMON,
+                5,
+                STEP_COOKED_SALMON_6,
+                new ItemStack(ModItems.COOKED_SALMON_CUBES, 1)
+        );
+        registerGiveStep(
+                Items.COOKED_SALMON,
+                6,
+                STEP_COOKED_SALMON_7,
+                new ItemStack(ModItems.COOKED_SALMON_CUBES, 1)
+        );
     }
 
     public CuttingProcess() {
@@ -144,66 +198,10 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
         // 空手交互特殊步骤
         registerStep(STEP_EMPTY, new EmptyStep());
 
-        // 注册特殊步骤
-        registerQuickSpecialStep(
-                Items.CARROT,          // 触发物品
-                11,                    // 在第12刀触发
-                STEP_CARROT_12,        // 步骤ID
-                new ItemStack(ModItems.CARROT_SLICES, 1),
-                new ItemStack(ModItems.CARROT_HEAD, 1)
-        );
-
-        registerQuickSpecialStep(
-                Items.COD,
-                7,
-                STEP_COD_8,
-                new ItemStack(ModItems.COD_CUBES, 1)
-        );
-        registerQuickSpecialStep(
-                Items.COD,
-                8,
-                STEP_COD_9,
-                new ItemStack(ModItems.COD_CUBES, 1)
-        );
-
-        registerQuickSpecialStep(
-                Items.COOKED_COD,
-                7,
-                STEP_COOKED_COD_8,
-                new ItemStack(ModItems.COOKED_COD_CUBES, 1)
-        );
-        registerQuickSpecialStep(
-                Items.COOKED_COD,
-                8,
-                STEP_COOKED_COD_9,
-                new ItemStack(ModItems.COOKED_COD_CUBES, 1)
-        );
-
-        registerQuickSpecialStep(
-                Items.SALMON,
-                5,
-                STEP_SALMON_6,
-                new ItemStack(ModItems.SALMON_CUBES, 1)
-        );
-        registerQuickSpecialStep(
-                Items.SALMON,
-                6,
-                STEP_SALMON_7,
-                new ItemStack(ModItems.SALMON_CUBES, 1)
-        );
-
-        registerQuickSpecialStep(
-                Items.COOKED_SALMON,
-                5,
-                STEP_COOKED_SALMON_6,
-                new ItemStack(ModItems.COOKED_SALMON_CUBES, 1)
-        );
-        registerQuickSpecialStep(
-                Items.COOKED_SALMON,
-                6,
-                STEP_COOKED_SALMON_7,
-                new ItemStack(ModItems.COOKED_SALMON_CUBES, 1)
-        );
+        for (String id : SPECIAL_STEP_INSTANCES.keySet()) {
+            Function<CuttingProcess<?>, Step<UpPlaceBlockEntity>> function = SPECIAL_STEP_INSTANCES.get(id);
+            Step<UpPlaceBlockEntity> step = function.apply(this);
+        }
     }
 
     // ============ 步骤实现类 ============
@@ -305,23 +303,24 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
      * @param stepId 步骤ID
      * @param itemsToGive 要给予的物品
      */
-    public void registerQuickSpecialStep(Item item, int cutNumber, String stepId, ItemStack... itemsToGive) {
+    public static void registerGiveStep(Item item, int cutNumber, String stepId, ItemStack... itemsToGive) {
         // 注册步骤
-        registerStep(stepId, StepBuilders.simple(
-                ctx -> {
-                    if (ctx.isServerSide()) {
-                        currentCut++;
-                        updateInventory(ctx.blockEntity(), currentCut);
-                        for (ItemStack stack : itemsToGive) {
-                            ctx.giveStack(stack.copy());
-                        }
-                        ctx.playSound(SoundEvents.ENTITY_ITEM_PICKUP);
-                        ctx.blockEntity().markDirtyAndSync();
-                    }
-                    return ActionResult.SUCCESS;
-                },
-                STEP_COMPLETE
-        ));
+        SPECIAL_STEP_INSTANCES.put(stepId, process ->
+                StepBuilders.simple(
+                        ctx -> {
+                            if (ctx.isServerSide()) {
+                                process.currentCut++;
+                                process.updateInventory(ctx.blockEntity(), process.currentCut);
+                                for (ItemStack stack : itemsToGive) {
+                                    ctx.giveStack(stack.copy());
+                                }
+                                ctx.playSound(SoundEvents.ENTITY_ITEM_PICKUP);
+                                ctx.blockEntity().markDirtyAndSync();
+                            }
+                            return ActionResult.SUCCESS;
+                        },
+                        STEP_COMPLETE
+                ));
 
         // 添加到触发映射
         SPECIAL_STEP_TRIGGERS
@@ -351,30 +350,6 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
         if (!context.isCreateMode() && tool.isDamageable()) {
             tool.damage(1, context.player(), p -> p.sendToolBreakStatus(context.hand()));
         }
-    }
-
-    /**
-     * 根据物品类型返回相应的切割音效。
-     *
-     * @param itemStack 待切割的物品
-     * @return 对应的切割音效
-     */
-    private SoundEvent getCutSoundForItem(ItemStack itemStack) {
-        if (itemStack.isEmpty()) {
-            return ModSounds.CUT; // 默认音效
-        }
-
-        // 检查是否为肉类或鱼类
-        boolean isMeat = itemStack.isIn(ItemTags.MEAT);
-        boolean isFish = itemStack.isIn(ItemTags.FISH);
-
-        // 如果是肉类或鱼类，播放切肉音效
-        if (isMeat || isFish) {
-            return ModSounds.CUT_MEAT;
-        }
-
-        // 其他情况播放普通切割音效
-        return ModSounds.CUT;
     }
 
     /**

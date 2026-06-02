@@ -8,6 +8,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.context.LootContextParameterSet;
@@ -253,6 +254,11 @@ public class CombustionFirewoodBlock extends BlockWithEntity {
         }
         // 非熄灭状态不掉落任何物品
         return List.of();
+    }
+
+    @Override
+    public Item asItem() {
+        return ModItems.FIREWOOD;
     }
 
     public enum CombustionState implements StringIdentifiable {
