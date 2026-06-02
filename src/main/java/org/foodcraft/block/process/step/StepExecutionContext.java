@@ -15,7 +15,6 @@ import net.minecraft.world.World;
 import org.foodcraft.block.process.AbstractProcess;
 import org.foodcraft.util.FoodCraftUtils;
 
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -47,11 +46,18 @@ import java.util.Random;
  * @param player      执行交互的玩家
  * @param hand        玩家使用的手（主手或副手）
  * @param hit         方块点击信息
- * @param contextData 临时上下文数据存储（仅当前步骤执行期间有效）
  */
 public record StepExecutionContext<T>(AbstractProcess<T> process, T blockEntity, BlockState blockState, World world,
-                                      BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit,
-                                      Map<String, Object> contextData) {
+                                      BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+
+    /**
+     * 检查该上下文是否无玩家参与。
+     *
+     * @return 如果无玩家参与则返回true
+     */
+    public boolean isNoPlayer() {
+        return player == null || hand == null || hit == null;
+    }
 
     /**
      * 获取玩家当前手持的物品堆栈。
@@ -86,28 +92,6 @@ public record StepExecutionContext<T>(AbstractProcess<T> process, T blockEntity,
         if (!player.giveItemStack(stack)) {
             player.dropItem(stack, false);
         }
-    }
-
-    /**
-     * 从临时上下文数据中获取值。
-     *
-     * @param key 数据的键
-     * @param <V> 数据的类型
-     * @return 数据的值，如果不存在则返回null
-     */
-    @SuppressWarnings("unchecked")
-    public <V> V getContextData(String key) {
-        return (V) contextData.get(key);
-    }
-
-    /**
-     * 向临时上下文数据中设置值。
-     *
-     * @param key 数据的键
-     * @param value 数据的值
-     */
-    public void setContextData(String key, Object value) {
-        contextData.put(key, value);
     }
 
     /**

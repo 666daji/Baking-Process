@@ -127,7 +127,6 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
         this.savedRecipeId = "";
 
         registerSteps();
-        setInitialStep(STEP_CUT);
     }
 
     // ============ 步骤注册 ============

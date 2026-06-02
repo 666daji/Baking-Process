@@ -47,16 +47,4 @@ public interface Step<T> {
     default boolean canExecuteOn(T blockEntity) {
         return true;
     }
-
-    /**
-     * 获取步骤的默认下一步ID。
-     *
-     * <p>当步骤返回{@link StepResult.Type#NEXT_STEP}但未指定下一步ID时，
-     * 将使用此方法返回的ID。默认返回null，表示没有默认下一步。</p>
-     *
-     * @return 默认下一步ID，或null表示没有默认下一步
-     */
-    default String getDefaultNextStepId() {
-        return null;
-    }
 }

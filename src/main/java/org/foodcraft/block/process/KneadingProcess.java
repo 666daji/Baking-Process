@@ -71,11 +71,6 @@ public class KneadingProcess<T extends BlockEntity & Inventory> extends Abstract
 
         // 注册步骤
         registerSteps();
-
-        // 设置初始步骤（仅在全新流程时）
-        if (currentStepId == null) {
-            setInitialStep(STEP_ADD_FLOUR);
-        }
     }
 
     private void registerSteps() {

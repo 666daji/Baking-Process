@@ -19,6 +19,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.foodcraft.FoodCraft;
 import org.foodcraft.block.PlateBlock;
 import org.foodcraft.block.process.EatDishesProcess;
 import org.foodcraft.block.process.PlatingProcess;
@@ -219,13 +220,9 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
      * 尝试摆盘。
      */
     public ActionResult tryPlating(PlayerEntity player, Hand hand, BlockHitResult hit) {
-        // 如果吃流程活跃，不允许摆盘
-        if (eatProcess.isActive()) {
-            return ActionResult.PASS;
-        }
-
-        // 已经存在菜肴时不可以开始摆盘
-        if (outcome != null) {
+        // 检查是否满足摆盘条件
+        if (eatProcess.isActive() || outcome != null || getCachedState().get(PlateBlock.IS_COVERED)) {
+            FoodCraft.LOGGER.info("正常情况");
             return ActionResult.PASS;
         }
 

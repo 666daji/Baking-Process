@@ -24,7 +24,6 @@ public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> exten
 
     public EatDishesProcess() {
         registerStep(STEP_EAT, new EatStep());
-        setInitialStep(STEP_EAT);
     }
 
     public int getEatenCount() {

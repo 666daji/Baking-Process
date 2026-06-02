@@ -28,7 +28,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.foodcraft.FoodCraft;
 import org.foodcraft.block.entity.PlateBlockEntity;
 import org.foodcraft.contentsystem.api.ContainerUtil;
 import org.foodcraft.contentsystem.content.AbstractContent;
@@ -61,6 +60,10 @@ public class PlateBlock extends Block implements BlockEntityProvider {
         BlockEntity entity = world.getBlockEntity(pos);
         ItemStack handStack = player.getStackInHand(hand);
 
+        if (hand == Hand.OFF_HAND) {
+            return ActionResult.PASS;
+        }
+
         if (entity instanceof PlateBlockEntity plateBlockEntity) {
             // 尝试食用
             if (plateBlockEntity.getOutcome() != null && !state.get(IS_COVERED) && handStack.isEmpty()) {
@@ -82,10 +85,8 @@ public class PlateBlock extends Block implements BlockEntityProvider {
             }
 
             // 尝试取下盖子
-            if (state.get(IS_COVERED) && player.isSneaking() && plateBlockEntity.removeCoverAndRestore()) {
-                if (!player.isCreative()) {
-                    player.giveItemStack(new ItemStack(ModItems.PLATE_LID));
-                }
+            if (!state.get(IS_COVERED) && player.isSneaking() && plateBlockEntity.removeCoverAndRestore()) {
+                player.giveItemStack(new ItemStack(ModItems.PLATE_LID));
                 return ActionResult.SUCCESS;
             }
 
@@ -105,10 +106,7 @@ public class PlateBlock extends Block implements BlockEntityProvider {
             }
 
             // 尝试摆盘
-            ActionResult result = plateBlockEntity.tryPlating(player, hand, hit);
-            if (result.isAccepted()) {
-                return result;
-            }
+            return plateBlockEntity.tryPlating(player, hand, hit);
         }
 
         return super.onUse(state, world, pos, player, hand, hit);

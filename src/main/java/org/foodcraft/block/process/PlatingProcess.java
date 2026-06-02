@@ -8,13 +8,13 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.world.World;
 import org.foodcraft.block.entity.PlatableBlockEntity;
 import org.foodcraft.block.process.playeraction.PlayerAction;
+import org.foodcraft.block.process.playeraction.PlayerActionCreators;
+import org.foodcraft.block.process.playeraction.PlayerActionFactory;
 import org.foodcraft.block.process.playeraction.impl.AddContentPlayerAction;
 import org.foodcraft.block.process.playeraction.impl.AddItemPlayerAction;
 import org.foodcraft.block.process.step.Step;
 import org.foodcraft.block.process.step.StepExecutionContext;
 import org.foodcraft.block.process.step.StepResult;
-import org.foodcraft.contentsystem.api.ContainerUtil;
-import org.foodcraft.contentsystem.content.AbstractContent;
 import org.foodcraft.recipe.PlatingRecipe;
 import org.foodcraft.registry.ModRecipeTypes;
 import org.jetbrains.annotations.Nullable;
@@ -57,7 +57,6 @@ public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends
 
     public PlatingProcess() {
         registerSteps();
-        setInitialStep(STEP_PERFORM_ACTION);
     }
 
     private void registerSteps() {
@@ -79,6 +78,12 @@ public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends
      * </ol>
      */
     protected class PerformActionStep implements Step<T> {
+        private static final PlayerActionFactory.PlayerActionCreator CREATOR =
+                PlayerActionCreators.firstNonNull(
+                        PlayerActionFactory.getRegisteredCreator(AddContentPlayerAction.TYPE),
+                        PlayerActionFactory.getRegisteredCreator(AddItemPlayerAction.TYPE)
+                );
+
         @Override
         public StepResult execute(StepExecutionContext<T> context) {
             // 防止重入逻辑
@@ -90,7 +95,7 @@ public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends
             PlatableBlockEntity plate = context.blockEntity();
 
             // 从上下文创建预期操作
-            PlayerAction expectedAction = createActionFromContext(context);
+            PlayerAction expectedAction = CREATOR.create(context);
 
             // 已执行操作列表
             List<PlayerAction> performedActions = plate.getPerformedActions();
@@ -139,22 +144,6 @@ public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends
             }
 
             return executeAction(context, plate, expectedAction, currentStep);
-        }
-
-        @Nullable
-        private PlayerAction createActionFromContext(StepExecutionContext<T> context) {
-            ItemStack heldItem = context.getHeldItemStack();
-            AbstractContent content = ContainerUtil.extractContent(heldItem);
-
-            if (content != null) {
-                return AddContentPlayerAction.fromContext(context).orElseThrow();
-            }
-
-            if (!heldItem.isEmpty()) {
-                return new AddItemPlayerAction(heldItem.getItem(), 1);
-            }
-
-            return null;
         }
 
         /**

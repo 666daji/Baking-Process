@@ -19,7 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.foodcraft.FoodCraft;
 import org.foodcraft.block.entity.PotsBlockEntity;
 import org.foodcraft.util.FoodCraftUtils;
 import org.jetbrains.annotations.Nullable;

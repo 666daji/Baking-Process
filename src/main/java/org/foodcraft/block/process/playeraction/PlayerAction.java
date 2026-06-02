@@ -6,8 +6,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.foodcraft.block.process.step.StepExecutionContext;
 
-import java.util.Optional;
-
 /**
  * 玩家操作基类，代表玩家在流程步骤中执行的具体交互动作。
  *
@@ -55,20 +53,6 @@ public abstract class PlayerAction {
         System.arraycopy(parts, 1, params, 0, params.length);
 
         return PlayerActionFactory.create(type, params);
-    }
-
-    /**
-     * 从执行上下文创建操作实例。
-     *
-     * <p>用于在流程步骤中根据玩家当前的交互情况创建操作。
-     * 不是所有操作都能从任意上下文创建，子类可以重写此方法。</p>
-     *
-     * @param context 步骤执行上下文
-     * @return 如果可以从上下文创建操作，则返回包含操作的Optional；否则返回空Optional
-     */
-    public static Optional<PlayerAction> fromContext(StepExecutionContext<?> context) {
-        // 默认实现返回空，子类可以重写
-        return Optional.empty();
     }
 
     /**

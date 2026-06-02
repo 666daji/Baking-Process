@@ -137,11 +137,6 @@ public final class StepBuilders {
             ActionResult result = executor.apply(context);
             return StepResult.nextStep(nextStepId, result);
         }
-
-        @Override
-        public String getDefaultNextStepId() {
-            return nextStepId;
-        }
     }
 
     /** 循环步骤实现 */
@@ -168,11 +163,6 @@ public final class StepBuilders {
             } else {
                 return StepResult.continueSameStep(result);
             }
-        }
-
-        @Override
-        public String getDefaultNextStepId() {
-            return nextStepId;
         }
     }
 
@@ -256,11 +246,6 @@ public final class StepBuilders {
         @Override
         public boolean canExecuteOn(T blockEntity) {
             return blockEntityFilter.test(blockEntity) && wrappedStep.canExecuteOn(blockEntity);
-        }
-
-        @Override
-        public String getDefaultNextStepId() {
-            return wrappedStep.getDefaultNextStepId();
         }
     }
 }

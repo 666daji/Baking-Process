@@ -12,7 +12,6 @@ import java.util.Map;
  * <p>工厂模式允许动态注册新的操作类型，使系统易于扩展。</p>
  */
 public final class PlayerActionFactory {
-
     private static final Map<String, PlayerActionParser> PARSERS = new HashMap<>();
     private static final Map<String, PlayerActionCreator> CREATORS = new HashMap<>();
 
@@ -66,20 +65,13 @@ public final class PlayerActionFactory {
     }
 
     /**
-     * 尝试从上下文创建操作。
+     * 获取注册的上下文创建器。
      *
      * @param type 操作类型
-     * @param context 步骤执行上下文
-     * @return 如果创建器存在且成功创建，则返回操作实例；否则返回null
+     * @return 对应的上下文创建器
      */
-    @Nullable
-    public static PlayerAction createFromContext(String type, StepExecutionContext<?> context) {
-        PlayerActionCreator creator = CREATORS.get(type);
-        if (creator == null) {
-            return null;
-        }
-
-        return creator.create(context);
+    public static PlayerActionCreator getRegisteredCreator(String type) {
+        return CREATORS.get(type);
     }
 
     /**
@@ -99,7 +91,7 @@ public final class PlayerActionFactory {
     // ==================== 内部接口 ====================
 
     /**
-     * 操作解析器接口，用于从字符串参数创建操作。
+     * 操作解析器，用于从字符串参数创建操作。
      */
     @FunctionalInterface
     public interface PlayerActionParser {
@@ -107,7 +99,7 @@ public final class PlayerActionFactory {
     }
 
     /**
-     * 操作创建器接口，用于从上下文创建操作。
+     * 上下文创建器，用于从上下文创建操作。
      */
     @FunctionalInterface
     public interface PlayerActionCreator {

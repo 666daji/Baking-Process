@@ -108,8 +108,8 @@
 
   "content.foodcraft.honey": "蜂蜜",
 
-  "player_action.add_content": "添加%s",
-  "player_action.add_item": "添加%s",
+  "player_action.add_content": "添加%s:%s份",
+  "player_action.add_item": "添加%s:%s份",
 
   "grinding_stone.add.refused": "这东西可不能磨哦",
   "grinding_stone.add.full": "已经满了!",

@@ -72,9 +72,6 @@ public abstract class AbstractProcess<T> {
     /** 流程是否处于活动状态 */
     protected boolean isActive = false;
 
-    /** 步骤上下文数据，每次执行步骤时临时存储（仅用于临时数据传递） */
-    private final Map<String, Object> stepContext = new HashMap<>();
-
     // ============ 受保护的方法（子类使用） ============
 
     /**
@@ -90,25 +87,10 @@ public abstract class AbstractProcess<T> {
         steps.put(stepId, step);
     }
 
-    /**
-     * 设置流程的初始步骤。
-     *
-     * <p>当流程开始时，将从这个步骤开始执行。必须在注册步骤后调用此方法。</p>
-     *
-     * @param stepId 初始步骤的ID
-     * @throws IllegalArgumentException 如果步骤ID未注册
-     */
-    protected void setInitialStep(String stepId) {
-        if (!steps.containsKey(stepId)) {
-            throw new IllegalArgumentException("Step is not registered: " + stepId);
-        }
-        this.currentStepId = stepId;
-    }
-
     // ============ 公开的方法（外部调用） ============
 
     /**
-     * 执行当前步骤。
+     * 有玩家参与的情况下执行当前步骤。
      *
      * <p>此方法会调用当前步骤的{@link Step#execute}方法，并根据返回的
      * {@link StepResult}决定下一步动作。每次调用必定消耗当前步骤，
@@ -136,9 +118,8 @@ public abstract class AbstractProcess<T> {
         String stepBeforeExecution = currentStepId;
 
         // 准备执行上下文
-        stepContext.clear(); // 清空临时上下文
         StepExecutionContext<T> context = new StepExecutionContext<>(
-                this, blockEntity, blockState, world, pos, player, hand, hit, stepContext
+                this, blockEntity, blockState, world, pos, player, hand, hit
         );
 
         // 子类可以重写beforeGetStep方法来在获取步骤前做一些处理
@@ -165,6 +146,17 @@ public abstract class AbstractProcess<T> {
     }
 
     /**
+     * 无玩家参与的情况下执行步骤。
+     * <p>这样流程的推进就可以在方块的tick方法或者一些奇怪的地方进行了。</p>
+     *
+     * @return 交互结果
+     * @see #executeStep(Object, BlockState, World, BlockPos, PlayerEntity, Hand, BlockHitResult)
+     */
+    public ActionResult executeStep(T blockEntity, BlockState blockState, World world, BlockPos pos) {
+        return executeStep(blockEntity, blockState, world, pos, null, null ,null);
+    }
+
+    /**
      * 开始执行流程。
      *
      * <p>此方法将流程状态重置为初始状态，并调用{@link #onStart(World, Object)}回调。
@@ -174,7 +166,6 @@ public abstract class AbstractProcess<T> {
         this.isActive = true;
         this.currentStepId = getInitialStepId();
         this.previousStepId = null;
-        this.stepContext.clear();
         onStart(world, blockEntit);
     }
 
@@ -188,7 +179,6 @@ public abstract class AbstractProcess<T> {
         this.currentStepId = getInitialStepId();
         this.previousStepId = null;
         this.isActive = false;
-        this.stepContext.clear();
         onReset();
     }
 
@@ -253,18 +243,16 @@ public abstract class AbstractProcess<T> {
             case CONTINUE_SAME_STEP:
                 // 保持当前步骤不变，用于循环结构
                 // 上一步应该保持不变（因为步骤没变）
-                this.previousStepId = executedStepId;
                 break;
 
             case NEXT_STEP:
                 // 转移到下一步
-                if (result.getNextStepId() != null) {
-                    if (!steps.containsKey(result.getNextStepId())) {
-                        throw new IllegalStateException("The next step is not registered: " + result.getNextStepId());
-                    }
-                    this.currentStepId = result.getNextStepId();
-                    this.previousStepId = executedStepId;
+                if (result.getNextStepId() == null || !steps.containsKey(result.getNextStepId())) {
+                    throw new IllegalStateException("The next step is not registered: " + result.getNextStepId());
                 }
+
+                this.currentStepId = result.getNextStepId();
+                this.previousStepId = executedStepId;
                 break;
 
             case COMPLETE:
@@ -402,13 +390,6 @@ public abstract class AbstractProcess<T> {
         if (shouldShowStepList()) {
             sb.append("Registered Steps: [").append(String.join(", ", steps.keySet())).append("]\n");
         }
-
-        // 临时上下文数据状态
-        sb.append("Has Context Data: ").append(!stepContext.isEmpty());
-        if (!stepContext.isEmpty()) {
-            sb.append(" (").append(stepContext.size()).append(" entries)");
-        }
-        sb.append("\n");
 
         // 添加子类自定义状态信息
         String customInfo = getCustomStatusInfo();
