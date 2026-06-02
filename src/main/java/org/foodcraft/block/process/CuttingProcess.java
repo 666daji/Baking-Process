@@ -87,121 +87,12 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
     /** 特殊步骤实例映射：步骤ID -> 步骤实例 */
     private static final Map<String, Function<CuttingProcess<?>, Step<UpPlaceBlockEntity>>> SPECIAL_STEP_INSTANCES = new HashMap<>();
 
-    static {
-        // 配置胡萝卜的特殊切割步骤
-        Map<Integer, String> carrotTriggers = new HashMap<>();
-        carrotTriggers.put(9, STEP_EMPTY);  // 第10刀
-        carrotTriggers.put(10, STEP_EMPTY); // 第11刀
-        carrotTriggers.put(11, STEP_CARROT_12); // 第12刀
-
-        Map<Integer, String> appleTriggers = new HashMap<>();
-        appleTriggers.put(5, STEP_EMPTY);
-
-        Map<Integer, String> codTriggers = new HashMap<>();
-        codTriggers.put(6, STEP_EMPTY);
-        codTriggers.put(7, STEP_COD_8);
-        codTriggers.put(8, STEP_COD_9);
-
-        Map<Integer, String> cookedCodTriggers = new HashMap<>();
-        codTriggers.put(6, STEP_EMPTY);
-        codTriggers.put(7, STEP_COOKED_COD_8);
-        codTriggers.put(8, STEP_COOKED_COD_9);
-
-        Map<Integer, String> salmonTriggers = new HashMap<>();
-        salmonTriggers.put(5, STEP_SALMON_6);
-        salmonTriggers.put(6, STEP_SALMON_7);
-
-        Map<Integer, String> cookedSalmonTriggers = new HashMap<>();
-        salmonTriggers.put(5, STEP_COOKED_SALMON_6);
-        salmonTriggers.put(6, STEP_COOKED_SALMON_7);
-
-        SPECIAL_STEP_TRIGGERS.put(Items.CARROT, carrotTriggers);
-        SPECIAL_STEP_TRIGGERS.put(Items.APPLE, appleTriggers);
-        SPECIAL_STEP_TRIGGERS.put(Items.COD, codTriggers);
-        SPECIAL_STEP_TRIGGERS.put(Items.COOKED_COD, cookedCodTriggers);
-        SPECIAL_STEP_TRIGGERS.put(Items.SALMON, salmonTriggers);
-        SPECIAL_STEP_TRIGGERS.put(Items.COOKED_SALMON, cookedSalmonTriggers);
-
-        registerGiveStep(
-                Items.COD,
-                7,
-                STEP_COD_8,
-                new ItemStack(ModItems.COD_CUBES, 1)
-        );
-        registerGiveStep(
-                Items.COD,
-                8,
-                STEP_COD_9,
-                new ItemStack(ModItems.COD_CUBES, 1)
-        );
-
-        registerGiveStep(
-                Items.COOKED_COD,
-                7,
-                STEP_COOKED_COD_8,
-                new ItemStack(ModItems.COOKED_COD_CUBES, 1)
-        );
-        registerGiveStep(
-                Items.COOKED_COD,
-                8,
-                STEP_COOKED_COD_9,
-                new ItemStack(ModItems.COOKED_COD_CUBES, 1)
-        );
-
-        registerGiveStep(
-                Items.SALMON,
-                5,
-                STEP_SALMON_6,
-                new ItemStack(ModItems.SALMON_CUBES, 1)
-        );
-        registerGiveStep(
-                Items.SALMON,
-                6,
-                STEP_SALMON_7,
-                new ItemStack(ModItems.SALMON_CUBES, 1)
-        );
-
-        registerGiveStep(
-                Items.COOKED_SALMON,
-                5,
-                STEP_COOKED_SALMON_6,
-                new ItemStack(ModItems.COOKED_SALMON_CUBES, 1)
-        );
-        registerGiveStep(
-                Items.COOKED_SALMON,
-                6,
-                STEP_COOKED_SALMON_7,
-                new ItemStack(ModItems.COOKED_SALMON_CUBES, 1)
-        );
-    }
-
     public CuttingProcess() {
         super();
         this.inputStack = ItemStack.EMPTY;
         this.savedRecipeId = "";
 
         registerSteps();
-    }
-
-    // ============ 步骤注册 ============
-
-    /**
-     * 注册所有切割步骤。
-     */
-    private void registerSteps() {
-        // 普通切割步骤
-        registerStep(STEP_CUT, new CuttingStep());
-
-        // 完成步骤
-        registerStep(STEP_COMPLETE, StepBuilders.complete(this::executeComplete));
-
-        // 空手交互特殊步骤
-        registerStep(STEP_EMPTY, new EmptyStep());
-
-        for (String id : SPECIAL_STEP_INSTANCES.keySet()) {
-            Function<CuttingProcess<?>, Step<UpPlaceBlockEntity>> function = SPECIAL_STEP_INSTANCES.get(id);
-            Step<UpPlaceBlockEntity> step = function.apply(this);
-        }
     }
 
     // ============ 步骤实现类 ============
@@ -295,8 +186,33 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
         return ActionResult.SUCCESS;
     }
 
+    // ============ 步骤注册 ============
+
     /**
-     * 快速注册特殊给予步骤
+     * 注册所有切割步骤。
+     */
+    private void registerSteps() {
+        // 普通切割步骤
+        registerStep(STEP_CUT, new CuttingStep());
+
+        // 完成步骤
+        registerStep(STEP_COMPLETE, StepBuilders.complete(this::executeComplete));
+
+        // 空手交互特殊步骤
+        registerStep(STEP_EMPTY, new EmptyStep());
+
+        for (String id : SPECIAL_STEP_INSTANCES.keySet()) {
+            Function<CuttingProcess<?>, Step<UpPlaceBlockEntity>> function = SPECIAL_STEP_INSTANCES.get(id);
+            Step<UpPlaceBlockEntity> step = function.apply(this);
+
+            @SuppressWarnings("unchecked")
+            Step<T> typedStep = (Step<T>) step;
+            registerStep(id, typedStep);
+        }
+    }
+
+    /**
+     * 注册特殊给予步骤
      *
      * @param item 触发物品
      * @param cutNumber 触发切割次数（从0开始）
@@ -326,6 +242,20 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
         SPECIAL_STEP_TRIGGERS
                 .computeIfAbsent(item, k -> new HashMap<>())
                 .put(cutNumber, stepId);
+    }
+
+    /**
+     * 注册空手操作步骤映射。
+     *
+     * @param item 触发物品
+     * @param cutNumber 触发切割次数（从0开始）
+     */
+    public static void registerEmptyStep(Item item, int... cutNumber) {
+        for (int i : cutNumber) {
+            SPECIAL_STEP_TRIGGERS
+                    .computeIfAbsent(item, k -> new HashMap<>())
+                    .put(i, STEP_EMPTY);
+        }
     }
 
     // ============ 辅助方法 ============
@@ -382,11 +312,10 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);
             if (!stack.isEmpty()) {
-                if (!player.isCreative()) {
-                    if (!player.giveItemStack(stack.copy())) {
-                        player.dropItem(stack.copy(), false);
-                    }
+                if (!player.giveItemStack(stack.copy())) {
+                    player.dropItem(stack.copy(), false);
                 }
+
                 inventory.setStack(i, ItemStack.EMPTY);
             }
         }
@@ -640,4 +569,37 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
             ItemStack inputStack,
             boolean hasPendingSpecialStep
     ) {}
+
+    static {
+        // 注册空步骤
+        registerEmptyStep(Items.CARROT, 9, 10);
+        registerEmptyStep(Items.APPLE, 5);
+        registerEmptyStep(Items.COD, 6);
+        registerEmptyStep(Items.COOKED_COD, 6);
+
+        // 注册给予步骤
+        registerGiveStep(Items.CARROT, 11, STEP_CARROT_12,
+                new ItemStack(ModItems.CARROT_SLICES, 1),
+                new ItemStack(ModItems.CARROT_HEAD, 1));
+
+        registerGiveStep(Items.COD, 7, STEP_COD_8,
+                new ItemStack(ModItems.COD_CUBES, 1));
+        registerGiveStep(Items.COD, 8, STEP_COD_9,
+                new ItemStack(ModItems.COD_CUBES, 1));
+
+        registerGiveStep(Items.COOKED_COD, 7, STEP_COOKED_COD_8,
+                new ItemStack(ModItems.COOKED_COD_CUBES, 1));
+        registerGiveStep(Items.COOKED_COD, 8, STEP_COOKED_COD_9,
+                new ItemStack(ModItems.COOKED_COD_CUBES, 1));
+
+        registerGiveStep(Items.SALMON, 5, STEP_SALMON_6,
+                new ItemStack(ModItems.SALMON_CUBES, 1));
+        registerGiveStep(Items.SALMON, 6, STEP_SALMON_7,
+                new ItemStack(ModItems.SALMON_CUBES, 1));
+
+        registerGiveStep(Items.COOKED_SALMON, 5, STEP_COOKED_SALMON_6,
+                new ItemStack(ModItems.COOKED_SALMON_CUBES, 1));
+        registerGiveStep(Items.COOKED_SALMON, 6, STEP_COOKED_SALMON_7,
+                new ItemStack(ModItems.COOKED_SALMON_CUBES, 1));
+    }
 }

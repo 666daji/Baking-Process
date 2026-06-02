@@ -52,8 +52,8 @@ public class CuttingBoardBlock extends UpPlaceBlock {
             }
         }
 
-        // 如果玩家手持物品为空或者与容器中物品不同，允许取出
-        return !handStack.isEmpty();
+        // 如果容器不为空，允许取出
+        return !blockEntity.isEmpty();
     }
 
     @Override

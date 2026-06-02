@@ -85,10 +85,6 @@ public record StepExecutionContext<T>(AbstractProcess<T> process, T blockEntity,
      * @param stack 要给予的物品
      */
     public void giveStack(ItemStack stack) {
-        if (isCreateMode()) {
-            return;
-        }
-
         if (!player.giveItemStack(stack)) {
             player.dropItem(stack, false);
         }
