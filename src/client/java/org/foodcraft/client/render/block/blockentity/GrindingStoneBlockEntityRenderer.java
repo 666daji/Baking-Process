@@ -146,11 +146,9 @@ public class GrindingStoneBlockEntityRenderer extends WithAnimationBlockEntityRe
     private void manageAnimationState(GrindingStoneBlockEntity entity, float tickDelta, BlockState state) {
         // 更新动画状态
         if (entity.isGrinding()) {
-            if (!entity.grindingAnimationState.isRunning()) {
-                entity.grindingAnimationState.start(entity.getAge());
-            }
+            entity.grindingAnimationState.startIfNotRunning(entity.getAge());
         } else {
-            entity.grindingAnimationState.stop();
+            entity.grindingAnimationState.stopAndKeepProgress();
         }
 
         // 应用动画

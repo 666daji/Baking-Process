@@ -8,6 +8,9 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ItemStackParticleEffect;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -85,26 +88,14 @@ public class GrindingStoneBlock extends BlockWithEntity {
                 if (grindingEntity.tryAddEnergy(40)) {
                     return ActionResult.SUCCESS;
                 } else {
-                    player.sendMessage(Text.translatable("grinding_stone.energy.full"), true);
-                    return ActionResult.FAIL;
+                    return ActionResult.PASS;
                 }
             }
             // 手持物品时尝试添加物品
             else {
                 GrindingStoneBlockEntity.AddInputResult result = grindingEntity.addInput(handStack, player);
                 return switch (result) {
-                    case INVALID -> {
-                        player.sendMessage(Text.translatable("grinding_stone.add.refused"), true);
-                        yield ActionResult.FAIL;
-                    }
-                    case FULL -> {
-                        player.sendMessage(Text.translatable("grinding_stone.add.full"), true);
-                        yield ActionResult.FAIL;
-                    }
-                    case NOT_ENOUGH -> {
-                        player.sendMessage(Text.translatable("grinding_stone.add.not_enough"), true);
-                        yield ActionResult.FAIL;
-                    }
+                    case INVALID, FULL, NOT_ENOUGH -> ActionResult.PASS;
                     case SUCCESS -> ActionResult.SUCCESS;
                 };
             }
@@ -174,6 +165,11 @@ public class GrindingStoneBlock extends BlockWithEntity {
                     1.0F,
                     true
             );
+            for (int i = 0; i < world.random.nextInt(3) + 2; i++) {
+                world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, grindingStoneBlockEntity.getStack(0)),
+                        pos.getX() + world.random.nextFloat(), pos.getY() + 1, pos.getZ() + world.random.nextFloat(),
+                        world.random.nextGaussian() * 0.05, 0.005, world.random.nextGaussian() * 0.05);
+            }
         }
     }
 

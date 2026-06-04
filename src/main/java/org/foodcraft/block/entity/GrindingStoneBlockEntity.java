@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 import org.foodcraft.recipe.GrindingRecipe;
 import org.foodcraft.registry.ModRecipeTypes;
 import org.foodcraft.registry.ModBlockEntityTypes;
-import org.foodcraft.util.ModAnimationState;
+import org.foodcraft.util.EnhancedAnimationState;
 import org.jetbrains.annotations.Nullable;
 
 public class GrindingStoneBlockEntity extends BlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider {
@@ -40,14 +40,11 @@ public class GrindingStoneBlockEntity extends BlockEntity implements SidedInvent
     int grindingTime;
     int grindingTimeTotal;
 
-    public final ModAnimationState grindingAnimationState = new ModAnimationState();
+    public final EnhancedAnimationState grindingAnimationState = new EnhancedAnimationState();
     protected int age;
 
-    private final Object2IntOpenHashMap<Identifier> recipesUsed = new Object2IntOpenHashMap<>();
     private final RecipeManager.MatchGetter<Inventory, ? extends GrindingRecipe> matchGetter;
-
-    @Nullable
-    private Recipe<?> lastRecipe;
+    @Nullable private Recipe<?> lastRecipe;
 
     public GrindingStoneBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.GRINDING_STONE, pos, state);
@@ -476,7 +473,6 @@ public class GrindingStoneBlockEntity extends BlockEntity implements SidedInvent
 
             // 记录使用的配方
             this.setLastRecipe(recipe);
-            this.recipesUsed.addTo(recipe.getId(), 1);
         }
     }
 

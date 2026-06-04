@@ -5,7 +5,7 @@ import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.entity.animation.Animation;
 import org.foodcraft.client.util.ModAnimationHelper;
-import org.foodcraft.util.ModAnimationState;
+import org.foodcraft.util.EnhancedAnimationState;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
@@ -187,7 +187,7 @@ public abstract class WithAnimationBlockEntityRenderer<T extends BlockEntity> im
      * @param speedMultiplier   动画速度乘数
      * @param scale             动画缩放比例
      */
-    protected void applyAnimation(ModAnimationState animationState, Animation animation,
+    protected void applyAnimation(EnhancedAnimationState animationState, Animation animation,
                                   float animationProgress, float speedMultiplier, float scale) {
         resetAllModelParts();
         alwaysUpdateAnimation(animationState, animation, animationProgress, speedMultiplier, scale);
@@ -206,13 +206,11 @@ public abstract class WithAnimationBlockEntityRenderer<T extends BlockEntity> im
      * @param speedMultiplier   动画速度乘数
      * @param scale             动画缩放比例
      */
-    protected void updateAnimation(ModAnimationState animationState, Animation animation,
+    protected void updateAnimation(EnhancedAnimationState animationState, Animation animation,
                                    float animationProgress, float speedMultiplier, float scale) {
         animationState.update(
                 animationProgress,
-                speedMultiplier,
-                animation.looping(),
-                animation.lengthInSeconds()
+                speedMultiplier
         );
 
         animationState.run(state -> ModAnimationHelper.animate(
@@ -236,13 +234,11 @@ public abstract class WithAnimationBlockEntityRenderer<T extends BlockEntity> im
      * @param speedMultiplier   动画速度乘数
      * @param scale             动画缩放比例
      */
-    protected void alwaysUpdateAnimation(ModAnimationState animationState, Animation animation,
+    protected void alwaysUpdateAnimation(EnhancedAnimationState animationState, Animation animation,
                                          float animationProgress, float speedMultiplier, float scale) {
         animationState.update(
                 animationProgress,
-                speedMultiplier,
-                animation.looping(),
-                animation.lengthInSeconds()
+                speedMultiplier
         );
 
         ModAnimationHelper.animate(
