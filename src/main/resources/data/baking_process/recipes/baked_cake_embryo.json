@@ -1,0 +1,6 @@
+{
+  "type": "baking_process:stove",
+  "ingredient": "content|baking_process:cake_embryo",
+  "result": "content|baking_process:baked_cake_embryo",
+  "stoveTime": 16000
+}

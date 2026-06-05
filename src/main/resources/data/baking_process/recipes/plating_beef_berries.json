@@ -1,0 +1,9 @@
+{
+  "type": "baking_process:plating",
+  "container": "baking_process:iron_plate",
+  "actions": [
+    "add_item|minecraft:beef",
+    "add_item|minecraft:sweet_berries"
+  ],
+  "result": "baking_process:beef_berries"
+}

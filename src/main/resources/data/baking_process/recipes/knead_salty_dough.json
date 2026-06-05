@@ -1,0 +1,21 @@
+{
+  "type": "baking_process:dough_making",
+  "output": {
+    "item": "baking_process:salty_dough",
+    "count": 1
+  },
+  "flours": {
+    "wheat": 3
+  },
+  "liquids": {
+    "baking_process:water": 3
+  },
+  "extra_items": {
+    "items": [
+      {
+        "item": "baking_process:salt_flour",
+        "count": 2
+      }
+    ]
+  }
+}

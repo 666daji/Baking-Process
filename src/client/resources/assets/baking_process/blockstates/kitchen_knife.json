@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "baking_process:block/kitchen_knife",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "baking_process:block/kitchen_knife"
+    },
+    "facing=east": {
+      "model": "baking_process:block/kitchen_knife",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "baking_process:block/kitchen_knife",
+      "y": 90
+    }
+  }
+}

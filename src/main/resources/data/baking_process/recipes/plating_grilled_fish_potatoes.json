@@ -1,0 +1,10 @@
+{
+  "type": "baking_process:plating",
+  "container": "baking_process:iron_plate",
+  "actions": [
+    "add_item|baking_process:potato_cubes",
+    "add_item|baking_process:potato_cubes",
+    "add_item|minecraft:cod"
+  ],
+  "result": "baking_process:grilled_fish_potatoes"
+}

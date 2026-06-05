@@ -14,7 +14,7 @@ loom {
     splitEnvironmentSourceSets()
 
     mods {
-        "foodcraft" {
+        "baking_process" {
             sourceSet sourceSets.main
             sourceSet sourceSets.client
         }

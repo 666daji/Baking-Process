@@ -1,0 +1,14 @@
+{
+  "type": "baking_process:plating",
+  "container": "baking_process:iron_plate",
+  "actions": [
+    "add_item|baking_process:salmon_cubes",
+    "add_item|baking_process:salmon_cubes",
+    "add_item|baking_process:salt_flour",
+    "add_item|minecraft:glow_berries",
+    "add_item|minecraft:glow_berries",
+    "add_item|minecraft:glow_berries",
+    "add_item|minecraft:glow_berries"
+  ],
+  "result": "baking_process:fry_salmon_cubes"
+}

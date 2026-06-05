@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "baking_process:block/clay_pots",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "baking_process:block/clay_pots",
+      "y": 90
+    },
+    "facing=east": {
+      "model": "baking_process:block/clay_pots"
+    },
+    "facing=west": {
+      "model": "baking_process:block/clay_pots",
+      "y": 180
+    }
+  }
+}

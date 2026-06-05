@@ -1,0 +1,72 @@
+{
+  "itemgroup.baking_process": "Art de la Boulangerie de Tw",
+
+  "item.baking_process.wheat_flour": "Farine de Blé",
+  "item.baking_process.lapis_lazuli_flour": "Farine de Lapis-Lazuli",
+  "item.baking_process.cocoa_flour": "Farine de Cacao",
+  "item.baking_process.amethyst_flour": "Farine d'Améthyste",
+  "block.baking_process.flour_sack": "Sac de Farine",
+
+  "block.baking_process.grinding_stone": "Pierre à Moudre",
+  "block.baking_process.toast_mold": "Moule à Toast",
+  "block.baking_process.heat_resistant_slate": "Ardoise Résistante à la Chaleur",
+  "block.baking_process.firewood": "Bois de Chauffage",
+  "block.baking_process.pottery_table": "Table de Poterie",
+
+  "block.baking_process.iron_dishes": "Assiette en Fer Décorée",
+  "block.baking_process.wooden_shelf": "Étagère en Bois",
+  "block.baking_process.cutting_board": "Planche à Découper",
+  "block.baking_process.iron_pots": "Pot en Fer",
+  "item.baking_process.bread_spatula": "Spatule à Pain",
+
+  "item.baking_process.milk_potion": "Bouteille de Lait",
+
+  "block.baking_process.dough": "Pâte",
+  "block.baking_process.hard_bread": "Pain Dur",
+  "block.baking_process.small_bread_embryo": "Embryon de Petit Pain",
+  "block.baking_process.small_bread": "Petit Pain",
+  "block.baking_process.cake_embryo": "Embryon de Gâteau",
+  "block.baking_process.baguette": "Baguette",
+  "block.baking_process.baguette_embryo": "Embryon de Baguette",
+  "item.baking_process.fluffy_dough": "Embryon de Pain Moelleux",
+  "block.baking_process.toast": "Toast",
+  "item.baking_process.milk_dough": "Embryon de Pain au Lait",
+  "block.baking_process.baked_cake_embryo": "Embryon de Gâteau Cuit",
+  "block.baking_process.hard_bread_boat": "Bateau en Pain Dur",
+  "block.baking_process.mushroom_stew_hard_bread_boat": "Bateau en Pain Dur avec Ragout de Champignons",
+  "block.baking_process.beetroot_soup_hard_bread_boat": "Bateau en Pain Dur avec Soupe de Betterave",
+
+  "block.baking_process.cake_embryo_mold": "Moule d'Embryon de Gâteau",
+  "block.baking_process.toast_embryo_mold": "Moule d'Embryon de Toast",
+  "item.baking_process.milk_bread_embryo_cake_embryo_mold": "Moule de Gâteau avec Embryon de Pain au Lait",
+  "item.baking_process.fluffy_bread_embryo_toast_embryo_mold": "Moule de Toast avec Embryon de Pain Moelleux",
+
+  "block.baking_process.salt_ore": "Minerai de Sel",
+  "block.baking_process.deepslate_salt_ore": "Minerai de Sel d'Ardoise des Abîmes",
+
+  "item.baking_process.salt_shaker": "Salière",
+  "item.baking_process.salt_cubes": "Cubes de Sel",
+
+  "block.baking_process.clay_pots_embryo": "Embryon de Pot en Argile",
+  "block.baking_process.clay_pots": "Pot en Argile",
+  "block.baking_process.flower_pot_embryo": "Embryon de Pot de Fleur",
+
+  "container.baking_process.pottery_table": "Table de Poterie",
+
+  "subtitles.baking_process.stove_baking": "Four: Cuisson",
+  "subtitle.baking_process.stone_grinding": "Pierre à Moudre: Rotation",
+  "subtitle.baking_process.combustion_firewood": "Feu de Camp: Brûlage",
+
+  "grinding_stone.add.refused": "Ceci ne peut être moulu!",
+  "grinding_stone.add.full": "C'est déjà plein!",
+  "grinding_stone.energy.full": "Pas besoin de pousser la pierre à moudre maintenant...",
+  "grinding_stone.add.not_enough": "Cela ne semble pas suffisant...",
+
+  "item.baking_process.flour_sack.fullness": "Capacité: %s/%s",
+  "item.baking_process.flour_sack.content": "%s x%s",
+  "item.baking_process.flour_sack.tooltip.empty": "Clic droit pour ajouter de la farine",
+  "item.baking_process.flour_sack.tooltip.non_empty": "Clic droit pour sortir de la farine",
+  "item.baking_process.flour_sack.tooltip.contents": "Clic droit pour sortir de la farine",
+
+  "tooltip.pottery_table.start_crafting": "Commencer la Fabrication"
+}

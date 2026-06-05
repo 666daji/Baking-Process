@@ -1,0 +1,4 @@
+{
+  "parent": "baking_process:block/wooden_shelf",
+  "gui_light": "front"
+}

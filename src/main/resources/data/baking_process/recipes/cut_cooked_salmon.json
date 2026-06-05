@@ -1,0 +1,40 @@
+{
+  "type": "baking_process:cut",
+  "input": {
+    "item": "minecraft:cooked_salmon"
+  },
+  "output": {
+    "item": "baking_process:cooked_salmon_cubes",
+    "count": 1
+  },
+  "totalCuts": 7,
+  "defaultState": {},
+  "cutStates": {
+    "5": {
+      "0": {
+        "item": "baking_process:cooked_salmon_cubes",
+        "count": 2
+      },
+      "1": {
+        "item": "baking_process:kitchen_waste",
+        "count": 1
+      }
+    },
+    "6": {
+      "0": {
+        "item": "baking_process:cooked_salmon_cubes",
+        "count": 1
+      },
+      "1": {
+        "item": "baking_process:kitchen_waste",
+        "count": 1
+      }
+    },
+    "7": {
+      "0": {
+        "item": "baking_process:kitchen_waste",
+        "count": 1
+      }
+    }
+  }
+}

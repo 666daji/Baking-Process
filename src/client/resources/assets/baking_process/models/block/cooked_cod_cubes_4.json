@@ -1,0 +1,7 @@
+{
+  "parent": "baking_process:block/cod_cubes_4",
+  "textures": {
+    "11": "minecraft:block/cooked_cod",
+    "particle": "baking_process:item/cooked_cod_cubes"
+  }
+}

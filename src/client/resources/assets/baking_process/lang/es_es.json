@@ -1,0 +1,72 @@
+{
+  "itemgroup.baking_process": "Arte de Horneado de Tw",
+
+  "item.baking_process.wheat_flour": "Harina de Trigo",
+  "item.baking_process.lapis_lazuli_flour": "Harina de Lapislázuli",
+  "item.baking_process.cocoa_flour": "Harina de Cacao",
+  "item.baking_process.amethyst_flour": "Harina de Amatista",
+  "block.baking_process.flour_sack": "Saco de Harina",
+
+  "block.baking_process.grinding_stone": "Piedra de Moler",
+  "block.baking_process.toast_mold": "Molde de Tostada",
+  "block.baking_process.heat_resistant_slate": "Pizarra Resistente al Calor",
+  "block.baking_process.firewood": "Leña",
+  "block.baking_process.pottery_table": "Mesa de Alfarería",
+
+  "block.baking_process.iron_dishes": "Plato de Hierro Decorado",
+  "block.baking_process.wooden_shelf": "Estante de Madera",
+  "block.baking_process.cutting_board": "Tabla de Cortar",
+  "block.baking_process.iron_pots": "Olla de Hierro",
+  "item.baking_process.bread_spatula": "Espátula para Pan",
+
+  "item.baking_process.milk_potion": "Botella de Leche",
+
+  "block.baking_process.dough": "Masa",
+  "block.baking_process.hard_bread": "Pan Duro",
+  "block.baking_process.small_bread_embryo": "Embrión de Pan Pequeño",
+  "block.baking_process.small_bread": "Pan Pequeño",
+  "block.baking_process.cake_embryo": "Embrión de Pastel",
+  "block.baking_process.baguette": "Baguette",
+  "block.baking_process.baguette_embryo": "Embrión de Baguette",
+  "item.baking_process.fluffy_dough": "Embrión de Pan Esponjoso",
+  "block.baking_process.toast": "Tostada",
+  "item.baking_process.milk_dough": "Embrión de Pan con Leche",
+  "block.baking_process.baked_cake_embryo": "Embrión de Pastel Horneado",
+  "block.baking_process.hard_bread_boat": "Barco de Pan Duro",
+  "block.baking_process.mushroom_stew_hard_bread_boat": "Barco de Pan Duro con Estofado de Champiñones",
+  "block.baking_process.beetroot_soup_hard_bread_boat": "Barco de Pan Duro con Sopa de Remolacha",
+
+  "block.baking_process.cake_embryo_mold": "Molde de Embrión de Pastel",
+  "block.baking_process.toast_embryo_mold": "Molde de Embrión de Tostada",
+  "item.baking_process.milk_bread_embryo_cake_embryo_mold": "Molde de Pastel con Embrión de Pan con Leche",
+  "item.baking_process.fluffy_bread_embryo_toast_embryo_mold": "Molde de Tostada con Embrión de Pan Esponjoso",
+
+  "block.baking_process.salt_ore": "Mena de Sal",
+  "block.baking_process.deepslate_salt_ore": "Mena de Sal de Pizarra Profunda",
+
+  "item.baking_process.salt_shaker": "Salero",
+  "item.baking_process.salt_cubes": "Cubos de Sal",
+
+  "block.baking_process.clay_pots_embryo": "Embrión de Maceta de Arcilla",
+  "block.baking_process.clay_pots": "Maceta de Arcilla",
+  "block.baking_process.flower_pot_embryo": "Embrión de Maceta",
+
+  "container.baking_process.pottery_table": "Mesa de Alfarería",
+
+  "subtitles.baking_process.stove_baking": "Horno: Horneando",
+  "subtitle.baking_process.stone_grinding": "Piedra de Moler: Girando",
+  "subtitle.baking_process.combustion_firewood": "Fogata: Quemando",
+
+  "grinding_stone.add.refused": "¡Esto no se puede moler!",
+  "grinding_stone.add.full": "¡Ya está lleno!",
+  "grinding_stone.energy.full": "No es necesario empujar la piedra de moler ahora...",
+  "grinding_stone.add.not_enough": "Esto no parece suficiente...",
+
+  "item.baking_process.flour_sack.fullness": "Capacidad: %s/%s",
+  "item.baking_process.flour_sack.content": "%s x%s",
+  "item.baking_process.flour_sack.tooltip.empty": "Clic derecho para añadir harina",
+  "item.baking_process.flour_sack.tooltip.non_empty": "Clic derecho para sacar harina",
+  "item.baking_process.flour_sack.tooltip.contents": "Clic derecho para sacar harina",
+
+  "tooltip.pottery_table.start_crafting": "Comenzar a Fabricar"
+}

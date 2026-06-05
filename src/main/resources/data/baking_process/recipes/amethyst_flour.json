@@ -1,0 +1,8 @@
+{
+  "type": "baking_process:grinding",
+  "ingredient": {
+    "item": "minecraft:amethyst_shard"
+  },
+  "result": "baking_process:amethyst_flour",
+  "grindingTime": 400
+}

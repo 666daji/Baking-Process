@@ -1,0 +1,12 @@
+{
+  "type": "baking_process:plating",
+  "container": "baking_process:iron_plate",
+  "actions": [
+    "add_item|minecraft:red_mushroom",
+    "add_item|minecraft:brown_mushroom",
+    "add_item|minecraft:brown_mushroom",
+    "add_item|minecraft:brown_mushroom",
+    "add_item|baking_process:salt_flour"
+  ],
+  "result": "baking_process:roasted_mushrooms"
+}

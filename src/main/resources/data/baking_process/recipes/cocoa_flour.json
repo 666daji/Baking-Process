@@ -1,0 +1,8 @@
+{
+  "type": "baking_process:grinding",
+  "ingredient": {
+    "item": "minecraft:cocoa_beans"
+  },
+  "result": "baking_process:cocoa_flour",
+  "grindingTime": 200
+}

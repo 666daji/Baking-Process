@@ -1,0 +1,7 @@
+{
+  "parent": "baking_process:block/flour_sack",
+  "textures": {
+    "0": "baking_process:block/sugar_sack",
+    "particle": "baking_process:item/sugar_sack"
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "parent": "foodcraft:block/water_bucket_3",
-	"textures": {
-      "flow": "minecraft:block/milk_still",
-      "bucket": "minecraft:block/bucket",
-      "particle": "minecraft:item/milk_bucket"
-	}
-}

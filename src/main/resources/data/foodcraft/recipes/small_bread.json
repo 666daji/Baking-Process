@@ -1,6 +1,0 @@
-{
-  "type": "foodcraft:stove",
-  "ingredient": "foodcraft:small_bread_embryo",
-  "result": "foodcraft:small_bread",
-  "stoveTime": 14000
-}

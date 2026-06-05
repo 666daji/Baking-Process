@@ -1,0 +1,6 @@
+{
+  "parent" : "baking_process:process/cut_minecraft_salmon_5",
+  "textures": {
+    "1": "baking_process:block/cooked_salmon_cubes"
+  }
+}

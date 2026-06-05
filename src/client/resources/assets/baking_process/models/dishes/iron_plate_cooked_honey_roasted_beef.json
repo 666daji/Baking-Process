@@ -1,0 +1,7 @@
+{
+  "parent": "baking_process:dishes/iron_plate_honey_roasted_beef",
+  "textures": {
+    "beef": "minecraft:block/cooked_beef",
+    "carrot": "baking_process:block/roasted_carrot"
+  }
+}

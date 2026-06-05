@@ -1,0 +1,8 @@
+{
+  "type": "baking_process:grinding",
+  "ingredient": {
+    "item": "minecraft:sugar"
+  },
+  "result": "baking_process:sugar_flour",
+  "grindingTime": 40
+}

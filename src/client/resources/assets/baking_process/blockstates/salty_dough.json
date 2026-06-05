@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "baking_process:block/salty_dough",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "baking_process:block/salty_dough"
+    },
+    "facing=east": {
+      "model": "baking_process:block/salty_dough",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "baking_process:block/salty_dough",
+      "y": 90
+    }
+  }
+}

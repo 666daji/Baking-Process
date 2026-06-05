@@ -1,0 +1,30 @@
+{
+  "type": "baking_process:dough_making",
+  "output": {
+    "item": "baking_process:toast_dough",
+    "count": 1
+  },
+  "flours": {
+    "wheat": 3
+  },
+  "liquids": {
+    "baking_process:water": 2,
+    "baking_process:milk": 1
+  },
+  "extra_items": {
+    "items": [
+      {
+        "item": "minecraft:egg",
+        "count": 1
+      },
+      {
+        "item": "minecraft:sugar",
+        "count": 1
+      },
+      {
+        "item": "baking_process:salt_flour",
+        "count": 1
+      }
+    ]
+  }
+}

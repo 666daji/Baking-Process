@@ -1,0 +1,9 @@
+{
+	"format_version": "1.21.6",
+	"credit": "Made with Blockbench",
+	"parent": "baking_process:block/spatula",
+	"textures": {
+		"spatula": "baking_process:block/bread_spatula",
+		"particle": "baking_process:block/bread_spatula_pa"
+	}
+}

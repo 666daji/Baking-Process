@@ -1,0 +1,7 @@
+{
+  "parent": "baking_process:block/salmon_cubes_2",
+  "textures": {
+    "11": "minecraft:block/cooked_salmon_cubes",
+    "particle": "baking_process:item/cooked_salmon_cubes"
+  }
+}

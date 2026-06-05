@@ -1,0 +1,72 @@
+{
+  "itemgroup.baking_process": "TW's Baking Craft",
+
+  "item.baking_process.wheat_flour": "Wheat Flour",
+  "item.baking_process.lapis_lazuli_flour": "Lapis Lazuli Flour",
+  "item.baking_process.cocoa_flour": "Cocoa Flour",
+  "item.baking_process.amethyst_flour": "Amethyst Flour",
+  "block.baking_process.flour_sack": "Flour Sack",
+
+  "block.baking_process.grinding_stone": "Grinding Stone",
+  "block.baking_process.toast_mold": "Toast Mold",
+  "block.baking_process.heat_resistant_slate": "Heat-Resistant Slate",
+  "block.baking_process.firewood": "Firewood",
+  "block.baking_process.pottery_table": "Pottery Table",
+
+  "block.baking_process.iron_dishes": "Iron Decorated Plate",
+  "block.baking_process.wooden_shelf": "Wooden Shelf",
+  "block.baking_process.cutting_board": "Cutting Board",
+  "block.baking_process.iron_pots": "Iron Pot",
+  "item.baking_process.bread_spatula": "Bread Spatula",
+
+  "item.baking_process.milk_potion": "Milk Bottle",
+
+  "block.baking_process.dough": "Dough",
+  "block.baking_process.hard_bread": "Hard Bread",
+  "block.baking_process.small_bread_embryo": "Small Bread Embryo",
+  "block.baking_process.small_bread": "Small Bread",
+  "block.baking_process.cake_embryo": "Cake Embryo",
+  "block.baking_process.baguette": "Baguette",
+  "block.baking_process.baguette_embryo": "Baguette Embryo",
+  "item.baking_process.fluffy_dough": "Fluffy Dough",
+  "block.baking_process.toast": "Toast",
+  "item.baking_process.milk_dough": "Milk Dough",
+  "block.baking_process.baked_cake_embryo": "Baked Cake Embryo",
+  "block.baking_process.hard_bread_boat": "Hard Bread Boat",
+  "block.baking_process.mushroom_stew_hard_bread_boat": "Hard Bread Boat with Mushroom Stew",
+  "block.baking_process.beetroot_soup_hard_bread_boat": "Hard Bread Boat with Beetroot Soup",
+
+  "block.baking_process.cake_embryo_mold": "Cake Embryo Mold",
+  "block.baking_process.toast_embryo_mold": "Toast Embryo Mold",
+  "item.baking_process.milk_bread_embryo_cake_embryo_mold": "Cake Embryo Mold with Milk Bread Embryo",
+  "item.baking_process.fluffy_bread_embryo_toast_embryo_mold": "Toast Embryo Mold with Fluffy Bread Embryo",
+
+  "block.baking_process.salt_ore": "Salt Ore",
+  "block.baking_process.deepslate_salt_ore": "Deepslate Salt Ore",
+
+  "item.baking_process.salt_shaker": "Salt Shaker",
+  "item.baking_process.salt_cubes": "Salt Cubes",
+
+  "block.baking_process.clay_pots_embryo": "Clay Pot Embryo",
+  "block.baking_process.clay_pots": "Clay Pot",
+  "block.baking_process.flower_pot_embryo": "Flower Pot Embryo",
+
+  "container.baking_process.pottery_table": "Pottery Table",
+
+  "subtitles.baking_process.stove_baking": "Stove: Baking",
+  "subtitle.baking_process.stone_grinding": "Grinding Stone: Turning",
+  "subtitle.baking_process.combustion_firewood": "Campfire: Burning",
+
+  "grinding_stone.add.refused": "This cannot be ground!",
+  "grinding_stone.add.full": "It's already full!",
+  "grinding_stone.energy.full": "No need to push the grinding stone now...",
+  "grinding_stone.add.not_enough": "This doesn't seem enough...",
+
+  "item.baking_process.flour_sack.fullness": "Capacity: %s/%s",
+  "item.baking_process.flour_sack.content": "%s x%s",
+  "item.baking_process.flour_sack.tooltip.empty": "Right-click to add flour",
+  "item.baking_process.flour_sack.tooltip.non_empty": "Right-click to take out flour",
+  "item.baking_process.flour_sack.tooltip.contents": "Right-click to take out flour",
+
+  "tooltip.pottery_table.start_crafting": "Start Crafting"
+}

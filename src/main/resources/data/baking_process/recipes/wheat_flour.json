@@ -1,0 +1,9 @@
+{
+  "type": "baking_process:grinding",
+  "ingredient": {
+    "item": "minecraft:wheat"
+  },
+  "inputCount": 4,
+  "result": "baking_process:wheat_flour",
+  "grindingTime": 200
+}

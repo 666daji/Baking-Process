@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.bakingprocess.client.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "BlockEntityRendererFactoriesMixin",
+    "BlockModelRendererMixin",
+    "ItemRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

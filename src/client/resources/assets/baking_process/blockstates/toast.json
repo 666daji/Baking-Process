@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "baking_process:block/toast",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "baking_process:block/toast"
+    },
+    "facing=east": {
+      "model": "baking_process:block/toast",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "baking_process:block/toast",
+      "y": 90
+    }
+  }
+}

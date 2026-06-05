@@ -1,7 +1,0 @@
-{
-  "parent": "foodcraft:block/pots",
-  "textures": {
-    "pots": "foodcraft:block/iron_pots",
-    "particle": "minecraft:block/iron_block"
-  }
-}

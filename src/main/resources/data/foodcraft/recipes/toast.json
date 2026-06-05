@@ -1,6 +1,0 @@
-{
-  "type": "foodcraft:stove",
-  "ingredient": "content|foodcraft:toast_embryo",
-  "result": "content|foodcraft:toast",
-  "stoveTime": 12000
-}

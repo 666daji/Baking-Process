@@ -1,0 +1,72 @@
+{
+  "itemgroup.baking_process": "Tw의 베이킹 크래프트",
+
+  "item.baking_process.wheat_flour": "밀가루",
+  "item.baking_process.lapis_lazuli_flour": "청금석 가루",
+  "item.baking_process.cocoa_flour": "코코아 가루",
+  "item.baking_process.amethyst_flour": "자수정 가루",
+  "block.baking_process.flour_sack": "가루 주머니",
+
+  "block.baking_process.grinding_stone": "맷돌",
+  "block.baking_process.toast_mold": "토스트 틀",
+  "block.baking_process.heat_resistant_slate": "내열 슬레이트",
+  "block.baking_process.firewood": "장작",
+  "block.baking_process.pottery_table": "도예 작업대",
+
+  "block.baking_process.iron_dishes": "철제 접시",
+  "block.baking_process.wooden_shelf": "목제 선반",
+  "block.baking_process.cutting_board": "도마",
+  "block.baking_process.iron_pots": "철제 냄비",
+  "item.baking_process.bread_spatula": "빈대떡용 뒤집개",
+
+  "item.baking_process.milk_potion": "우유 병",
+
+  "block.baking_process.dough": "반죽",
+  "block.baking_process.hard_bread": "딱딱한 빵",
+  "block.baking_process.small_bread_embryo": "작은 빵 반죽",
+  "block.baking_process.small_bread": "작은 빵",
+  "block.baking_process.cake_embryo": "케이크 반죽",
+  "block.baking_process.baguette": "바게트",
+  "block.baking_process.baguette_embryo": "바게트 반죽",
+  "item.baking_process.fluffy_dough": "폭신한 빵 반죽",
+  "block.baking_process.toast": "토스트",
+  "item.baking_process.milk_dough": "우유빵 반죽",
+  "block.baking_process.baked_cake_embryo": "구운 케이크 반죽",
+  "block.baking_process.hard_bread_boat": "딱딱한 빵 보트",
+  "block.baking_process.mushroom_stew_hard_bread_boat": "버섯 스튜가 담긴 딱딱한 빵 보트",
+  "block.baking_process.beetroot_soup_hard_bread_boat": "비트 수프가 담긴 딱딱한 빵 보트",
+
+  "block.baking_process.cake_embryo_mold": "케이크 반죽 틀",
+  "block.baking_process.toast_embryo_mold": "토스트 반죽 틀",
+  "item.baking_process.milk_bread_embryo_cake_embryo_mold": "우유빵 반죽이 담긴 케이크 틀",
+  "item.baking_process.fluffy_bread_embryo_toast_embryo_mold": "폭신한 빵 반죽이 담긴 토스트 틀",
+
+  "block.baking_process.salt_ore": "소금 광석",
+  "block.baking_process.deepslate_salt_ore": "심층암 소금 광석",
+
+  "item.baking_process.salt_shaker": "소금통",
+  "item.baking_process.salt_cubes": "소금 덩어리",
+
+  "block.baking_process.clay_pots_embryo": "점토 화분 반죽",
+  "block.baking_process.clay_pots": "점토 화분",
+  "block.baking_process.flower_pot_embryo": "화분 반죽",
+
+  "container.baking_process.pottery_table": "도예 작업대",
+
+  "subtitles.baking_process.stove_baking": "난로: 굽기",
+  "subtitle.baking_process.stone_grinding": "맷돌: 돌기",
+  "subtitle.baking_process.combustion_firewood": "모닥불: 타기",
+
+  "grinding_stone.add.refused": "이것은 갈 수 없습니다!",
+  "grinding_stone.add.full": "이미 가득 찼습니다!",
+  "grinding_stone.energy.full": "지금은 맷돌을 돌릴 필요가 없습니다...",
+  "grinding_stone.add.not_enough": "이것만으로는 부족한 것 같습니다...",
+
+  "item.baking_process.flour_sack.fullness": "용량: %s/%s",
+  "item.baking_process.flour_sack.content": "%s x%s",
+  "item.baking_process.flour_sack.tooltip.empty": "오른쪽 클릭으로 가루 추가",
+  "item.baking_process.flour_sack.tooltip.non_empty": "오른쪽 클릭으로 가루 꺼내기",
+  "item.baking_process.flour_sack.tooltip.contents": "오른쪽 클릭으로 가루 꺼내기",
+
+  "tooltip.pottery_table.start_crafting": "제작 시작"
+}

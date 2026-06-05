@@ -1,0 +1,7 @@
+{
+  "variants":{
+    "": {
+      "model": "baking_process:block/grinding_stone"
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "itemgroup.baking_process": "Tws Backkunst",
+
+  "item.baking_process.wheat_flour": "Weizenmehl",
+  "item.baking_process.lapis_lazuli_flour": "Lapislazuli-Mehl",
+  "item.baking_process.cocoa_flour": "Kakaomehl",
+  "item.baking_process.amethyst_flour": "Amethystmehl",
+  "block.baking_process.flour_sack": "Mehlsack",
+
+  "block.baking_process.grinding_stone": "Mahlstein",
+  "block.baking_process.toast_mold": "Toastform",
+  "block.baking_process.heat_resistant_slate": "Hitzebeständige Schieferplatte",
+  "item.baking_process.firewood": "Brennholz",
+  "block.baking_process.pottery_table": "Töpfertisch",
+
+  "block.baking_process.iron_dishes": "Eiserner Teller",
+  "block.baking_process.wooden_shelf": "Holzregal",
+  "block.baking_process.cutting_board": "Schneidebrett",
+  "block.baking_process.iron_pots": "Eisentopf",
+  "item.baking_process.bread_spatula": "Brotschieber",
+
+  "item.baking_process.milk_potion": "Milchflasche",
+
+  "block.baking_process.dough": "Teig",
+  "block.baking_process.hard_bread": "Hartes Brot",
+  "block.baking_process.small_bread_embryo": "Kleiner Brotteig",
+  "block.baking_process.small_bread": "Kleines Brot",
+  "block.baking_process.cake_embryo": "Kuchenteig",
+  "block.baking_process.baguette": "Baguette",
+  "block.baking_process.baguette_embryo": "Baguetteteig",
+  "item.baking_process.fluffy_bread_embryo": "Fluffiger Brotteig",
+  "block.baking_process.toast": "Toast",
+  "item.baking_process.milk_bread_embryo": "Milchbrotteig",
+  "block.baking_process.baked_cake_embryo": "Gebackener Kuchenteig",
+  "block.baking_process.hard_bread_boat": "Hartes Brotschiff",
+  "block.baking_process.mushroom_stew_hard_bread_boat": "Hartes Brotschiff mit Pilzsuppe",
+  "block.baking_process.beetroot_soup_hard_bread_boat": "Hartes Brotschiff mit Rote-Bete-Suppe",
+
+  "block.baking_process.cake_embryo_mold": "Kuchenform",
+  "block.baking_process.toast_embryo_mold": "Toastform",
+  "item.baking_process.milk_bread_embryo_cake_embryo_mold": "Kuchenform mit Milchbrotteig",
+  "item.baking_process.fluffy_bread_embryo_toast_embryo_mold": "Toastform mit fluffigem Brotteig",
+
+  "block.baking_process.salt_ore": "Salzerz",
+  "block.baking_process.deepslate_salt_ore": "Tiefenschiefer-Salzerz",
+
+  "item.baking_process.salt_shaker": "Salzstreuer",
+  "item.baking_process.salt_cubes": "Salzwürfel",
+
+  "block.baking_process.clay_pots_embryo": "Tontopfrohling",
+  "block.baking_process.clay_pots": "Tontopf",
+  "block.baking_process.flower_pot_embryo": "Blumentopfrohling",
+
+  "container.baking_process.pottery_table": "Töpfertisch",
+
+  "subtitles.baking_process.stove_baking": "Ofen: Backen",
+  "subtitle.baking_process.stone_grinding": "Mahlstein: Drehen",
+  "subtitle.baking_process.combustion_firewood": "Lagerfeuer: Brennen",
+
+  "grinding_stone.add.refused": "Das kann nicht gemahlen werden!",
+  "grinding_stone.add.full": "Es ist schon voll!",
+  "grinding_stone.energy.full": "Jetzt muss der Mahlstein nicht gedrückt werden...",
+  "grinding_stone.add.not_enough": "Das scheint nicht genug zu sein...",
+
+  "item.baking_process.flour_sack.fullness": "Kapazität: %s/%s",
+  "item.baking_process.flour_sack.content": "%s x%s",
+  "item.baking_process.flour_sack.tooltip.empty": "Rechtsklick zum Hinzufügen von Mehl",
+  "item.baking_process.flour_sack.tooltip.non_empty": "Rechtsklick zum Entnehmen von Mehl",
+  "item.baking_process.flour_sack.tooltip.contents": "Rechtsklick zum Entnehmen von Mehl",
+
+  "tooltip.pottery_table.start_crafting": "Herstellung beginnen"
+}

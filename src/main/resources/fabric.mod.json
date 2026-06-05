@@ -7,27 +7,27 @@
   "authors": ["Tenacious Wonder"],
   "contact": {
     "homepage": "https://modrinth.com/mod/baking-process",
-    "sources": "https://github.com/666daji/Food-Craft",
-    "issues": "https://github.com/666daji/Food-Craft/issues"
+    "sources": "https://github.com/666daji/Baking_Process",
+    "issues": "https://github.com/666daji/Baking_Process/issues"
   },
   "license": "MIT",
-  "icon": "assets/foodcraft/icon.png",
+  "icon": "assets/baking_process/icon.png",
   "environment": "*",
   "entrypoints": {
     "fabric-datagen": [
-      "org.foodcraft.client.FoodCraftDataGenerator"
+      "org.bakingprocess.client.BakingProcessDataGenerator"
     ],
     "client": [
-      "org.foodcraft.client.FoodCraftClient"
+      "org.bakingprocess.client.BakingProcessClient"
     ],
     "main": [
-      "org.foodcraft.FoodCraft"
+      "org.bakingprocess.BakingProcess"
     ]
   },
   "mixins": [
-    "foodcraft.mixins.json",
+    "baking_process.mixins.json",
     {
-      "config": "foodcraft.client.mixins.json",
+      "config": "baking_process.client.mixins.json",
       "environment": "client"
     }
   ],

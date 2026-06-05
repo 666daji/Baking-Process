@@ -1,8 +1,0 @@
-{
-  "type": "foodcraft:grinding",
-  "ingredient": {
-    "item": "minecraft:amethyst_shard"
-  },
-  "result": "foodcraft:amethyst_flour",
-  "grindingTime": 400
-}

@@ -1,0 +1,8 @@
+{
+  "type": "baking_process:grinding",
+  "ingredient": {
+    "item": "minecraft:lapis_lazuli"
+  },
+  "result": "baking_process:lapis_lazuli_flour",
+  "grindingTime": 200
+}

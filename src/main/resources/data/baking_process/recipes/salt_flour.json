@@ -1,0 +1,8 @@
+{
+  "type": "baking_process:grinding",
+  "ingredient": {
+    "item": "baking_process:salt_cubes"
+  },
+  "result": "baking_process:salt_flour",
+  "grindingTime": 40
+}

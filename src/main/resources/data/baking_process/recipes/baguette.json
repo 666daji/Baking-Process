@@ -1,0 +1,6 @@
+{
+  "type": "baking_process:stove",
+  "ingredient": "baking_process:baguette_embryo",
+  "result": "baking_process:baguette",
+  "stoveTime": 18000
+}

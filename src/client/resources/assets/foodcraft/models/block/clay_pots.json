@@ -1,9 +1,0 @@
-{
-	"format_version": "1.21.6",
-	"credit": "Made with Blockbench",
-	"parent": "foodcraft:block/pots",
-	"textures": {
-		"particle": "foodcraft:block/clay_pa",
-		"pots": "foodcraft:block/clay_pots"
-	}
-}

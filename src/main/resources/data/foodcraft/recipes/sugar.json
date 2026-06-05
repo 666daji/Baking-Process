@@ -1,8 +1,0 @@
-{
-  "type": "foodcraft:grinding",
-  "ingredient": {
-    "item": "minecraft:sugar_cane"
-  },
-  "result": "minecraft:sugar",
-  "grindingTime": 100
-}

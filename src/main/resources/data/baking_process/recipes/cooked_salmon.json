@@ -1,0 +1,6 @@
+{
+  "type": "baking_process:stove",
+  "ingredient": "minecraft:salmon",
+  "result": "minecraft:cooked_salmon",
+  "stoveTime": 12000
+}

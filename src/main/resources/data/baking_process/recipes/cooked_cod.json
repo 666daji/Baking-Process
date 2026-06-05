@@ -1,0 +1,6 @@
+{
+  "type": "baking_process:stove",
+  "ingredient": "minecraft:cod",
+  "result": "minecraft:cooked_cod",
+  "stoveTime": 12000
+}

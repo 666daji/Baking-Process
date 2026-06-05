@@ -1,6 +1,0 @@
-{
-  "type": "foodcraft:stove",
-  "ingredient": "foodcraft:baguette_embryo",
-  "result": "foodcraft:baguette",
-  "stoveTime": 18000
-}

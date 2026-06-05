@@ -1,0 +1,7 @@
+{
+  "parent": "baking_process:block/pots",
+  "textures": {
+    "pots": "baking_process:block/iron_pots",
+    "particle": "minecraft:block/iron_block"
+  }
+}

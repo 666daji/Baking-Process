@@ -1,0 +1,6 @@
+{
+  "type": "baking_process:stove",
+  "ingredient": "content|baking_process:toast_embryo",
+  "result": "content|baking_process:toast",
+  "stoveTime": 12000
+}

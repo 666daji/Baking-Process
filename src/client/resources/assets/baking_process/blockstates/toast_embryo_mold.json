@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "baking_process:block/toast_embryo_mold",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "baking_process:block/toast_embryo_mold"
+    },
+    "facing=east": {
+      "model": "baking_process:block/toast_embryo_mold",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "baking_process:block/toast_embryo_mold",
+      "y": 90
+    }
+  }
+}

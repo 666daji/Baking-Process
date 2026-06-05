@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "baking_process:block/cutting_board"
+    },
+    "facing=south": {
+      "model": "baking_process:block/cutting_board",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "baking_process:block/cutting_board",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "baking_process:block/cutting_board",
+      "y": 270
+    }
+  }
+}

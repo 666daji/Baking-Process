@@ -1,0 +1,72 @@
+{
+  "itemgroup.baking_process": "Twのベーキングクラフト",
+
+  "item.baking_process.wheat_flour": "小麦粉",
+  "item.baking_process.lapis_lazuli_flour": "ラピスラズリ粉",
+  "item.baking_process.cocoa_flour": "ココア粉",
+  "item.baking_process.amethyst_flour": "アメジスト粉",
+  "block.baking_process.flour_sack": "粉袋",
+
+  "block.baking_process.grinding_stone": "石臼",
+  "block.baking_process.toast_mold": "トースト型",
+  "block.baking_process.heat_resistant_slate": "耐熱スレート",
+  "block.baking_process.firewood": "薪",
+  "block.baking_process.pottery_table": "陶芸台",
+
+  "block.baking_process.iron_dishes": "鉄製皿",
+  "block.baking_process.wooden_shelf": "木棚",
+  "block.baking_process.cutting_board": "まな板",
+  "block.baking_process.iron_pots": "鉄鍋",
+  "item.baking_process.bread_spatula": "パンヘラ",
+
+  "item.baking_process.milk_potion": "ミルク瓶",
+
+  "block.baking_process.dough": "生地",
+  "block.baking_process.hard_bread": "ハードブレッド",
+  "block.baking_process.small_bread_embryo": "小さなパン胚",
+  "block.baking_process.small_bread": "小さなパン",
+  "block.baking_process.cake_embryo": "ケーキ胚",
+  "block.baking_process.baguette": "バゲット",
+  "block.baking_process.baguette_embryo": "バゲット胚",
+  "item.baking_process.fluffy_dough": "ふわふわ生地",
+  "block.baking_process.toast": "トースト",
+  "item.baking_process.milk_dough": "ミルク生地",
+  "block.baking_process.baked_cake_embryo": "焼いたケーキ胚",
+  "block.baking_process.hard_bread_boat": "ハードブレッドボート",
+  "block.baking_process.mushroom_stew_hard_bread_boat": "マッシュルームシチュー入りハードブレッドボート",
+  "block.baking_process.beetroot_soup_hard_bread_boat": "ビートルートスープ入りハードブレッドボート",
+
+  "block.baking_process.cake_embryo_mold": "ケーキ胚型",
+  "block.baking_process.toast_embryo_mold": "トースト胚型",
+  "item.baking_process.milk_bread_embryo_cake_embryo_mold": "ミルクパン胚入りケーキ胚型",
+  "item.baking_process.fluffy_bread_embryo_toast_embryo_mold": "ふわふわパン胚入りトースト胚型",
+
+  "block.baking_process.salt_ore": "塩鉱石",
+  "block.baking_process.deepslate_salt_ore": "深層岩塩鉱石",
+
+  "item.baking_process.salt_shaker": "塩振り",
+  "item.baking_process.salt_cubes": "塩キューブ",
+
+  "block.baking_process.clay_pots_embryo": "粘土ポット胚",
+  "block.baking_process.clay_pots": "粘土ポット",
+  "block.baking_process.flower_pot_embryo": "植木鉢胚",
+
+  "container.baking_process.pottery_table": "陶芸台",
+
+  "subtitles.baking_process.stove_baking": "ストーブ: 焼き上げ",
+  "subtitle.baking_process.stone_grinding": "石臼: 回転",
+  "subtitle.baking_process.combustion_firewood": "キャンプファイヤー: 燃焼",
+
+  "grinding_stone.add.refused": "これは粉砕できません!",
+  "grinding_stone.add.full": "すでに満杯です!",
+  "grinding_stone.energy.full": "今は石臼を押す必要はありません...",
+  "grinding_stone.add.not_enough": "これでは足りないようです...",
+
+  "item.baking_process.flour_sack.fullness": "容量: %s/%s",
+  "item.baking_process.flour_sack.content": "%s x%s",
+  "item.baking_process.flour_sack.tooltip.empty": "右クリックで粉を追加",
+  "item.baking_process.flour_sack.tooltip.non_empty": "右クリックで粉を取り出す",
+  "item.baking_process.flour_sack.tooltip.contents": "右クリックで粉を取り出す",
+
+  "tooltip.pottery_table.start_crafting": "製作開始"
+}

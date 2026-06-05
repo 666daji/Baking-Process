@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "baking_process:dough"
+    }
+  ],
+  "result": {
+    "item": "baking_process:small_bread_embryo",
+    "count": 3
+  }
+}

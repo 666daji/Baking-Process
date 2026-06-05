@@ -1,0 +1,7 @@
+{
+  "type": "baking_process:stove",
+  "ingredient": "minecraft:porkchop",
+  "MaxInputCount": 2,
+  "result": "minecraft:cooked_porkchop",
+  "stoveTime": 9000
+}

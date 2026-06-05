@@ -1,7 +1,0 @@
-{
-  "parent": "foodcraft:block/flour_sack_2",
-  "textures": {
-    "0": "foodcraft:block/sugar_sack",
-    "particle": "foodcraft:item/sugar_sack"
-  }
-}

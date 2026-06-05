@@ -1,0 +1,6 @@
+{
+  "type": "baking_process:stove",
+  "ingredient": "baking_process:clay_pots_embryo",
+  "result": "baking_process:clay_pots",
+  "stoveTime": 24000
+}

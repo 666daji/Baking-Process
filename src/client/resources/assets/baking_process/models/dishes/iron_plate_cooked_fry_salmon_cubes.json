@@ -1,0 +1,6 @@
+{
+  "parent": "baking_process:dishes/iron_plate_fry_salmon_cubes",
+  "textures": {
+    "salmon": "baking_process:block/cooked_salmon_cubes"
+  }
+}

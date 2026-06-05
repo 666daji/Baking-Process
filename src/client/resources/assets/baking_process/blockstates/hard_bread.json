@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "baking_process:block/hard_bread",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "baking_process:block/hard_bread"
+    },
+    "facing=east": {
+      "model": "baking_process:block/hard_bread",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "baking_process:block/hard_bread",
+      "y": 90
+    }
+  }
+}

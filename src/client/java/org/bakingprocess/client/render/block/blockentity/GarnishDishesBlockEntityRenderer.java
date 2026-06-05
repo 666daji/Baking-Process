@@ -1,0 +1,24 @@
+package org.bakingprocess.client.render.block.blockentity;
+
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import org.bakingprocess.block.entity.DishesBlockEntity;
+
+public class GarnishDishesBlockEntityRenderer extends UpPlaceBlockEntityRenderer<DishesBlockEntity> {
+
+    public GarnishDishesBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
+        super(ctx);
+    }
+
+    @Override
+    public void render(DishesBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        if (!entity.isEmpty()) {
+            matrices.push();
+            matrices.translate(0.0, 0.1, 0.0);
+
+            fromStackRender(entity.getStack(0), entity, tickDelta, matrices, vertexConsumers, light, overlay);
+            matrices.pop();
+        }
+    }
+}

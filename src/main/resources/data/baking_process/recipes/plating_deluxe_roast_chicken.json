@@ -1,0 +1,14 @@
+{
+  "type": "baking_process:plating",
+  "container": "baking_process:iron_plate",
+  "actions": [
+    "add_item|minecraft:chicken",
+    "add_item|minecraft:sweet_berries",
+    "add_item|baking_process:carrot_slices",
+    "add_item|baking_process:carrot_slices",
+    "add_item|baking_process:salt_flour",
+    "add_content|baking_process:honey",
+    "add_item|baking_process:carrot_head"
+  ],
+  "result": "baking_process:deluxe_roast_chicken"
+}

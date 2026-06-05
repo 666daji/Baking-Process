@@ -1,6 +1,0 @@
-{
-  "type": "foodcraft:stove",
-  "ingredient": "content|foodcraft:deluxe_roast_chicken",
-  "result": "content|foodcraft:cooked_deluxe_roast_chicken",
-  "stoveTime": 18000
-}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/potion_3",
+  "textures": {
+    "6": "baking_process:block/milk_overlay",
+    "7": "minecraft:block/potion",
+    "particle": "baking_process:item/potion_overlay"
+  }
+}

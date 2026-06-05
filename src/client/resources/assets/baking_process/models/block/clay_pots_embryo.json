@@ -1,0 +1,9 @@
+{
+	"format_version": "1.21.6",
+	"credit": "Made with Blockbench",
+	"parent": "baking_process:block/pots",
+	"textures": {
+		"pots": "baking_process:block/clay_pots_embryo",
+		"particle": "baking_process:block/clay_embryo_pa"
+	}
+}

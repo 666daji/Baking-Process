@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "baking_process:block/baguette",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "baking_process:block/baguette",
+      "y": 90
+    },
+    "facing=east": {
+      "model": "baking_process:block/baguette"
+    },
+    "facing=west": {
+      "model": "baking_process:block/baguette",
+      "y": 180
+    }
+  }
+}

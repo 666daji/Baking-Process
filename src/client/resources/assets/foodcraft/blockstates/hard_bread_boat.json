@@ -1,8 +1,0 @@
-{
-  "variants": {
-    "facing=north": { "model": "foodcraft:block/hard_bread_boat" },
-    "facing=east": { "model": "foodcraft:block/hard_bread_boat", "y": 90 },
-    "facing=south": { "model": "foodcraft:block/hard_bread_boat", "y": 180 },
-    "facing=west": { "model": "foodcraft:block/hard_bread_boat", "y": 270 }
-  }
-}

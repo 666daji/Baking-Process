@@ -1,6 +1,0 @@
-{
-  "parent": "foodcraft:dishes/iron_plate_fry_salmon_cubes",
-  "textures": {
-    "salmon": "foodcraft:block/cooked_salmon_cubes"
-  }
-}

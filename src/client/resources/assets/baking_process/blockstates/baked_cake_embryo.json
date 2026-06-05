@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "baking_process:block/baked_cake_embryo",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "baking_process:block/baked_cake_embryo"
+    },
+    "facing=east": {
+      "model": "baking_process:block/baked_cake_embryo",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "baking_process:block/baked_cake_embryo",
+      "y": 90
+    }
+  }
+}

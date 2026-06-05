@@ -1,0 +1,6 @@
+{
+  "type": "baking_process:stove",
+  "ingredient": "baking_process:dough",
+  "result": "baking_process:hard_bread",
+  "stoveTime": 21000
+}

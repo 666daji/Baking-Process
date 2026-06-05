@@ -1,8 +1,0 @@
-{
-  "type": "foodcraft:grinding",
-  "ingredient": {
-    "item": "minecraft:lapis_lazuli"
-  },
-  "result": "foodcraft:lapis_lazuli_flour",
-  "grindingTime": 200
-}

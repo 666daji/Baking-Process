@@ -1,0 +1,6 @@
+{
+  "type": "baking_process:stove",
+  "ingredient": "baking_process:small_bread_embryo",
+  "result": "baking_process:small_bread",
+  "stoveTime": 14000
+}

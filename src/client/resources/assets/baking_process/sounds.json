@@ -1,0 +1,55 @@
+{
+  "stove_baking": {
+    "sounds": [
+      "baking_process:block/stove_baking_1"
+    ],
+    "subtitle": "subtitles.baking_process.stove_baking"
+  },
+  "grinding_stone_grinding": {
+    "sounds": [
+      "baking_process:block/grinding_stone_grinding_1",
+      "baking_process:block/grinding_stone_grinding_2"
+    ],
+    "subtitle": "subtitle.baking_process.stone_grinding"
+  },
+  "cut": {
+    "sounds": [
+      "baking_process:process/cut_1",
+      "baking_process:process/cut_2"
+    ],
+    "subtitle": "subtitle.baking_process.cut"
+  },
+  "cut_meat": {
+    "sounds": [
+      "baking_process:process/cut_meat_1",
+      "baking_process:process/cut_meat_2"
+    ],
+    "subtitle": "subtitle.baking_process.cut_meat"
+  },
+  "kitchen_knife_place": {
+    "sounds": [
+      "baking_process:block/kitchen_knife_place"
+    ],
+    "subtitle": "subtitle.baking_process.kitchen_knife_place"
+  },
+  "kitchen_knife_fetch": {
+    "sounds": [
+      "baking_process:block/kitchen_knife_fetch"
+    ],
+    "subtitle": "subtitle.baking_process.kitchen_knife_fetch"
+  },
+  "kitchen_knife_board_place": {
+    "sounds": [
+      "baking_process:block/kitchen_knife_board_place"
+    ],
+    "subtitle": "subtitle.baking_process.kitchen_knife_board_place"
+  },
+  "soup_fill": {
+    "sounds": [
+      "item/bucket/empty1",
+      "item/bucket/empty2",
+      "item/bucket/empty3"
+    ],
+    "subtitle": "subtitle.baking_process.soup_fill"
+  }
+}
