@@ -11,7 +11,6 @@ import org.bakingprocess.block.entity.PlatableBlockEntity;
 import org.bakingprocess.block.process.playeraction.PlayerAction;
 import org.bakingprocess.contentsystem.content.AbstractContent;
 import org.bakingprocess.contentsystem.content.DishesContent;
-import org.bakingprocess.contentsystem.api.OccupyUtil;
 import org.bakingprocess.registry.ModRecipeSerializers;
 import org.bakingprocess.registry.ModRecipeTypes;
 import org.jetbrains.annotations.Nullable;
@@ -105,7 +104,7 @@ public class PlatingRecipe implements Recipe<PlatableBlockEntity> {
 
     @Override
     public ItemStack craft(PlatableBlockEntity inventory, DynamicRegistryManager registryManager) {
-        return OccupyUtil.createAbstractOccupy(output);
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -116,7 +115,7 @@ public class PlatingRecipe implements Recipe<PlatableBlockEntity> {
 
     @Override
     public ItemStack getOutput(DynamicRegistryManager registryManager) {
-        return OccupyUtil.createAbstractOccupy(output);
+        return ItemStack.EMPTY;
     }
 
     @Override

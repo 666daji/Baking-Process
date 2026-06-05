@@ -272,6 +272,18 @@ public class ModModelLoader implements ModelLoadingPlugin {
         registerPlatingSequenceModels(
                 ModItems.IRON_PLATE,
                 Arrays.asList(
+                        new AddItemPlayerAction(Items.RABBIT),
+                        new AddItemPlayerAction(ModItems.SALT_FLOUR),
+                        new AddContentPlayerAction(ModContents.HONEY),
+                        new AddItemPlayerAction(ModItems.CARROT_SLICES),
+                        new AddItemPlayerAction(ModItems.CARROT_SLICES),
+                        new AddItemPlayerAction(Items.SWEET_BERRIES)
+                ),
+                ModContents.DELUXE_ROASTED_RABBIT);
+
+        registerPlatingSequenceModels(
+                ModItems.IRON_PLATE,
+                Arrays.asList(
                         new AddItemPlayerAction(Items.MUTTON),
                         new AddItemPlayerAction(ModItems.SALT_FLOUR),
                         new AddContentPlayerAction(ModContents.HONEY),
@@ -280,6 +292,7 @@ public class ModModelLoader implements ModelLoadingPlugin {
                         new AddItemPlayerAction(ModItems.CARROT_HEAD)
                 ),
                 ModContents.HONEY_ROASTED_MUTTON);
+
         registerPlatingSequenceModels(
                 ModItems.IRON_PLATE,
                 Arrays.asList(

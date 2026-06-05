@@ -1,8 +1,8 @@
 {
   "values": [
-    "foodcraft:salt_ore",
-    "foodcraft:deepslate_salt_ore",
-    "foodcraft:grinding_stone",
-    "foodcraft:heat_resistant_slate"
+    "baking_process:salt_ore",
+    "baking_process:deepslate_salt_ore",
+    "baking_process:grinding_stone",
+    "baking_process:heat_resistant_slate"
   ]
 }

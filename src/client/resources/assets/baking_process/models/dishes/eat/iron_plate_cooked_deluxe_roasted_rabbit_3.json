@@ -1,0 +1,95 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"rabbit": "baking_process:block/roast_honey_rabbit",
+		"plate": "baking_process:block/cooked_honey_iron_plate"
+	},
+	"elements": [
+		{
+			"from": [7, 2, 6.5],
+			"to": [9, 5, 9.5],
+			"rotation": {"angle": 0, "axis": "x", "origin": [7, 2, 6.5]},
+			"faces": {
+				"north": {"uv": [1, 8.5, 2, 10], "texture": "#rabbit"},
+				"east": {"uv": [0, 7, 1.5, 8.5], "texture": "#rabbit"},
+				"south": {"uv": [2, 8.5, 3, 10], "texture": "#rabbit"},
+				"west": {"uv": [1.5, 7, 3, 8.5], "texture": "#rabbit"},
+				"up": {"uv": [4, 10, 3, 8.5], "texture": "#rabbit"},
+				"down": {"uv": [5, 8.5, 4, 10], "texture": "#rabbit"}
+			}
+		},
+		{
+			"from": [7.5, 2, 9.5],
+			"to": [8.5, 3, 11.5],
+			"rotation": {"angle": 0, "axis": "x", "origin": [6.5, 2, 9.5]},
+			"faces": {
+				"north": {"uv": [4, 10, 4.5, 10.5], "texture": "#rabbit"},
+				"east": {"uv": [10, 1, 11, 1.5], "texture": "#rabbit"},
+				"south": {"uv": [4.5, 10, 5, 10.5], "texture": "#rabbit"},
+				"west": {"uv": [10, 1.5, 11, 2], "texture": "#rabbit"},
+				"up": {"uv": [2.5, 11, 2, 10], "texture": "#rabbit"},
+				"down": {"uv": [10.5, 2, 10, 3], "texture": "#rabbit"}
+			}
+		},
+		{
+			"from": [1, 1, 1],
+			"to": [15, 1.4, 15],
+			"rotation": {"angle": 0, "axis": "y", "origin": [1, 0, 1]},
+			"faces": {
+				"north": {"uv": [7, 0, 14, 0.5], "texture": "#plate"},
+				"east": {"uv": [7, 0.5, 14, 1], "texture": "#plate"},
+				"south": {"uv": [7, 1, 14, 1.5], "texture": "#plate"},
+				"west": {"uv": [7, 1.5, 14, 2], "texture": "#plate"},
+				"up": {"uv": [7, 7, 0, 0], "texture": "#plate"},
+				"down": {"uv": [7, 7, 0, 14], "texture": "#plate"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [71, 0, 0],
+			"translation": [-0.25, 4, 2.5],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"firstperson_righthand": {
+			"translation": [0, 6.25, 0]
+		},
+		"gui": {
+			"rotation": [30, 45, 0],
+			"translation": [0, 1.75, 0],
+			"scale": [0.8, 0.8, 0.8]
+		},
+		"fixed": {
+			"rotation": [-90, 0, 0],
+			"translation": [0, 0, -5],
+			"scale": [0.69, 0.67, 0.65]
+		}
+	},
+	"groups": [
+		{
+			"name": "豪华烤兔",
+			"origin": [8, 8, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [
+				{
+					"name": "兔",
+					"origin": [8, 8, 8],
+					"scope": 0,
+					"color": 0,
+					"children": [
+						{
+							"name": "group",
+							"origin": [8, 8, 8],
+							"scope": 0,
+							"color": 0,
+							"children": [0, 1]
+						}
+					]
+				},
+				2
+			]
+		}
+	]
+}

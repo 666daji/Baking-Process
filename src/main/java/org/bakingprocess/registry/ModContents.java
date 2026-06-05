@@ -59,7 +59,7 @@ public class ModContents {
             createModId("deluxe_roasted_rabbit"));
 
     public static final DishesContent COOKED_DELUXE_ROASTED_RABBIT = new DishesContent(
-            createModId("cooked_deluxe_roasted_rabbit"), ModFoodComponents.COOKED_DELUXE_ROASTED_RABBIT, 3);
+            createModId("cooked_deluxe_roasted_rabbit"), ModFoodComponents.COOKED_DELUXE_ROASTED_RABBIT, 4);
 
     public static final DishesContent HONEY_ROASTED_MUTTON = new DishesContent(
             createModId("honey_roasted_mutton"));

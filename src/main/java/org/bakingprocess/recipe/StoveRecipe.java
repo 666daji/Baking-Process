@@ -1,5 +1,6 @@
 package org.bakingprocess.recipe;
 
+import com.mojang.datafixers.util.Either;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
@@ -10,32 +11,22 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.bakingprocess.contentsystem.api.ContainerUtil;
 import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.api.OccupyUtil;
 import org.bakingprocess.registry.ModRecipeSerializers;
 import org.bakingprocess.registry.ModRecipeTypes;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class StoveRecipe implements Recipe<Inventory> {
-    public static final Set<StoveRecipe> NEED_OTHER_MODEL_RECIPES = new HashSet<>();
-
     protected final Identifier id;
-    protected final ItemStack input;
-    protected final ItemStack output;
+    protected final Either<ItemStack, AbstractContent> input;
+    protected final Either<ItemStack, AbstractContent> output;
     protected final int bakingTime;
     protected final int MaxInputCount;
 
-    public StoveRecipe(Identifier id, ItemStack input, ItemStack output, int MaxInputCount, int bakingTime) {
+    public StoveRecipe(Identifier id, Either<ItemStack, AbstractContent> input, Either<ItemStack, AbstractContent> output, int MaxInputCount, int bakingTime) {
         this.id = id;
         this.input = input;
         this.output = output;
         this.MaxInputCount = MaxInputCount;
         this.bakingTime = bakingTime;
-
-        if (MaxInputCount > 1) {
-            NEED_OTHER_MODEL_RECIPES.add(this);
-        }
     }
 
     public int getMaxInputCount() {
@@ -46,14 +37,8 @@ public class StoveRecipe implements Recipe<Inventory> {
     public boolean matches(Inventory inventory, World world) {
         ItemStack stack = inventory.getStack(0);
 
-        if (OccupyUtil.isOccupy(this.input)) {
-            AbstractContent input = OccupyUtil.getContentFromOccupy(this.input);
-            AbstractContent content = ContainerUtil.extractContent(stack);
-
-            return input != null && input.equals(content);
-        }
-
-        return ItemStack.areItemsEqual(stack, input);
+        return input.map(inputStack -> ItemStack.areItemsEqual(stack, inputStack),
+                inputContent -> inputContent.equals(ContainerUtil.extractContent(stack)));
     }
 
     @Override
@@ -61,9 +46,8 @@ public class StoveRecipe implements Recipe<Inventory> {
         ItemStack stack = inventory.getStack(0);
         int count = Math.min(stack.getCount(), MaxInputCount);
 
-        return OccupyUtil.isOccupy(this.output)?
-            ContainerUtil.replaceContent(stack, OccupyUtil.getContentFromOccupy(this.output)):
-            output.copyWithCount(count);
+        return output.map(outputStack -> outputStack.copyWithCount(count),
+                outputContent -> ContainerUtil.replaceContent(stack, outputContent));
     }
 
     @Override
@@ -73,7 +57,8 @@ public class StoveRecipe implements Recipe<Inventory> {
 
     @Override
     public ItemStack getOutput(DynamicRegistryManager registryManager) {
-        return this.output.copy();
+        return this.output.map(outputStack -> outputStack,
+                outputContent -> ItemStack.EMPTY);
     }
 
     @Override
@@ -109,16 +94,16 @@ public class StoveRecipe implements Recipe<Inventory> {
     }
 
     /**
-     * 获取输入物品堆栈
+     * 获取输入。
      */
-    public ItemStack getInput() {
+    public Either<ItemStack, AbstractContent> getInput() {
         return input;
     }
 
     /**
-     * 获取输出物品堆栈
+     * 获取输出。
      */
-    public ItemStack getOutput() {
+    public Either<ItemStack, AbstractContent> getOutput() {
         return output;
     }
 }

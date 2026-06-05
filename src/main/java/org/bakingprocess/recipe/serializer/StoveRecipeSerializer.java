@@ -1,6 +1,8 @@
 package org.bakingprocess.recipe.serializer;
 
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Either;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.RecipeSerializer;
@@ -8,7 +10,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.api.OccupyUtil;
 import org.bakingprocess.contentsystem.registry.ContentRegistry;
 import org.bakingprocess.recipe.StoveRecipe;
 
@@ -20,11 +21,11 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     public StoveRecipe read(Identifier id, JsonObject json) {
         // 读取输入物品（可以是普通物品或内容物）
         String inputString = JsonHelper.getString(json, "ingredient");
-        ItemStack input = readStackFromString(inputString);
+        Either<ItemStack, AbstractContent> input = readStackFromString(inputString);
 
         // 读取结果物品（可以是普通物品或内容物）
         String resultString = JsonHelper.getString(json, "result");
-        ItemStack result = readStackFromString(resultString);
+        Either<ItemStack, AbstractContent> result = readStackFromString(resultString);
 
         // 读取烘烤时间、最大输入数量和模具信息
         int inputCount = JsonHelper.getInt(json, "MaxInputCount", 1);
@@ -36,10 +37,12 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     @Override
     public StoveRecipe read(Identifier id, PacketByteBuf buf) {
         // 读取输入物品
-        ItemStack input = buf.readItemStack();
+        String inputString = buf.readString();
+        Either<ItemStack, AbstractContent> input = readStackFromString(inputString);
 
         // 读取结果物品
-        ItemStack result = buf.readItemStack();
+        String resultString = buf.readString();
+        Either<ItemStack, AbstractContent> result = readStackFromString(resultString);
 
         // 读取额外数据
         int inputCount = buf.readInt();
@@ -50,23 +53,30 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
 
     @Override
     public void write(PacketByteBuf buf, StoveRecipe recipe) {
-        // 写入输入物品
-        buf.writeItemStack(recipe.getInput());
+        // 将组件转换为 "type|value" 字符串后直接写入
+        buf.writeString(componentToString(recipe.getInput()));
+        buf.writeString(componentToString(recipe.getOutput()));
 
-        // 写入结果物品
-        buf.writeItemStack(recipe.getOutput(null));
-
-        // 写入额外数据
         buf.writeInt(recipe.getMaxInputCount());
         buf.writeVarInt(recipe.getBakingTime());
     }
 
     /**
-     * 从字符串中读取物品堆栈。
+     * 将 Either<ItemStack, AbstractContent> 转换为与配方 JSON 格式一致的字符串。
+     */
+    private static String componentToString(Either<ItemStack, AbstractContent> component) {
+        return component.map(
+                stack -> "item|" + Registries.ITEM.getId(stack.getItem()),
+                content -> "content|" + content.getId()
+        );
+    }
+
+    /**
+     * 从字符串中读取组件。
      * <p>使用'|'分割，格式为"类别|值"：</p>
      * <ul>
-     *   <li>类别为"item"时：解析为普通的物品堆栈，值为物品ID（如"minecraft:apple"）</li>
-     *   <li>类别为"content"时：从内容物注册表中获取对应的抽象内容物，然后使用{@link OccupyUtil#createAbstractOccupy(AbstractContent)}创建占位堆栈</li>
+     *   <li>类别为"item"时：解析为物品堆栈</li>
+     *   <li>类别为"content"时：解析为内容物</li>
      * </ul>
      * <p>如果字符串中不包含'|'，则默认按普通物品处理。</p>
      *
@@ -75,7 +85,7 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
      * @throws IllegalArgumentException 如果无法解析出有效物品或内容物
      * @throws NullPointerException 如果输入字符串为null
      */
-    private static ItemStack readStackFromString(String idString) {
+    private static Either<ItemStack, AbstractContent> readStackFromString(String idString) {
         Objects.requireNonNull(idString, "Input string cannot be null");
 
         // 去除前后空格
@@ -103,30 +113,30 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     }
 
     /**
-     * 解析普通物品堆栈
+     * 解析物品堆栈。
      * @param itemId 物品ID字符串
      * @return 物品堆栈
      * @throws IllegalArgumentException 如果物品不存在
      */
-    private static ItemStack parseItemStack(String itemId) {
+    private static Either<ItemStack, AbstractContent> parseItemStack(String itemId) {
         Identifier identifier = Identifier.tryParse(itemId);
         if (identifier == null) {
             throw new IllegalArgumentException("Invalid item ID format: '" + itemId + "'");
         }
 
-        var item = Registries.ITEM.getOrEmpty(identifier)
+        Item item = Registries.ITEM.getOrEmpty(identifier)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found: " + itemId));
 
-        return new ItemStack(item);
+        return Either.left(new ItemStack(item));
     }
 
     /**
-     * 解析内容物堆栈
+     * 解析内容物。
      * @param contentId 内容物ID字符串
      * @return 内容物占位堆栈
      * @throws IllegalArgumentException 如果内容物不存在
      */
-    private static ItemStack parseContentStack(String contentId) {
+    private static Either<ItemStack, AbstractContent> parseContentStack(String contentId) {
         Identifier identifier = Identifier.tryParse(contentId);
         if (identifier == null) {
             throw new IllegalArgumentException("Invalid content ID format: '" + contentId + "'");
@@ -137,6 +147,6 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
             throw new IllegalArgumentException("Content not found: " + contentId);
         }
 
-        return OccupyUtil.createAbstractOccupy(content);
+        return Either.right(content);
     }
 }

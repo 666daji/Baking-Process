@@ -7,7 +7,7 @@
 		"stem": "minecraft:block/sweet_berries_stem",
 		"chicken": "baking_process:block/plate_cooked_chicken",
 		"carrot": "baking_process:block/roasted_carrot",
-		"plate": "baking_process:block/cooked_deluxe_roast_chicken_plate"
+		"plate": "baking_process:block/cooked_honey_iron_plate"
 	},
 	"elements": [
 		{
