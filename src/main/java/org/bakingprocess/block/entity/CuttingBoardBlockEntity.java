@@ -68,19 +68,19 @@ public class CuttingBoardBlockEntity extends UpPlaceBlockEntity {
     }
 
     @Override
-    public ActionResult tryAddItem(ItemStack stack) {
+    public Result tryAddItem(ItemStack stack) {
         if (isEmpty() && isValidItem(stack)) {
             ItemStack placedStack = stack.copy();
             placedStack.setCount(1);
             setStack(0, placedStack);
             markDirtyAndSync();
-            return ActionResult.SUCCESS;
+            return Result.of(placedStack, ActionResult.SUCCESS);
         }
-        return ActionResult.FAIL;
+        return Result.of(ActionResult.PASS);
     }
 
     @Override
-    public void onPlace(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, ItemStack placeStack) {
+    public void onPlace(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, ItemStack placeStack, List<ItemStack> itemStacks) {
         if (placeStack.getItem().equals(ModItems.KITCHEN_KNIFE)) {
             world.playSound(
                     null, pos,
@@ -93,26 +93,25 @@ public class CuttingBoardBlockEntity extends UpPlaceBlockEntity {
             return;
         }
 
-        super.onPlace(state, world, pos, player, hand, hit, placeStack);
+        super.onPlace(state, world, pos, player, hand, hit, placeStack, itemStacks);
     }
 
     @Override
-    public ActionResult tryFetchItem(PlayerEntity player) {
+    public Result tryFetchItem(PlayerEntity player) {
         // 如果切菜流程在进行中，不允许取出物品
         if (cuttingProcess.isActive() ) {
-            return ActionResult.FAIL;
+            return Result.of(ActionResult.PASS);
         }
 
         if (!isEmpty()) {
             ItemStack stack = removeStack(0, 1);
-            this.fetchStacks = List.of(stack.copy());
             if (!player.isCreative() && !player.giveItemStack(stack)) {
                 player.dropItem(stack, false);
             }
             markDirtyAndSync();
-            return ActionResult.SUCCESS;
+            return Result.of(List.of(stack.copy()), ActionResult.SUCCESS);
         }
-        return ActionResult.FAIL;
+        return Result.of(ActionResult.PASS);
     }
 
     /**

@@ -79,9 +79,9 @@ public class DishesBlockEntity extends UpPlaceBlockEntity {
         return BakingProcessUtils.createCountBlockstate(stack, facing);
     }
 
-    public ActionResult tryAddItem(ItemStack stack) {
+    public Result tryAddItem(ItemStack stack) {
         if (stack.isEmpty() || !isValidItem(stack)) {
-            return ActionResult.FAIL;
+            return Result.of(ActionResult.PASS);
         }
 
         Item item = stack.getItem();
@@ -92,29 +92,28 @@ public class DishesBlockEntity extends UpPlaceBlockEntity {
         if (currentStack.isEmpty()) {
             this.setStack(0, newStack);
             this.markDirtyAndSync();
-            return ActionResult.SUCCESS;
+            return Result.of(newStack, ActionResult.SUCCESS);
         } else if (currentStack.getItem() == item) {
             FoodBlock block = (FoodBlock) getInventoryBlockState().getBlock();
             if (currentStack.getCount() < block.MAX_FOOD) {
                 currentStack.increment(1);
                 this.markDirtyAndSync();
-                return ActionResult.SUCCESS;
+                return Result.of(newStack, ActionResult.SUCCESS);
             }
         }
-        return ActionResult.FAIL;
+        return Result.of(ActionResult.PASS);
     }
 
-    public ActionResult tryFetchItem(PlayerEntity player) {
+    public Result tryFetchItem(PlayerEntity player) {
         if (!isEmpty()) {
             ItemStack stack = removeStack(0, 1);
-            this.fetchStacks = List.of(stack.copy());
             if (!player.isCreative() && !player.giveItemStack(stack)) {
                 player.dropItem(stack, false);
             }
             markDirtyAndSync();
-            return ActionResult.SUCCESS;
+            return Result.of(List.of(stack.copy()), ActionResult.SUCCESS);
         }
-        return ActionResult.FAIL;
+        return Result.of(ActionResult.PASS);
     }
 
     @Override

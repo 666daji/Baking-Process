@@ -180,9 +180,9 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
     }
 
     @Override
-    public ActionResult tryAddItem(ItemStack stack) {
+    public Result tryAddItem(ItemStack stack) {
         if (stack.isEmpty() || !isValidItem(stack)) {
-            return ActionResult.FAIL;
+            return Result.of(ActionResult.PASS);
         }
 
         // 如果是花，尝试插入到空花盆中
@@ -197,17 +197,17 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
         if (emptySlot != -1) {
             this.setStack(emptySlot, newStack);
             this.markDirtyAndSync();
-            return ActionResult.SUCCESS;
+            return Result.of(newStack, ActionResult.SUCCESS);
         }
-        return ActionResult.FAIL;
+        return Result.of(ActionResult.PASS);
     }
 
     /**
      * 尝试将花插入到空花盆中
      */
-    private ActionResult tryInsertFlower(ItemStack flowerStack) {
+    private Result tryInsertFlower(ItemStack flowerStack) {
         if (!(flowerStack.getItem() instanceof BlockItem blockItem)) {
-            return ActionResult.FAIL;
+            return Result.of(ActionResult.PASS);
         }
 
         Block flowerBlock = blockItem.getBlock();
@@ -220,11 +220,11 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
                 // 设置花盆插花数据
                 setFlowerId(i, flowerId);
                 this.markDirtyAndSync();
-                return ActionResult.SUCCESS;
+                return Result.of(flowerStack.copy(), ActionResult.SUCCESS);
             }
         }
 
-        return ActionResult.FAIL;
+        return Result.of(ActionResult.PASS);
     }
 
     /**
@@ -241,38 +241,39 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
     }
 
     @Override
-    public ActionResult tryFetchItem(PlayerEntity player) {
-        for (int i = this.size() - 1; i >= 0; i--) {
-            ItemStack stack = this.getStack(i);
-            if (!stack.isEmpty()) {
-                // 如果是花盆且有花，先尝试取出花
-                if (isFlowerPot(stack) && hasFlower(i)) {
-                    return tryFetchFlower(player, i);
-                }
-
-                // 直接取出物品
-                ItemStack extractedStack = stack.copy();
-                extractedStack.setCount(1);
-
-                this.fetchStacks = List.of(extractedStack.copy());
-
-                if (!player.isCreative() && !player.giveItemStack(extractedStack)) {
-                    player.dropItem(extractedStack, false);
-                }
-
-                stack.decrement(1);
-                if (stack.isEmpty()) {
-                    this.setStack(i, ItemStack.EMPTY);
-                    // 清除花盆数据
-                    clearFlowerId(i);
-                }
-
-                this.markDirtyAndSync();
-                return ActionResult.SUCCESS;
-            }
-        }
-
-        return ActionResult.FAIL;
+    public Result tryFetchItem(PlayerEntity player) {
+//        for (int i = this.size() - 1; i >= 0; i--) {
+//            ItemStack stack = this.getStack(i);
+//            if (!stack.isEmpty()) {
+//                // 如果是花盆且有花，先尝试取出花
+//                if (isFlowerPot(stack) && hasFlower(i)) {
+//                    return tryFetchFlower(player, i);
+//                }
+//
+//                // 直接取出物品
+//                ItemStack extractedStack = stack.copy();
+//                extractedStack.setCount(1);
+//
+//                this.fetchStacks = List.of(extractedStack.copy());
+//
+//                if (!player.isCreative() && !player.giveItemStack(extractedStack)) {
+//                    player.dropItem(extractedStack, false);
+//                }
+//
+//                stack.decrement(1);
+//                if (stack.isEmpty()) {
+//                    this.setStack(i, ItemStack.EMPTY);
+//                    // 清除花盆数据
+//                    clearFlowerId(i);
+//                }
+//
+//                this.markDirtyAndSync();
+//                return ActionResult.SUCCESS;
+//            }
+//        }
+//
+//        return ActionResult.FAIL;
+        return Result.of(ActionResult.PASS);
     }
 
     /**
@@ -290,9 +291,7 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
                     String flowerId = getFlowerId(i);
                     if (!flowerId.isEmpty()) {
                         Block flowerBlock = Registries.BLOCK.get(new Identifier(flowerId));
-                        if (flowerBlock != null) {
-                            drops.add(new ItemStack(flowerBlock));
-                        }
+                        drops.add(new ItemStack(flowerBlock));
                     }
                 }
 
@@ -313,14 +312,10 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
         }
 
         Block flowerBlock = Registries.BLOCK.get(new Identifier(flowerId));
-        if (flowerBlock == null) {
-            return ActionResult.FAIL;
-        }
 
         // 创建花的物品堆栈
         ItemStack flowerStack = new ItemStack(flowerBlock);
 
-        this.fetchStacks = List.of(flowerStack.copy());
         // 给予玩家花
         if (!player.isCreative() && !player.giveItemStack(flowerStack)) {
             player.dropItem(flowerStack, false);

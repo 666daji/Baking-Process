@@ -193,9 +193,9 @@ public class HeatResistantSlateBlockPileEntity extends UpPlaceBlockEntity implem
     }
 
     @Override
-    public ActionResult tryAddItem(ItemStack stack) {
+    public Result tryAddItem(ItemStack stack) {
         if (stack.isEmpty() || !isValidItem(stack)) {
-            return ActionResult.FAIL;
+            return Result.of(ActionResult.PASS);
         }
 
         // 尝试放置的新堆栈
@@ -207,13 +207,13 @@ public class HeatResistantSlateBlockPileEntity extends UpPlaceBlockEntity implem
             newStack.setCount(Math.min(newStack.getCount(), maxCount));
             this.setStack(0, newStack);
             this.markDirtyAndSync();
-            return ActionResult.SUCCESS;
+            return Result.of(newStack, ActionResult.SUCCESS);
         }
-        return ActionResult.FAIL;
+        return Result.of(ActionResult.PASS);
     }
 
     @Override
-    public void onPlace(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, ItemStack placeStack) {
+    public void onPlace(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, ItemStack placeStack, List<ItemStack> itemStacks) {
         playSound(world, pos, placeStack, true);
 
         if (!player.isCreative()) {
@@ -222,14 +222,12 @@ public class HeatResistantSlateBlockPileEntity extends UpPlaceBlockEntity implem
     }
 
     @Override
-    public ActionResult tryFetchItem(PlayerEntity player) {
+    public Result tryFetchItem(PlayerEntity player) {
         ItemStack contentStack = this.getStack(0);
 
         if (contentStack.isEmpty()) {
-            return ActionResult.FAIL;
+            return Result.of(ActionResult.PASS);
         }
-
-        this.fetchStacks = List.of(contentStack.copy());
 
         // 普通物品的取出逻辑
         if (!player.isCreative() && !player.giveItemStack(contentStack)) {
@@ -239,7 +237,7 @@ public class HeatResistantSlateBlockPileEntity extends UpPlaceBlockEntity implem
         this.setStack(0, ItemStack.EMPTY);
 
         this.markDirtyAndSync();
-        return ActionResult.SUCCESS;
+        return Result.of(contentStack.copy(), ActionResult.SUCCESS);
     }
 
     @Override

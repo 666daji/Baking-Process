@@ -18,7 +18,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
@@ -26,10 +25,7 @@ import net.minecraft.world.World;
 import org.bakingprocess.block.UpPlaceBlock;
 import org.bakingprocess.util.BakingProcessUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 放置物品方块实体基类，用于管理方块上的物品放置和取出功能。
@@ -46,20 +42,9 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
      */
     protected DefaultedList<ItemStack> inventory;
 
-    /**
-     * 临时存储取出的物品列表
-     * <p>
-     * 在执行{@link #tryFetchItem(PlayerEntity)}方法后，成功取出的物品会暂存在此列表中。
-     * 这些物品通常会在{@link #onFetch(BlockState, World, BlockPos, PlayerEntity, Hand, BlockHitResult, List)}方法中
-     * 被立即消耗或转移，因此该列表大部分时间都为空。
-     * </p>
-     */
-    protected List<ItemStack> fetchStacks;
-
     public UpPlaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int inventorySize) {
         super(type, pos, state);
         this.inventory = DefaultedList.ofSize(inventorySize, ItemStack.EMPTY);
-        this.fetchStacks = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -121,8 +106,13 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
         this.inventory.clear();
     }
 
+    @Override
+    public boolean canPlayerUse(PlayerEntity player) {
+        return true;
+    }
+
     /**
-     * 限制物品堆叠大小不超过最大值
+     * 限制物品堆叠大小不超过最大值。
      *
      * @param stack 需要限制堆叠大小的物品堆栈
      */
@@ -133,7 +123,7 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     }
 
     /**
-     * 验证槽位索引是否在有效范围内
+     * 验证槽位索引是否在有效范围内。
      *
      * @param slot 要验证的槽位索引
      * @throws IllegalArgumentException 如果槽位索引超出有效范围
@@ -145,7 +135,7 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     }
 
     /**
-     * 获取容器中物品的碰撞形状
+     * 获取容器中物品的碰撞形状。
      * <p>
      * 该方法用于计算物品在方块世界中的视觉表现和碰撞体积。
      * </p>
@@ -159,7 +149,7 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     public abstract VoxelShape getContentShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context);
 
     /**
-     * 验证物品是否可以放入该方块实体的物品栏
+     * 验证物品是否可以放入该方块实体的物品栏。
      *
      * @param stack 待验证的物品堆栈
      * @return 如果可以放入返回true，否则返回false
@@ -167,32 +157,28 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     public abstract boolean isValidItem(ItemStack stack);
 
     /**
-     * 尝试向容器中添加物品
+     * 尝试向容器中添加物品。
      * <p>
      * 默认每次添加会消耗数量为1的物品。如果需要不同的消耗数量，
-     * 一般需要重写{@link #onPlace(BlockState, World, BlockPos, PlayerEntity, Hand, BlockHitResult, ItemStack)}方法，
+     * 一般需要重写{@link #onPlace(BlockState, World, BlockPos, PlayerEntity, Hand, BlockHitResult, ItemStack, List)}方法，
      * 来扣除玩家不同数量的物品
      * </p>
      *
      * @param stack 要添加的物品堆栈
      * @return 操作结果，成功返回{@link ActionResult#SUCCESS}，失败返回{@link ActionResult#FAIL}
      */
-    public abstract ActionResult tryAddItem(ItemStack stack);
+    public abstract Result tryAddItem(ItemStack stack);
 
     /**
-     * 尝试从容器中取出物品
-     * <p>
-     * <strong>重要：</strong>子类在重写此方法时，必须在返回成功结果之前设置{@link #fetchStacks}字段，
-     * 将成功取出的物品添加到该列表中。
-     * </p>
+     * 尝试从容器中取出物品。
      *
      * @param player 执行取出操作的玩家
      * @return 操作结果，成功返回{@link ActionResult#SUCCESS}，失败返回{@link ActionResult#FAIL}
      */
-    public abstract ActionResult tryFetchItem(PlayerEntity player);
+    public abstract Result tryFetchItem(PlayerEntity player);
 
     /**
-     * 当物品成功取出时调用的回调方法
+     * 当物品成功取出时调用的回调方法。
      * <p>
      * 默认实现会播放取出音效。子类可以重写此方法来添加自定义逻辑，
      * 如播放粒子效果、执行特殊操作等。如果重写此方法，请确保根据需要
@@ -212,22 +198,23 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     }
 
     /**
-     * 当物品成功放置时调用的回调方法
+     * 当物品成功放置时调用的回调方法。
      * <p>
      * 默认实现会播放放置音效并消耗玩家手中1个物品（创造模式除外）。
      * 子类可以重写此方法来添加自定义逻辑。如果重写此方法，请确保根据需要
      * 调用父类方法以保持默认的音效和物品消耗行为。
      * </p>
      *
-     * @param state 当前方块状态
-     * @param world 方块所在的世界
-     * @param pos 方块位置
-     * @param player 执行放置操作的玩家
-     * @param hand 玩家使用的手
-     * @param hit 方块击中结果
+     * @param state      当前方块状态
+     * @param world      方块所在的世界
+     * @param pos        方块位置
+     * @param player     执行放置操作的玩家
+     * @param hand       玩家使用的手
+     * @param hit        方块击中结果
      * @param placeStack 放置的物品堆栈
+     * @param itemStacks 操作影响的物品堆栈，一般是长度1的placeStack列表
      */
-    public void onPlace(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, ItemStack placeStack) {
+    public void onPlace(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, ItemStack placeStack, List<ItemStack> itemStacks) {
         playSound(world, pos, placeStack, true);
 
         if (!player.isCreative()) {
@@ -236,30 +223,7 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     }
 
     /**
-     * 获取当前暂存的取出物品列表，并清空内部存储
-     * <p>
-     * 这是一个消费型获取方法，调用后会清空内部的{@link #fetchStacks}列表。
-     * 确保每次调用后列表都会被重置，为下一次取出操作做准备。
-     * </p>
-     *
-     * @param fetchPlayer 执行取出操作的玩家
-     * @param hand 玩家使用的手
-     * @param hit 击中结果
-     * @return 当前暂存的取出物品列表，如果为空则返回空列表（不会返回null）
-     */
-    public List<ItemStack> getFetchStacks(PlayerEntity fetchPlayer, Hand hand, HitResult hit) {
-        if (fetchStacks.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        // 创建副本并清空原列表
-        List<ItemStack> result = new ArrayList<>(fetchStacks);
-        fetchStacks = new CopyOnWriteArrayList<>();
-        return result;
-    }
-
-    /**
-     * 根据物品堆栈获取对应的声音事件
+     * 根据物品堆栈获取对应的声音事件。
      * <p>
      * 如果物品是{@link BlockItem}，则返回对应方块的放置音效；
      * 否则返回默认的放置音效。
@@ -283,7 +247,7 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     }
 
     /**
-     * 默认的播放物品取回和放出的声音，子类在重写onPlace和onFetch方法时可以选择性地调用
+     * 默认的播放物品取回和放出的声音，子类在重写onPlace和onFetch方法时可以选择性地调用。
      * @param world 当前的世界
      * @param pos 播放声音的位置
      * @param isPlaceSound 是否是放置的声音
@@ -305,13 +269,8 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
         }
     }
 
-    @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        return true;
-    }
-
     /**
-     * 获取容器中的第一个物品的类型
+     * 获取容器中的第一个物品的类型。
      *
      * @return 容器中第一个物品的类型，如果容器为空则返回null
      */
@@ -321,7 +280,7 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     }
 
     /**
-     * 检查容器是否已满
+     * 检查容器是否已满。
      * <p>
      * 容器已满的条件是所有槽位都有物品且每个物品都达到了最大堆叠数量。
      * </p>
@@ -339,17 +298,7 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     }
 
     /**
-     * 检查操作结果是否表示操作被接受（成功执行）
-     *
-     * @param result 要检查的操作结果
-     * @return 如果操作被接受返回true，否则返回false
-     */
-    public boolean isAccepted(ActionResult result) {
-        return result.isAccepted();
-    }
-
-    /**
-     * 标记方块实体数据已更改，并同步到客户端
+     * 标记方块实体数据已更改，并同步到客户端。
      * <p>
      * 这是一个便捷方法，结合了{@link #markDirty()}和{@link #sync()}的调用。
      * </p>
@@ -360,7 +309,7 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     }
 
     /**
-     * 同步方块实体数据到客户端
+     * 同步方块实体数据到客户端。
      * <p>
      * 当方块实体数据发生变化时调用此方法，确保客户端能够及时更新显示。
      * </p>
@@ -368,6 +317,30 @@ public abstract class UpPlaceBlockEntity extends BlockEntity implements Inventor
     public void sync() {
         if (this.world != null && !this.world.isClient) {
             this.world.updateListeners(this.pos, this.getCachedState(), this.getCachedState(), 3);
+        }
+    }
+
+    /**
+     * 表示一次操作和取出的结果。
+     *
+     * @param opsStacks 操作的物品堆栈列表
+     * @param result 操作的结果
+     */
+    public record Result(List<ItemStack> opsStacks, ActionResult result) {
+        public static Result of(List<ItemStack> opsStacks, ActionResult result) {
+            return new Result(opsStacks, result);
+        }
+
+        public static Result of(ActionResult result) {
+            return new Result(List.of(), result);
+        }
+
+        public static Result of(ItemStack stack, ActionResult result) {
+            return new Result(List.of(stack), result);
+        }
+
+        public boolean isAccepted() {
+            return result.isAccepted();
         }
     }
 }
