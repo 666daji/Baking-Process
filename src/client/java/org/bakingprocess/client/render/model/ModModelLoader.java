@@ -9,9 +9,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.dfood.block.FoodBlocks;
 import org.bakingprocess.BakingProcess;
-import org.bakingprocess.block.process.playeraction.PlayerAction;
-import org.bakingprocess.block.process.playeraction.impl.AddContentPlayerAction;
-import org.bakingprocess.block.process.playeraction.impl.AddItemPlayerAction;
 import org.bakingprocess.contentsystem.content.DishesContent;
 import org.bakingprocess.contentsystem.content.ShapedDoughContent;
 import org.bakingprocess.registry.ModContents;
@@ -19,6 +16,10 @@ import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.registry.ModItems;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.twcore.api.process.PlayerAction;
+import org.twcore.process.playeraction.impl.AddContentPlayerAction;
+import org.twcore.process.playeraction.impl.AddItemPlayerAction;
+import org.twcore.registry.Contents;
 
 import java.util.*;
 
@@ -241,7 +242,7 @@ public class ModModelLoader implements ModelLoadingPlugin {
                 Arrays.asList(
                         new AddItemPlayerAction(Items.BEEF),
                         new AddItemPlayerAction(ModItems.SALT_FLOUR),
-                        new AddContentPlayerAction(ModContents.HONEY),
+                        new AddContentPlayerAction(Contents.HONEY),
                         new AddItemPlayerAction(ModItems.CARROT_SLICES),
                         new AddItemPlayerAction(ModItems.CARROT_SLICES)
                 ),
@@ -274,7 +275,7 @@ public class ModModelLoader implements ModelLoadingPlugin {
                 Arrays.asList(
                         new AddItemPlayerAction(Items.RABBIT),
                         new AddItemPlayerAction(ModItems.SALT_FLOUR),
-                        new AddContentPlayerAction(ModContents.HONEY),
+                        new AddContentPlayerAction(Contents.HONEY),
                         new AddItemPlayerAction(ModItems.CARROT_SLICES),
                         new AddItemPlayerAction(ModItems.CARROT_SLICES),
                         new AddItemPlayerAction(Items.SWEET_BERRIES)
@@ -286,7 +287,7 @@ public class ModModelLoader implements ModelLoadingPlugin {
                 Arrays.asList(
                         new AddItemPlayerAction(Items.MUTTON),
                         new AddItemPlayerAction(ModItems.SALT_FLOUR),
-                        new AddContentPlayerAction(ModContents.HONEY),
+                        new AddContentPlayerAction(Contents.HONEY),
                         new AddItemPlayerAction(ModItems.CARROT_SLICES),
                         new AddItemPlayerAction(ModItems.CARROT_SLICES),
                         new AddItemPlayerAction(ModItems.CARROT_HEAD)
@@ -301,7 +302,7 @@ public class ModModelLoader implements ModelLoadingPlugin {
                         new AddItemPlayerAction(ModItems.CARROT_SLICES),
                         new AddItemPlayerAction(ModItems.CARROT_SLICES),
                         new AddItemPlayerAction(ModItems.SALT_FLOUR),
-                        new AddContentPlayerAction(ModContents.HONEY),
+                        new AddContentPlayerAction(Contents.HONEY),
                         new AddItemPlayerAction(ModItems.CARROT_HEAD)
                 ),
                 ModContents.DELUXE_ROAST_CHICKEN);

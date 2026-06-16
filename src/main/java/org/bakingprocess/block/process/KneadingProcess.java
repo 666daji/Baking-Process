@@ -14,9 +14,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import org.dfood.sound.ModSoundGroups;
-import org.bakingprocess.block.process.step.Step;
-import org.bakingprocess.block.process.step.StepExecutionContext;
-import org.bakingprocess.block.process.step.StepResult;
 import org.bakingprocess.contentsystem.api.ContainerContentBinding;
 import org.bakingprocess.contentsystem.api.ContainerUtil;
 import org.bakingprocess.contentsystem.content.AbstractContent;
@@ -26,6 +23,10 @@ import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.recipe.DoughRecipe;
 import org.bakingprocess.registry.ModItems;
 import org.bakingprocess.registry.ModRecipeTypes;
+import org.twcore.api.process.AbstractProcess;
+import org.twcore.process.step.Step;
+import org.twcore.process.step.StepExecutionContext;
+import org.twcore.process.step.StepResult;
 
 import java.util.*;
 

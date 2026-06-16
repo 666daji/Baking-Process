@@ -23,15 +23,15 @@ import org.bakingprocess.BakingProcess;
 import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.block.process.EatDishesProcess;
 import org.bakingprocess.block.process.PlatingProcess;
-import org.bakingprocess.block.process.playeraction.PlayerAction;
 import org.bakingprocess.contentsystem.content.AbstractContent;
 import org.bakingprocess.contentsystem.content.DishesContent;
 import org.bakingprocess.contentsystem.registry.ContentRegistry;
 import org.bakingprocess.recipe.PlatingRecipe;
 import org.bakingprocess.registry.ModBlockEntityTypes;
 import org.bakingprocess.registry.ModItems;
-import org.bakingprocess.util.PlayerActionListUtil;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.process.PlayerAction;
+import org.twcore.process.playeraction.PlayerActionListUtil;
 
 import java.util.ArrayList;
 import java.util.List;

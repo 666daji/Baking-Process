@@ -8,12 +8,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import org.bakingprocess.block.entity.PlatableBlockEntity;
-import org.bakingprocess.block.process.playeraction.PlayerAction;
 import org.bakingprocess.contentsystem.content.AbstractContent;
 import org.bakingprocess.contentsystem.content.DishesContent;
 import org.bakingprocess.registry.ModRecipeSerializers;
 import org.bakingprocess.registry.ModRecipeTypes;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.process.PlayerAction;
 
 import java.util.HashMap;
 import java.util.List;

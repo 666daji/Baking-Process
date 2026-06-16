@@ -10,11 +10,11 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.bakingprocess.block.process.PlatingProcess;
-import org.bakingprocess.block.process.playeraction.PlayerAction;
-import org.bakingprocess.block.process.playeraction.impl.AddItemPlayerAction;
 import org.bakingprocess.contentsystem.content.DishesContent;
 import org.bakingprocess.recipe.PlatingRecipe;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.process.PlayerAction;
+import org.twcore.process.playeraction.impl.AddItemPlayerAction;
 
 import java.util.List;
 

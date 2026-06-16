@@ -10,11 +10,12 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.world.World;
 import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.block.entity.PlatableBlockEntity;
-import org.bakingprocess.block.process.step.Step;
-import org.bakingprocess.block.process.step.StepExecutionContext;
-import org.bakingprocess.block.process.step.StepResult;
 import org.bakingprocess.contentsystem.content.DishesContent;
 import org.bakingprocess.food.SimpleFoodComponent;
+import org.twcore.api.process.AbstractProcess;
+import org.twcore.process.step.Step;
+import org.twcore.process.step.StepExecutionContext;
+import org.twcore.process.step.StepResult;
 
 public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> extends AbstractProcess<T> {
     public static final String STEP_EAT = "eat";

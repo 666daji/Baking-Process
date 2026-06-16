@@ -9,10 +9,10 @@ import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import org.bakingprocess.block.process.playeraction.PlayerAction;
 import org.bakingprocess.contentsystem.content.AbstractContent;
 import org.bakingprocess.contentsystem.registry.ContentRegistry;
 import org.bakingprocess.recipe.PlatingRecipe;
+import org.twcore.api.process.PlayerAction;
 
 import java.util.ArrayList;
 import java.util.List;

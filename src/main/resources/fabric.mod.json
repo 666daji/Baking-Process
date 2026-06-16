@@ -22,9 +22,6 @@
     ],
     "main": [
       "org.bakingprocess.BakingProcess"
-    ],
-    "tw-core:register": [
-      "org.bakingprocess.RegistryCore"
     ]
   },
   "mixins": [
