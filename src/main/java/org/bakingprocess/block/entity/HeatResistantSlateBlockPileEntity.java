@@ -36,7 +36,6 @@ import org.bakingprocess.BakingProcess;
 import org.bakingprocess.block.CombustionFirewoodBlock;
 import org.bakingprocess.block.FirewoodBlock;
 import org.bakingprocess.block.HeatResistantSlateBlock;
-import org.bakingprocess.block.pile.*;
 import org.bakingprocess.item.ModSharpKitchenwareItem;
 import org.bakingprocess.recipe.StoveRecipe;
 import org.bakingprocess.registry.ModBlockEntityTypes;
@@ -45,6 +44,8 @@ import org.bakingprocess.util.BakingProcessUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.twcore.api.blockpile.*;
+import org.twcore.blockpile.*;
 
 import java.util.*;
 

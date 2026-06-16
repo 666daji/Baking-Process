@@ -5,7 +5,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import org.bakingprocess.block.entity.HeatResistantSlateBlockPileEntity;
-import org.bakingprocess.block.pile.CubeBlockPileReference;
+import org.twcore.api.blockpile.CubeBlockPileReference;
+import org.twcore.client.api.render.CubeBlockPileDebugRenderer;
 
 public class HeatResistantSlateBlockPileEntityRenderer extends UpPlaceBlockEntityRenderer<HeatResistantSlateBlockPileEntity> implements CubeBlockPileDebugRenderer<HeatResistantSlateBlockPileEntity> {
 

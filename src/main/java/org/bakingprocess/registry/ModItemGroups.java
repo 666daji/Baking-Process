@@ -69,7 +69,7 @@ public class ModItemGroups {
                             entries.add(ModItems.BAKED_CAKE_EMBRYO);
                             entries.add(ModItems.SALTY_DOUGH);
                             entries.add(ModItems.HARD_BREAD_BOAT);
-                            entries.addAll(BreadBoatItem.getAll((BreadBoatItem) ModItems.HARD_BREAD_BOAT));
+//                            entries.addAll(BreadBoatItem.getAll((BreadBoatItem) ModItems.HARD_BREAD_BOAT));
                             entries.add(ModItems.CARROT_SLICES);
                             entries.add(ModItems.CARROT_HEAD);
                             entries.add(ModItems.POTATO_CUBES);

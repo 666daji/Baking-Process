@@ -7,7 +7,7 @@ public class DFoodInit {
         FoodBlocksModifier.FoodBlockAdd();
         AssistedBlocks.registerAssistedBlocks();
 
-        // 注册形状
+        // 使用后的方块
         Shapes.shapeMap.put("baking_process:crippled_rabbit_stew",new int[][]{
                 {1, 4, 8}
         });
@@ -25,6 +25,58 @@ public class DFoodInit {
         });
         Shapes.shapeMap.put("baking_process:crippled_water_bucket", new int[][]{
                 {1, 3, 8}
+        });
+
+        // 粉尘袋
+        Shapes.shapeMap.put("baking_process:flour_sack",new int[][]{
+                {1, 2, 8}
+        });
+
+        // 奶制品
+        Shapes.shapeMap.put("baking_process:milk_potion",new int[][]{
+                {1, 2, 8}, {3, 3, 1}
+        });
+
+        // 面包
+        Shapes.shapeMap.put("baking_process:small_bread_embryo",new int[][]{
+                {1, 1, 12}
+        });
+        Shapes.shapeMap.put("baking_process:small_bread",new int[][]{
+                {1, 1, 12}
+        });
+        Shapes.shapeMap.put("baking_process:baguette_embryo",new int[][]{
+                {1, 1, 2}
+        });
+        Shapes.shapeMap.put("baking_process:baguette",new int[][]{
+                {1, 1, 2}
+        });
+        Shapes.shapeMap.put("baking_process:hard_bread",new int[][]{
+                {1, 1, 8}
+        });
+        Shapes.shapeMap.put("baking_process:dough",new int[][]{
+                {1, 1, 12}
+        });
+        Shapes.shapeMap.put("baking_process:cake_embryo",new int[][]{
+                {1, 1, 1}
+        });
+        Shapes.shapeMap.put("baking_process:hard_bread_boat",new int[][]{
+                {1, 1, 8}
+        });
+        Shapes.shapeMap.put("baking_process:mushroom_stew_hard_bread_boat",new int[][]{
+                {1, 1, 8}
+        });
+        Shapes.shapeMap.put("baking_process:beetroot_soup_hard_bread_boat",new int[][]{
+                {1, 1, 8}
+        });
+
+        //其他
+        Shapes.shapeMap.put("baking_process:firewood",new int[][]{
+                {1, 1, 1},{2, 2, 2},{3, 3, 3},{4, 4, 4},{5, 6, 5}
+        });
+
+        // 陶艺品胚
+        Shapes.shapeMap.put("baking_process:flower_pot_embryo",new int[][]{
+                {1, 1, 7}, {2, 4, 1}
         });
     }
 }
