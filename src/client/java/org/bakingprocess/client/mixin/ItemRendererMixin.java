@@ -10,7 +10,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import org.bakingprocess.client.render.item.replacer.ReplaceItemModel;
-import org.bakingprocess.client.render.item.replacer.ReplaceItemModel.ReplaceContext;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -50,7 +49,7 @@ public class ItemRendererMixin {
 
         ReplaceItemModel replacer = ReplaceItemModel.getReplace(stack.getItem());
         if (replacer != null) {
-            ReplaceContext context = new ReplaceContext(
+            ReplaceItemModel.ReplaceContext context = new ReplaceItemModel.ReplaceContext(
                     stack,
                     renderMode,
                     leftHanded,

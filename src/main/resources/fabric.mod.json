@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "baking-process",
+  "id": "tw-baking-process",
   "version": "${version}",
   "name": "TW`s Baking Process",
   "description": "A rich dietary system is added.enhance your diet!",
@@ -22,6 +22,9 @@
     ],
     "main": [
       "org.bakingprocess.BakingProcess"
+    ],
+    "tw-core:register": [
+      "org.bakingprocess.RegistryCore"
     ]
   },
   "mixins": [
@@ -36,6 +39,7 @@
     "fabric": "*",
     "minecraft": "~${minecraft_version}",
     "fabric-api": "*",
+    "tw-core": ">=1.20.1-1.0.1",
     "decorative-food": ">=1.20.1-1.1.1"
   }
 }

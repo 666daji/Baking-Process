@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 
 public class BakingProcess implements ModInitializer {
     public static final String MOD_ID = "baking_process";
-    public static final Logger LOGGER = LoggerFactory.getLogger("Tw`s Baking Process");
+    public static final Logger LOGGER = LoggerFactory.getLogger("TW`s Baking Process");
 
     @Override
     public void onInitialize() {
         DFoodInit.init();
         RegistryInit.init();
-        LOGGER.info("Baking Process is initializing!");
+        LOGGER.info("TW`s Baking Process is initializing!");
     }
 }
