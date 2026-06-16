@@ -19,12 +19,13 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.bakingprocess.block.entity.MoldBlockEntity;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.ShapedDoughContent;
+import org.bakingprocess.content.ShapedDoughContent;
 import org.bakingprocess.registry.ModBlocks;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.content.ContainerUtil;
+import org.twcore.content.Content;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MoldBlock extends BlockWithEntity {
@@ -81,7 +82,7 @@ public class MoldBlock extends BlockWithEntity {
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        AbstractContent content = ContainerUtil.extractContent(itemStack);
+        Content content = ContainerUtil.extractContent(itemStack);
         BlockEntity entity = world.getBlockEntity(pos);
 
         if (content instanceof ShapedDoughContent shapedDough && entity instanceof MoldBlockEntity moldBlockEntity) {
@@ -95,10 +96,15 @@ public class MoldBlock extends BlockWithEntity {
         BlockEntity entity = builder.get(LootContextParameters.BLOCK_ENTITY);
 
         if (entity instanceof MoldBlockEntity moldBlockEntity) {
+            List<ItemStack> newList = new ArrayList<>();
             ShapedDoughContent content = moldBlockEntity.getShapedDough();
             if (content != null) {
-                result.forEach(stack -> ContainerUtil.replaceContent(stack, content));
+                result.forEach(stack -> ContainerUtil.analyze(stack)
+                        .map(containerStack -> newList.add(containerStack.replaceContent(content)))
+                        .orElseGet(() -> newList.add(stack)));
             }
+
+            return newList;
         }
 
         return result;

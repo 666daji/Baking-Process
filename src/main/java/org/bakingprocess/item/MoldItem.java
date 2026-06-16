@@ -4,9 +4,9 @@ import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.ShapedDoughContent;
+import org.bakingprocess.content.ShapedDoughContent;
+import org.twcore.api.content.ContainerUtil;
+import org.twcore.content.Content;
 
 public class MoldItem extends BlockItem {
 
@@ -25,7 +25,7 @@ public class MoldItem extends BlockItem {
 
     @Override
     public Text getName(ItemStack stack) {
-        AbstractContent content = ContainerUtil.extractContent(stack);
+        Content content = ContainerUtil.extractContent(stack);
 
         if (content instanceof ShapedDoughContent shapedDough) {
             Text doughName = shapedDough.getDisplayName();

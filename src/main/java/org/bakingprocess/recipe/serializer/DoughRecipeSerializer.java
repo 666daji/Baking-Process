@@ -11,9 +11,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.recipe.DoughRecipe;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.ContentCategories;
-import org.bakingprocess.contentsystem.registry.ContentRegistry;
+import org.twcore.content.Content;
+import org.twcore.content.ContentCategories;
+import org.twcore.registry.Contents;
+import org.twcore.registry.TWRegistries;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.Map;
  *
  * <ul>
  *   <li>支持面粉类型（FlourType）到数量的映射</li>
- *   <li>支持液体内容物（AbstractContent）到数量的映射</li>
+ *   <li>支持液体内容物（Content）到数量的映射</li>
  *   <li>支持额外物品的数组格式和旧格式</li>
  *   <li>自动合并相同物品的数量</li>
  * </ul>
@@ -89,18 +90,18 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
         }
 
         // 3. 读取液体要求（内容物标识符 -> 数量）
-        Map<AbstractContent, Integer> liquidRequirements = new HashMap<>();
+        Map<Content, Integer> liquidRequirements = new HashMap<>();
         JsonObject liquidsObj = JsonHelper.getObject(json, "liquids");
         for (Map.Entry<String, JsonElement> entry : liquidsObj.entrySet()) {
             try {
                 Identifier contentId = Identifier.tryParse(entry.getKey());
-                AbstractContent content = ContentRegistry.get(contentId);
+                Content content = TWRegistries.CONTENT.get(contentId);
 
                 if (content == null) {
                     throw new JsonSyntaxException("Unknown content identifiers: " + entry.getKey());
                 }
 
-                if (!content.isIn(ContentCategories.BASE_LIQUID)) {
+                if (!content.isIn(Contents.BASE_LIQUID)) {
                     throw new JsonSyntaxException("The liquid contents must belong to the basal liquid grouping: " + entry.getKey());
                 }
 
@@ -167,13 +168,13 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
 
         // 3. 读取液体要求
         int liquidCount = buf.readVarInt();
-        Map<AbstractContent, Integer> liquidRequirements = new HashMap<>(liquidCount);
+        Map<Content, Integer> liquidRequirements = new HashMap<>(liquidCount);
         for (int i = 0; i < liquidCount; i++) {
             Identifier contentId = buf.readIdentifier();
             int count = buf.readVarInt();
 
-            AbstractContent content = ContentRegistry.get(contentId);
-            if (content != null && content.isIn(ContentCategories.BASE_LIQUID)) {
+            Content content = TWRegistries.CONTENT.get(contentId);
+            if (content != null && content.isIn(Contents.BASE_LIQUID)) {
                 liquidRequirements.put(content, count);
             }
         }
@@ -207,8 +208,8 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
 
         // 3. 写入液体要求
         buf.writeVarInt(recipe.getLiquidRequirements().size());
-        for (Map.Entry<AbstractContent, Integer> entry : recipe.getLiquidRequirements().entrySet()) {
-            buf.writeIdentifier(entry.getKey().getId());
+        for (Map.Entry<Content, Integer> entry : recipe.getLiquidRequirements().entrySet()) {
+            buf.writeIdentifier(TWRegistries.CONTENT.getId(entry.getKey()));
             buf.writeVarInt(entry.getValue());
         }
 

@@ -10,10 +10,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.dfood.block.SimpleFoodBlock;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.container.BreadBoatContainer;
-import org.bakingprocess.contentsystem.container.ContainerType;
-import org.bakingprocess.contentsystem.content.AbstractContent;
+import org.bakingprocess.container.BreadBoatContainer;
+import org.twcore.api.content.ContainerUtil;
+import org.twcore.container.ContainerType;
+import org.twcore.content.Content;
 
 public class EmptyBreadBoatBlock extends SimpleFoodBlock {
     /** 对应的装了内容物的方块 */
@@ -44,7 +44,7 @@ public class EmptyBreadBoatBlock extends SimpleFoodBlock {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         ItemStack handStack = player.getStackInHand(hand);
-        AbstractContent content = ContainerUtil.extractContent(handStack);
+        Content content = ContainerUtil.extractContent(handStack);
         BreadBoatContainer.BreadBoatSoupType soupType = BreadBoatContainer.BreadBoatSoupType.fromContent(content);
 
         if (soupType != null) {

@@ -6,9 +6,10 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.bakingprocess.BakingProcess;
-import org.bakingprocess.contentsystem.content.DishesContent;
+import org.bakingprocess.content.DishesContent;
 import org.jetbrains.annotations.Nullable;
 import org.twcore.api.process.PlayerAction;
+import org.twcore.content.Content;
 
 import java.util.*;
 
@@ -129,7 +130,7 @@ public class PlatingModelManager {
      * @param recipeActions 配方的完整操作序列
      * @param dish 配方对应的菜肴内容
      */
-    public void registerRecipeModel(Item container, List<PlayerAction> recipeActions, DishesContent dish) {
+    public void registerRecipeModel(Item container, List<PlayerAction> recipeActions, Content dish) {
         // 生成配方操作的编码序列哈希（作为唯一标识）
         String recipeHash = generateRecipeHash(recipeActions);
         Identifier dishId = ModModelLoader.createDishesModel(container, dish);

@@ -23,18 +23,19 @@ import org.bakingprocess.BakingProcess;
 import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.block.process.EatDishesProcess;
 import org.bakingprocess.block.process.PlatingProcess;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.DishesContent;
-import org.bakingprocess.contentsystem.registry.ContentRegistry;
+import org.bakingprocess.content.DishesContent;
 import org.bakingprocess.recipe.PlatingRecipe;
 import org.bakingprocess.registry.ModBlockEntityTypes;
 import org.bakingprocess.registry.ModItems;
 import org.jetbrains.annotations.Nullable;
 import org.twcore.api.process.PlayerAction;
+import org.twcore.content.Content;
 import org.twcore.process.playeraction.PlayerActionListUtil;
+import org.twcore.registry.TWRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity {
     /** 方块库存的最大容量，同时也是摆盘流程的最大步骤数量。 */
@@ -268,7 +269,7 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
 
         // 读取菜肴
         if (nbt.contains(OUTCOME_KEY, NbtElement.STRING_TYPE)) {
-            AbstractContent content = ContentRegistry.get(Identifier.tryParse(nbt.getString(OUTCOME_KEY)));
+            Content content = TWRegistries.CONTENT.get(Identifier.tryParse(nbt.getString(OUTCOME_KEY)));
             setOutcome((DishesContent) content);
         } else {
             // 读取操作列表
@@ -290,7 +291,7 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
         nbt.put("eat_process", eatNbt);
 
         if (outcome != null) {
-            nbt.putString(OUTCOME_KEY, outcome.getId().toString());
+            nbt.putString(OUTCOME_KEY, Objects.requireNonNull(TWRegistries.CONTENT.getId(outcome)).toString());
         } else {
             // 写入操作列表
             PlayerActionListUtil.writeActionsToNbt(nbt, performedActions);

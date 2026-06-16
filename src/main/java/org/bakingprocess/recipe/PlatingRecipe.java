@@ -8,12 +8,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import org.bakingprocess.block.entity.PlatableBlockEntity;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.DishesContent;
+import org.bakingprocess.content.DishesContent;
 import org.bakingprocess.registry.ModRecipeSerializers;
 import org.bakingprocess.registry.ModRecipeTypes;
 import org.jetbrains.annotations.Nullable;
 import org.twcore.api.process.PlayerAction;
+import org.twcore.content.Content;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +61,7 @@ public class PlatingRecipe implements Recipe<PlatableBlockEntity> {
      * @param actions 操作列表，列表顺序即为执行顺序
      * @param output 配方输出物品
      */
-    public PlatingRecipe(Identifier id, Item container, List<PlayerAction> actions, AbstractContent output) {
+    public PlatingRecipe(Identifier id, Item container, List<PlayerAction> actions, Content output) {
         if (output instanceof DishesContent dishes) {
             this.id = id;
             this.container = container;

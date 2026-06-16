@@ -19,7 +19,7 @@ import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.block.entity.PlateBlockEntity;
 import org.bakingprocess.client.render.model.ModModelLoader;
 import org.bakingprocess.client.render.model.PlatingModelManager;
-import org.bakingprocess.contentsystem.content.DishesContent;
+import org.bakingprocess.content.DishesContent;
 
 public class PlateBlockEntityRenderer implements BlockEntityRenderer<PlateBlockEntity> {
     private final BakedModelManager modelManager;

@@ -1,8 +1,8 @@
-package org.bakingprocess.contentsystem.content;
+package org.bakingprocess.content;
 
 import net.minecraft.item.FoodComponent;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.twcore.content.FoodContent;
 
 public class DishesContent extends FoodContent {
     /**
@@ -14,13 +14,13 @@ public class DishesContent extends FoodContent {
 
     protected final int eatCount;
 
-    public DishesContent(Identifier id, FoodComponent foodComponent, int eatCount) {
-        super(id, foodComponent);
+    public DishesContent(@NotNull String category, FoodComponent foodComponent, int eatCount) {
+        super(category, foodComponent);
         this.eatCount = eatCount;
     }
 
-    public DishesContent(Identifier id) {
-        this(id, RAW_DISHES, 0);
+    public DishesContent(@NotNull String category) {
+        this(category, RAW_DISHES, 0);
     }
 
     /**
@@ -29,11 +29,6 @@ public class DishesContent extends FoodContent {
      */
     public boolean canEat() {
         return !getFoodComponent().equals(RAW_DISHES);
-    }
-
-    @Override
-    public @NotNull String getCategory() {
-        return ContentCategories.DISHES;
     }
 
     /**

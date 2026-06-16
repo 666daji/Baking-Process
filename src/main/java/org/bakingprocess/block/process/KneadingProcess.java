@@ -14,19 +14,19 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import org.dfood.sound.ModSoundGroups;
-import org.bakingprocess.contentsystem.api.ContainerContentBinding;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.ContentCategories;
-import org.bakingprocess.contentsystem.registry.ContentRegistry;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.recipe.DoughRecipe;
 import org.bakingprocess.registry.ModItems;
 import org.bakingprocess.registry.ModRecipeTypes;
+import org.twcore.api.content.ContainerStack;
+import org.twcore.api.content.ContainerUtil;
 import org.twcore.api.process.AbstractProcess;
+import org.twcore.content.Content;
 import org.twcore.process.step.Step;
 import org.twcore.process.step.StepExecutionContext;
 import org.twcore.process.step.StepResult;
+import org.twcore.registry.Contents;
+import org.twcore.registry.TWRegistries;
 
 import java.util.*;
 
@@ -55,7 +55,7 @@ public class KneadingProcess<T extends BlockEntity & Inventory> extends Abstract
     private final Map<FlourItem.FlourType, Integer> flourCounts;
 
     /** 液体类型计数 */
-    private final Map<AbstractContent, Integer> liquidCounts;
+    private final Map<Content, Integer> liquidCounts;
 
     /** 揉面次数 */
     private int kneadingCount;
@@ -150,13 +150,13 @@ public class KneadingProcess<T extends BlockEntity & Inventory> extends Abstract
         public StepResult execute(StepExecutionContext<T> context) {
             ItemStack heldStack = context.getHeldItemStack();
 
-            Optional<ContainerContentBinding> bindingOpt = ContainerUtil.analyze(heldStack);
+            Optional<ContainerStack> bindingOpt = ContainerUtil.analyze(heldStack);
             if (bindingOpt.isEmpty()) {
                 return StepResult.fail(STEP_ADD_LIQUID, ActionResult.PASS);
             }
 
-            ContainerContentBinding binding = bindingOpt.get();
-            AbstractContent content = binding.content();
+            ContainerStack binding = bindingOpt.get();
+            Content content = binding.content();
 
             if (content == null || !isAllowedContent(content)) {
                 return StepResult.fail(STEP_ADD_LIQUID, ActionResult.PASS);
@@ -344,8 +344,8 @@ public class KneadingProcess<T extends BlockEntity & Inventory> extends Abstract
      * @param content 要检查的内容物
      * @return 是否可以在液体步骤中添加的内容
      */
-    public static boolean isAllowedContent(AbstractContent content) {
-        return content.isIn(ContentCategories.BASE_LIQUID);
+    public static boolean isAllowedContent(Content content) {
+        return content.isIn(Contents.BASE_LIQUID);
     }
 
     // ============ 状态获取方法 ============
@@ -357,7 +357,7 @@ public class KneadingProcess<T extends BlockEntity & Inventory> extends Abstract
     /**
      * 获取液体类型计数
      */
-    public Map<AbstractContent, Integer> getLiquidCounts() {
+    public Map<Content, Integer> getLiquidCounts() {
         return new HashMap<>(liquidCounts);
     }
 
@@ -438,8 +438,11 @@ public class KneadingProcess<T extends BlockEntity & Inventory> extends Abstract
 
         // 保存液体计数（LiquidType作为键）
         NbtCompound liquidsNbt = new NbtCompound();
-        for (Map.Entry<AbstractContent, Integer> entry : liquidCounts.entrySet()) {
-            liquidsNbt.putInt(entry.getKey().getId().toString(), entry.getValue());
+        for (Map.Entry<Content, Integer> entry : liquidCounts.entrySet()) {
+            Identifier id = TWRegistries.CONTENT.getId(entry.getKey());
+            if (id != null) {
+                liquidsNbt.putInt(id.toString(), entry.getValue());
+            }
         }
         nbt.put("liquids", liquidsNbt);
 
@@ -474,7 +477,7 @@ public class KneadingProcess<T extends BlockEntity & Inventory> extends Abstract
         if (nbt.contains("liquids")) {
             NbtCompound liquidsNbt = nbt.getCompound("liquids");
             for (String key : liquidsNbt.getKeys()) {
-                AbstractContent content =  ContentRegistry.get(Identifier.tryParse(key));
+                Content content = TWRegistries.CONTENT.get(Identifier.tryParse(key));
                 if (content != null && isAllowedContent(content)) {
                     liquidCounts.put(content, liquidsNbt.getInt(key));
                 }

@@ -9,10 +9,10 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.bakingprocess.block.process.KneadingProcess;
-import org.bakingprocess.contentsystem.content.AbstractContent;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.registry.ModRecipeSerializers;
 import org.bakingprocess.registry.ModRecipeTypes;
+import org.twcore.content.Content;
 
 import java.util.*;
 
@@ -27,14 +27,14 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
     private final Map<FlourItem.FlourType, Integer> flourRequirements;
 
     // 液体要求：液体类型 -> 数量
-    private final Map<AbstractContent, Integer> liquidRequirements;
+    private final Map<Content, Integer> liquidRequirements;
 
     // 额外物品要求：物品 -> 数量
     private final Map<Ingredient, Integer> extraRequirements;
 
     public DoughRecipe(Identifier id, ItemStack output,
                        Map<FlourItem.FlourType, Integer> flourRequirements,
-                       Map<AbstractContent, Integer> liquidRequirements,
+                       Map<Content, Integer> liquidRequirements,
                        Map<Ingredient, Integer> extraRequirements) {
         this.id = id;
         this.output = output;
@@ -79,8 +79,8 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
         return processTotal == requiredTotal;
     }
 
-    private boolean matchesLiquids(Map<AbstractContent, Integer> processLiquids) {
-        for (Map.Entry<AbstractContent, Integer> requirement : liquidRequirements.entrySet()) {
+    private boolean matchesLiquids(Map<Content, Integer> processLiquids) {
+        for (Map.Entry<Content, Integer> requirement : liquidRequirements.entrySet()) {
             int processCount = processLiquids.getOrDefault(requirement.getKey(), 0);
             if (processCount < requirement.getValue()) {
                 return false;
@@ -166,7 +166,7 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
         return Collections.unmodifiableMap(flourRequirements);
     }
 
-    public Map<AbstractContent, Integer> getLiquidRequirements() {
+    public Map<Content, Integer> getLiquidRequirements() {
         return Collections.unmodifiableMap(liquidRequirements);
     }
 

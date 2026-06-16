@@ -10,11 +10,13 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.ShapedDoughContent;
-import org.bakingprocess.contentsystem.registry.ContentRegistry;
+import org.bakingprocess.content.ShapedDoughContent;
 import org.bakingprocess.registry.ModBlockEntityTypes;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.content.Content;
+import org.twcore.registry.TWRegistries;
+
+import java.util.Objects;
 
 public class MoldBlockEntity extends BlockEntity{
     private static final String CONTENT_KEY = "shaped_dough";
@@ -29,14 +31,14 @@ public class MoldBlockEntity extends BlockEntity{
     @Override
     public void writeNbt(NbtCompound nbt) {
         if (shapedDough != null) {
-            nbt.putString(CONTENT_KEY, shapedDough.getId().toString());
+            nbt.putString(CONTENT_KEY, Objects.requireNonNull(TWRegistries.CONTENT.getId(shapedDough)).toString());
         }
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         if (nbt.contains(CONTENT_KEY, NbtElement.STRING_TYPE)) {
-            AbstractContent content = ContentRegistry.get(Identifier.tryParse(nbt.getString(CONTENT_KEY)));
+            Content content = TWRegistries.CONTENT.get(Identifier.tryParse(nbt.getString(CONTENT_KEY)));
             if (content instanceof ShapedDoughContent dough) {
                 this.shapedDough = dough;
             }

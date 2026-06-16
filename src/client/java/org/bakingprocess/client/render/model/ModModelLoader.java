@@ -9,17 +9,19 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.dfood.block.FoodBlocks;
 import org.bakingprocess.BakingProcess;
-import org.bakingprocess.contentsystem.content.DishesContent;
-import org.bakingprocess.contentsystem.content.ShapedDoughContent;
+import org.bakingprocess.content.DishesContent;
+import org.bakingprocess.content.ShapedDoughContent;
 import org.bakingprocess.registry.ModContents;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.registry.ModItems;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.twcore.api.process.PlayerAction;
+import org.twcore.content.Content;
 import org.twcore.process.playeraction.impl.AddContentPlayerAction;
 import org.twcore.process.playeraction.impl.AddItemPlayerAction;
 import org.twcore.registry.Contents;
+import org.twcore.registry.TWRegistries;
 
 import java.util.*;
 
@@ -317,7 +319,7 @@ public class ModModelLoader implements ModelLoadingPlugin {
      */
     public static void registerPlatingSequenceModels(Item container,
                                                      List<PlayerAction> actionSequence,
-                                                     @Nullable DishesContent dish) {
+                                                     @Nullable Content dish) {
         PlatingModelManager modelManager = PlatingModelManager.getInstance();
 
         // 注册配方映射和食用过程
@@ -338,9 +340,13 @@ public class ModModelLoader implements ModelLoadingPlugin {
     /**
      * 注册一个菜肴在容器中的所有食用过程模型。
      * @param container 容器
-     * @param dish 菜肴
+     * @param content 菜肴
      */
-    public static void registerEatStageModels(Item container, DishesContent dish) {
+    public static void registerEatStageModels(Item container, Content content) {
+        if (!(content instanceof DishesContent dish)) {
+            return;
+        }
+
         if (!dish.canEat()) {
             LOGGER.warn("{} is inedible", dish);
             return;
@@ -360,9 +366,9 @@ public class ModModelLoader implements ModelLoadingPlugin {
      * @param dishes 菜肴
      * @return 对应的放置模型标识符
      */
-    public static Identifier createDishesModel(Item baseContainer, DishesContent dishes) {
+    public static Identifier createDishesModel(Item baseContainer, Content dishes) {
         String containerId = Registries.ITEM.getId(baseContainer).getPath();
-        String dishesId = dishes.getId().getPath();
+        String dishesId = Objects.requireNonNull(TWRegistries.CONTENT.getId(dishes)).getPath();
 
         return new Identifier(BakingProcess.MOD_ID, "dishes/" + containerId + "_" + dishesId);
     }
@@ -376,17 +382,17 @@ public class ModModelLoader implements ModelLoadingPlugin {
      */
     public static Identifier createEatStageModel(Item container, DishesContent dish, int eatenCount) {
         String containerPath = Registries.ITEM.getId(container).getPath();
-        String dishPath = dish.getId().getPath();
+        String dishPath = Objects.requireNonNull(TWRegistries.CONTENT.getId(dish)).getPath();
         return new Identifier(BakingProcess.MOD_ID, "dishes/eat/" + containerPath + "_" + dishPath + "_" + eatenCount);
     }
 
     // =========== 定型面团 ===========
 
     public static void registerShapedDoughAll() {
-        MODELS_TO_LOAD.add(createShapedDoughModel(ModContents.TOAST_EMBRYO));
-        MODELS_TO_LOAD.add(createShapedDoughModel(ModContents.TOAST));
-        MODELS_TO_LOAD.add(createShapedDoughModel(ModContents.CAKE_EMBRYO));
-        MODELS_TO_LOAD.add(createShapedDoughModel(ModContents.BAKED_CAKE_EMBRYO));
+        MODELS_TO_LOAD.add(createShapedDoughModel((ShapedDoughContent) ModContents.TOAST_EMBRYO));
+        MODELS_TO_LOAD.add(createShapedDoughModel((ShapedDoughContent) ModContents.TOAST));
+        MODELS_TO_LOAD.add(createShapedDoughModel((ShapedDoughContent) ModContents.CAKE_EMBRYO));
+        MODELS_TO_LOAD.add(createShapedDoughModel((ShapedDoughContent) ModContents.BAKED_CAKE_EMBRYO));
     }
 
     /**
@@ -396,7 +402,8 @@ public class ModModelLoader implements ModelLoadingPlugin {
      * @return 对应的模型标识符
      */
     public static Identifier createShapedDoughModel(ShapedDoughContent content) {
-        return new Identifier(content.getId().getNamespace(), "block/" + content.getId().getPath());
+        Identifier contentId = Objects.requireNonNull(TWRegistries.CONTENT.getId(content));
+        return new Identifier(contentId.getNamespace(), "block/" + contentId.getPath());
     }
 
     // =========== 辅助方法 ===========

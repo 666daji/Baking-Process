@@ -22,11 +22,12 @@ import net.minecraft.world.event.GameEvent;
 import org.dfood.block.SimpleFoodBlock;
 import org.dfood.util.IntPropertyManager;
 import org.bakingprocess.BakingProcess;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.container.BreadBoatContainer;
+import org.bakingprocess.container.BreadBoatContainer;
 import org.bakingprocess.food.SimpleFoodComponent;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.content.ContainerUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -62,7 +63,9 @@ public class BreadBoatBlock extends SimpleFoodBlock {
 
     @Override
     public ItemStack createStack(int count, BlockState state, @Nullable BlockEntity blockEntity) {
-        return ContainerUtil.replaceContent(super.createStack(count, state, blockEntity), state.get(SOUP_TYPE).getContent());
+        return ContainerUtil.analyze(super.createStack(count, state, blockEntity))
+                .map(containerStack -> containerStack.replaceContent(state.get(SOUP_TYPE).getContent()))
+                .orElse(super.createStack(count, state, blockEntity));
     }
 
     /**
@@ -165,7 +168,10 @@ public class BreadBoatBlock extends SimpleFoodBlock {
         int bites = state.get(BITES);
         if (bites == 0){
             List<ItemStack> droppedStacks = super.getDroppedStacks(state, builder);
-            droppedStacks.forEach(stack -> ContainerUtil.replaceContent(stack, state.get(SOUP_TYPE).getContent()));
+            List<ItemStack> newList = new ArrayList<>();
+            droppedStacks.forEach(stack -> ContainerUtil.analyze(stack).map(containerStack ->
+                    newList.add(containerStack.replaceContent(state.get(SOUP_TYPE).getContent())))
+                    .orElseGet(() -> newList.add(stack)));
 
             return droppedStacks;
         }

@@ -9,10 +9,10 @@ import org.bakingprocess.block.EmptyBreadBoatBlock;
 import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.client.render.item.renderer.MoldItemRenderer;
 import org.bakingprocess.client.render.model.ModModelLoader;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.container.BreadBoatContainer;
-import org.bakingprocess.contentsystem.content.AbstractContent;
+import org.bakingprocess.container.BreadBoatContainer;
 import org.bakingprocess.registry.ModItems;
+import org.twcore.api.content.ContainerUtil;
+import org.twcore.content.Content;
 
 public class UpPlaceStackRenderers {
     public static void registerAll() {
@@ -22,7 +22,7 @@ public class UpPlaceStackRenderers {
         // 铁盘
         UpPlaceStackRenderer.register(ModItems.IRON_PLATE, context -> {
             BlockState state = context.getDefaultBlockState();
-            AbstractContent content = ContainerUtil.extractContent(context.stack());
+            Content content = ContainerUtil.extractContent(context.stack());
 
             if (content != null && state.getBlock() instanceof PlateBlock) {
                 state = state.with(PlateBlock.IS_COVERED, true);
@@ -34,7 +34,7 @@ public class UpPlaceStackRenderers {
         // 面包船
         UpPlaceStackRenderer.register(ModItems.HARD_BREAD_BOAT, context -> {
             BlockState state = context.getDefaultBlockState();
-            AbstractContent content = ContainerUtil.extractContent(context.stack());
+            Content content = ContainerUtil.extractContent(context.stack());
 
             if (content != null && state.getBlock() instanceof EmptyBreadBoatBlock) {
                 BreadBoatContainer.BreadBoatSoupType soupType =

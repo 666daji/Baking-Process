@@ -7,7 +7,7 @@
     "add_item|baking_process:carrot_slices",
     "add_item|baking_process:carrot_slices",
     "add_item|baking_process:salt_flour",
-    "add_content|baking_process:honey",
+    "add_content|tw_core:honey",
     "add_item|baking_process:carrot_head"
   ],
   "result": "baking_process:deluxe_roast_chicken"

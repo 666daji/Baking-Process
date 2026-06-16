@@ -9,19 +9,19 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.content.AbstractContent;
 import org.bakingprocess.registry.ModRecipeSerializers;
 import org.bakingprocess.registry.ModRecipeTypes;
+import org.twcore.api.content.ContainerUtil;
+import org.twcore.content.Content;
 
 public class StoveRecipe implements Recipe<Inventory> {
     protected final Identifier id;
-    protected final Either<ItemStack, AbstractContent> input;
-    protected final Either<ItemStack, AbstractContent> output;
+    protected final Either<ItemStack, Content> input;
+    protected final Either<ItemStack, Content> output;
     protected final int bakingTime;
     protected final int MaxInputCount;
 
-    public StoveRecipe(Identifier id, Either<ItemStack, AbstractContent> input, Either<ItemStack, AbstractContent> output, int MaxInputCount, int bakingTime) {
+    public StoveRecipe(Identifier id, Either<ItemStack, Content> input, Either<ItemStack, Content> output, int MaxInputCount, int bakingTime) {
         this.id = id;
         this.input = input;
         this.output = output;
@@ -47,7 +47,9 @@ public class StoveRecipe implements Recipe<Inventory> {
         int count = Math.min(stack.getCount(), MaxInputCount);
 
         return output.map(outputStack -> outputStack.copyWithCount(count),
-                outputContent -> ContainerUtil.replaceContent(stack, outputContent));
+                outputContent -> ContainerUtil.analyze(stack)
+                        .map(containerStack -> containerStack.replaceContent(outputContent))
+                        .orElse(stack));
     }
 
     @Override
@@ -96,14 +98,14 @@ public class StoveRecipe implements Recipe<Inventory> {
     /**
      * 获取输入。
      */
-    public Either<ItemStack, AbstractContent> getInput() {
+    public Either<ItemStack, Content> getInput() {
         return input;
     }
 
     /**
      * 获取输出。
      */
-    public Either<ItemStack, AbstractContent> getOutput() {
+    public Either<ItemStack, Content> getOutput() {
         return output;
     }
 }

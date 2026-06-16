@@ -4,7 +4,7 @@
   "actions": [
     "add_item|minecraft:rabbit",
     "add_item|baking_process:salt_flour",
-    "add_content|baking_process:honey",
+    "add_content|tw_core:honey",
     "add_item|baking_process:carrot_slices",
     "add_item|baking_process:carrot_slices",
     "add_item|minecraft:sweet_berries"

@@ -9,6 +9,7 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
@@ -22,6 +23,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -29,12 +31,17 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.bakingprocess.block.entity.PlateBlockEntity;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.DishesContent;
+import org.bakingprocess.container.BreadBoatContainer;
+import org.bakingprocess.content.DishesContent;
+import org.bakingprocess.item.BreadBoatItem;
+import org.bakingprocess.registry.ModContents;
 import org.bakingprocess.registry.ModItems;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.content.ContainerUtil;
+import org.twcore.content.Content;
+import org.twcore.content.ContentCategories;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -95,10 +102,11 @@ public class PlateBlock extends Block implements BlockEntityProvider {
                 // 构建带有菜肴数据的盘子物品
                 ItemStack plateStack = new ItemStack(this.asItem());
                 DishesContent outcome = plateBlockEntity.getOutcome();
-                ContainerUtil.replaceContent(plateStack, outcome);
 
                 // 给予玩家物品
-                player.giveItemStack(plateStack);
+                player.giveItemStack(ContainerUtil.analyze(plateStack)
+                        .map(containerStack -> containerStack.replaceContent(outcome))
+                        .orElse(plateStack));
 
                 // 移除方块
                 world.removeBlock(pos, false);
@@ -118,7 +126,10 @@ public class PlateBlock extends Block implements BlockEntityProvider {
 
         if (state.get(IS_COVERED) && entity instanceof PlateBlockEntity plateBlockEntity) {
             List<ItemStack> droppedStacks = super.getDroppedStacks(state, builder);
-            droppedStacks.forEach(stack -> ContainerUtil.replaceContent(stack, plateBlockEntity.getOutcome()));
+            List<ItemStack> newList = new ArrayList<>();
+            droppedStacks.forEach(stack -> ContainerUtil.analyze(stack)
+                    .map(containerStack -> newList.add(containerStack.replaceContent(plateBlockEntity.getOutcome())))
+                    .orElseGet(() -> newList.add(stack)));
 
             return droppedStacks;
         }
@@ -128,7 +139,7 @@ public class PlateBlock extends Block implements BlockEntityProvider {
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        AbstractContent content = ContainerUtil.extractContent(itemStack);
+        Content content = ContainerUtil.extractContent(itemStack);
         BlockEntity entity = world.getBlockEntity(pos);
 
         if (content instanceof DishesContent dishes && entity instanceof PlateBlockEntity plateBlockEntity) {
@@ -151,7 +162,7 @@ public class PlateBlock extends Block implements BlockEntityProvider {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
-        AbstractContent content = ContainerUtil.extractContent(stack);
+        Content content = ContainerUtil.extractContent(stack);
 
         if (content != null) {
             Text text = content.getDisplayName();
@@ -169,6 +180,18 @@ public class PlateBlock extends Block implements BlockEntityProvider {
         }
 
         return BASE_SHAPE;
+    }
+
+    public static DefaultedList<ItemStack> getAll(Item item) {
+        DefaultedList<ItemStack> result = DefaultedList.of();
+
+        for (Content content : ContentCategories.getByCategory(ModContents.DISHES)) {
+            ItemStack stack = new ItemStack(item);
+            ItemStack stack1 = ContainerUtil.analyze(stack).orElseThrow().replaceContent(content);
+            result.add(stack1);
+        }
+
+        return result;
     }
 
     @Override

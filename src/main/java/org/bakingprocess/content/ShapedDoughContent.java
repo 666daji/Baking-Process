@@ -1,4 +1,4 @@
-package org.bakingprocess.contentsystem.content;
+package org.bakingprocess.content;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -10,24 +10,20 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.content.Content;
 
-public class ShapedDoughContent extends AbstractContent{
+public class ShapedDoughContent extends Content {
     private static final Table<Identifier, Identifier, ShapedDoughContent> CACHES = HashBasedTable.create();
 
     protected final Identifier originalDough;
     protected final Identifier baseMold;
 
-    public ShapedDoughContent(Identifier id, Identifier originalDough, Identifier baseMold) {
-        super(id);
+    public ShapedDoughContent(@NotNull String category, Identifier originalDough, Identifier baseMold) {
+        super(category);
         this.originalDough = originalDough;
         this.baseMold = baseMold;
 
         CACHES.put(originalDough, baseMold, this);
-    }
-
-    @Override
-    public @NotNull String getCategory() {
-        return ContentCategories.SHAPED_DOUGH;
     }
 
     public Block getBaseMold() {

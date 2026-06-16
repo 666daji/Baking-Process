@@ -1,18 +1,21 @@
-package org.bakingprocess.contentsystem.container;
+package org.bakingprocess.container;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.ShapedDoughContent;
-import org.bakingprocess.contentsystem.registry.ContentRegistry;
+import org.bakingprocess.content.ShapedDoughContent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.container.ContainerType;
+import org.twcore.content.Content;
+import org.twcore.registry.TWRegistries;
+
+import java.util.Objects;
 
 public class MoldContainer extends ContainerType{
     public static final String DOUGH_KEY = "dough_type";
 
-    public MoldContainer(Identifier id, ContainerSettings settings) {
-        super(id, settings);
+    public MoldContainer(ContainerType.ContainerSettings settings) {
+        super(settings);
     }
 
     @Override
@@ -21,27 +24,24 @@ public class MoldContainer extends ContainerType{
     }
 
     @Override
-    public boolean canContain(AbstractContent content) {
+    public boolean canContain(Content content) {
         return content instanceof ShapedDoughContent shapedDough
                 && shapedDough.getBaseMold().asItem().equals(getEmptyItem());
     }
 
     @Override
-    public @Nullable AbstractContent extractContent(ItemStack stack) {
+    public @Nullable Content extractContent(ItemStack stack) {
         Identifier id = Identifier.tryParse(stack.getOrCreateNbt().getString(DOUGH_KEY));
         if (id != null) {
-            return ContentRegistry.get(id);
+            return TWRegistries.CONTENT.get(id);
         }
 
         return null;
     }
 
     @Override
-    public @NotNull ItemStack replaceContent(@NotNull ItemStack stack, @Nullable AbstractContent content) {
-        // 检查堆栈是否是有效的容器
-        if (!matches(stack)) {
-            invalidContainer(stack);
-        }
+    public @NotNull ItemStack replaceContent(@NotNull ItemStack stack, @Nullable Content content) {
+        validateReplace(stack, content);
 
         // 清空容器
         if (content == null) {
@@ -52,13 +52,8 @@ public class MoldContainer extends ContainerType{
             return stack;
         }
 
-        // 检查是否是有效的内容物
-        if (!canContain(content)) {
-            invalidContent(content);
-        }
-
         // 替换内容物
-        stack.getOrCreateNbt().putString(DOUGH_KEY, content.getId().toString());
+        stack.getOrCreateNbt().putString(DOUGH_KEY, Objects.requireNonNull(TWRegistries.CONTENT.getId(content)).toString());
         return stack;
     }
 }

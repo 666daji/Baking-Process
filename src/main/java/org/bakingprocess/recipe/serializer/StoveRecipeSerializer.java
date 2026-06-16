@@ -9,9 +9,9 @@ import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.registry.ContentRegistry;
 import org.bakingprocess.recipe.StoveRecipe;
+import org.twcore.content.Content;
+import org.twcore.registry.TWRegistries;
 
 import java.util.Objects;
 
@@ -21,11 +21,11 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     public StoveRecipe read(Identifier id, JsonObject json) {
         // 读取输入物品（可以是普通物品或内容物）
         String inputString = JsonHelper.getString(json, "ingredient");
-        Either<ItemStack, AbstractContent> input = readStackFromString(inputString);
+        Either<ItemStack, Content> input = readStackFromString(inputString);
 
         // 读取结果物品（可以是普通物品或内容物）
         String resultString = JsonHelper.getString(json, "result");
-        Either<ItemStack, AbstractContent> result = readStackFromString(resultString);
+        Either<ItemStack, Content> result = readStackFromString(resultString);
 
         // 读取烘烤时间、最大输入数量和模具信息
         int inputCount = JsonHelper.getInt(json, "MaxInputCount", 1);
@@ -38,11 +38,11 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     public StoveRecipe read(Identifier id, PacketByteBuf buf) {
         // 读取输入物品
         String inputString = buf.readString();
-        Either<ItemStack, AbstractContent> input = readStackFromString(inputString);
+        Either<ItemStack, Content> input = readStackFromString(inputString);
 
         // 读取结果物品
         String resultString = buf.readString();
-        Either<ItemStack, AbstractContent> result = readStackFromString(resultString);
+        Either<ItemStack, Content> result = readStackFromString(resultString);
 
         // 读取额外数据
         int inputCount = buf.readInt();
@@ -62,12 +62,12 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     }
 
     /**
-     * 将 Either<ItemStack, AbstractContent> 转换为与配方 JSON 格式一致的字符串。
+     * 将 Either<ItemStack, Content> 转换为与配方 JSON 格式一致的字符串。
      */
-    private static String componentToString(Either<ItemStack, AbstractContent> component) {
+    private static String componentToString(Either<ItemStack, Content> component) {
         return component.map(
                 stack -> "item|" + Registries.ITEM.getId(stack.getItem()),
-                content -> "content|" + content.getId()
+                content -> "content|" + TWRegistries.CONTENT.getId(content)
         );
     }
 
@@ -85,7 +85,7 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
      * @throws IllegalArgumentException 如果无法解析出有效物品或内容物
      * @throws NullPointerException 如果输入字符串为null
      */
-    private static Either<ItemStack, AbstractContent> readStackFromString(String idString) {
+    private static Either<ItemStack, Content> readStackFromString(String idString) {
         Objects.requireNonNull(idString, "Input string cannot be null");
 
         // 去除前后空格
@@ -118,7 +118,7 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
      * @return 物品堆栈
      * @throws IllegalArgumentException 如果物品不存在
      */
-    private static Either<ItemStack, AbstractContent> parseItemStack(String itemId) {
+    private static Either<ItemStack, Content> parseItemStack(String itemId) {
         Identifier identifier = Identifier.tryParse(itemId);
         if (identifier == null) {
             throw new IllegalArgumentException("Invalid item ID format: '" + itemId + "'");
@@ -136,13 +136,13 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
      * @return 内容物占位堆栈
      * @throws IllegalArgumentException 如果内容物不存在
      */
-    private static Either<ItemStack, AbstractContent> parseContentStack(String contentId) {
+    private static Either<ItemStack, Content> parseContentStack(String contentId) {
         Identifier identifier = Identifier.tryParse(contentId);
         if (identifier == null) {
             throw new IllegalArgumentException("Invalid content ID format: '" + contentId + "'");
         }
 
-        AbstractContent content = ContentRegistry.get(identifier);
+        Content content = TWRegistries.CONTENT.get(identifier);
         if (content == null) {
             throw new IllegalArgumentException("Content not found: " + contentId);
         }

@@ -12,11 +12,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import org.bakingprocess.block.EmptyBreadBoatBlock;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.container.BreadBoatContainer;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.FoodContent;
+import org.bakingprocess.container.BreadBoatContainer;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.content.ContainerUtil;
+import org.twcore.content.Content;
+import org.twcore.content.FoodContent;
 
 /**
  * 表示面包船容器的物品。
@@ -38,8 +38,8 @@ public class BreadBoatItem extends BlockItem {
 
         for (BreadBoatContainer.BreadBoatSoupType soupType : BreadBoatContainer.BreadBoatSoupType.values()) {
             ItemStack stack = new ItemStack(item);
-            ContainerUtil.replaceContent(stack, soupType.getContent());
-            result.add(stack);
+            ItemStack stack1 = ContainerUtil.analyze(stack).orElseThrow().replaceContent(soupType.getContent());
+            result.add(stack1);
         }
 
         return result;
@@ -47,7 +47,7 @@ public class BreadBoatItem extends BlockItem {
 
     @Override
     protected @Nullable BlockState getPlacementState(ItemPlacementContext context) {
-        AbstractContent content = ContainerUtil.extractContent(context.getStack());
+        Content content = ContainerUtil.extractContent(context.getStack());
         BlockState originalState = super.getPlacementState(context);
 
         if (content != null) {
@@ -75,7 +75,7 @@ public class BreadBoatItem extends BlockItem {
 
     @Override
     public Text getName(ItemStack stack) {
-        AbstractContent content = ContainerUtil.extractContent(stack);
+        Content content = ContainerUtil.extractContent(stack);
 
         if (content instanceof FoodContent soup) {
             Text soupName = soup.getDisplayName();
@@ -87,7 +87,7 @@ public class BreadBoatItem extends BlockItem {
 
     @Override
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
-        AbstractContent soupType = ContainerUtil.extractContent(stack);
+        Content soupType = ContainerUtil.extractContent(stack);
 
         // 如果容器中有汤并且使用物品的为玩家则喝汤
         if (soupType instanceof FoodContent soupContent && user instanceof PlayerEntity player) {

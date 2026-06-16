@@ -4,24 +4,18 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.bakingprocess.BakingProcess;
+import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.item.BreadBoatItem;
 
 public class ModItemGroups {
-    public static final RegistryKey<ItemGroup> DEMO_GROUP = register(BakingProcess.MOD_ID);
-
-    private static RegistryKey<ItemGroup> register(String id) {
-        return RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(BakingProcess.MOD_ID, id));
-    }
 
     private static void ModItemGroup(){
         Registry.register(
                 Registries.ITEM_GROUP,
-                DEMO_GROUP,
+                new Identifier(BakingProcess.MOD_ID, "main"),
                 ItemGroup.create(ItemGroup.Row.TOP, -1)
                         .displayName(Text.translatable("itemgroup.baking_process"))
                         .icon(() -> new ItemStack(ModItems.GRINDING_STONE))
@@ -69,7 +63,7 @@ public class ModItemGroups {
                             entries.add(ModItems.BAKED_CAKE_EMBRYO);
                             entries.add(ModItems.SALTY_DOUGH);
                             entries.add(ModItems.HARD_BREAD_BOAT);
-//                            entries.addAll(BreadBoatItem.getAll((BreadBoatItem) ModItems.HARD_BREAD_BOAT));
+                            entries.addAll(BreadBoatItem.getAll((BreadBoatItem) ModItems.HARD_BREAD_BOAT));
                             entries.add(ModItems.CARROT_SLICES);
                             entries.add(ModItems.CARROT_HEAD);
                             entries.add(ModItems.POTATO_CUBES);
@@ -98,6 +92,16 @@ public class ModItemGroups {
                             entries.add(ModItems.CLAY_POTS_EMBRYO);
                             entries.add(ModItems.CLAY_POTS);
                         }))
+                        .build()
+        );
+        Registry.register(
+                Registries.ITEM_GROUP,
+                new Identifier(BakingProcess.MOD_ID, "all_dish"),
+                ItemGroup.create(ItemGroup.Row.TOP, -1)
+                        .displayName(Text.translatable("itemgroup.baking_process.plating"))
+                        .icon(() -> new ItemStack(ModItems.GRINDING_STONE))
+                        .entries(((displayContext, entries) ->
+                                entries.addAll(PlateBlock.getAll(ModItems.IRON_PLATE))))
                         .build()
         );
     }

@@ -8,7 +8,7 @@
     "wheat": 3
   },
   "liquids": {
-    "baking_process:water": 3
+    "tw_core:water": 3
   },
   "extra_items": {
     "items": []

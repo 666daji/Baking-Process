@@ -10,7 +10,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.bakingprocess.block.process.PlatingProcess;
-import org.bakingprocess.contentsystem.content.DishesContent;
+import org.bakingprocess.content.DishesContent;
 import org.bakingprocess.recipe.PlatingRecipe;
 import org.jetbrains.annotations.Nullable;
 import org.twcore.api.process.PlayerAction;

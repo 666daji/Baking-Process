@@ -12,13 +12,13 @@ import org.bakingprocess.block.entity.FlourSackBlockEntity;
 import org.bakingprocess.block.entity.PotsBlockEntity;
 import org.bakingprocess.block.entity.ShelfBlockEntity;
 import org.bakingprocess.block.process.KneadingProcess;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.BaseLiquidContent;
 import org.bakingprocess.integration.dfood.AssistedBlocks;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.item.FlourSackItem;
 import org.bakingprocess.registry.ModBlocks;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.content.Content;
+import org.twcore.content.HaveColorContent;
 
 import java.util.Map;
 import java.util.Optional;
@@ -136,7 +136,7 @@ public class ModBlockColors {
             return -1; // 默认无颜色
         }
 
-        Map<AbstractContent, Integer> liquidCounts = process.getLiquidCounts();
+        Map<Content, Integer> liquidCounts = process.getLiquidCounts();
         if (liquidCounts.isEmpty()) {
             return -1; // 没有液体
         }
@@ -147,12 +147,12 @@ public class ModBlockColors {
         float totalBlue = 0;
 
         // 遍历所有液体，计算加权颜色
-        for (Map.Entry<AbstractContent, Integer> entry : liquidCounts.entrySet()) {
-            AbstractContent content = entry.getKey();
+        for (Map.Entry<Content, Integer> entry : liquidCounts.entrySet()) {
+            Content content = entry.getKey();
             int count = entry.getValue();
 
             // 只处理BaseLiquidContent类型
-            if (content instanceof BaseLiquidContent baseLiquidContent) {
+            if (content instanceof HaveColorContent baseLiquidContent) {
                 int color = baseLiquidContent.getColor();
 
                 // 分解颜色分量

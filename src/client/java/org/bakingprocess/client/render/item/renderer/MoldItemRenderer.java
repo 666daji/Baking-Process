@@ -12,9 +12,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import org.bakingprocess.client.render.model.ModModelLoader;
-import org.bakingprocess.contentsystem.api.ContainerUtil;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.content.ShapedDoughContent;
+import org.bakingprocess.content.ShapedDoughContent;
+import org.twcore.api.content.ContainerUtil;
+import org.twcore.content.Content;
 
 public class MoldItemRenderer {
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
@@ -28,7 +28,7 @@ public class MoldItemRenderer {
         BakedModelManager manager = CLIENT.getBakedModelManager();
 
         BlockState state = blockItem.getBlock().getDefaultState();
-        AbstractContent content = ContainerUtil.extractContent(stack);
+        Content content = ContainerUtil.extractContent(stack);
 
         // 渲染方块本身
         blockRenderer.renderBlockAsEntity(state, matrices, vertexConsumers, light, overlay);

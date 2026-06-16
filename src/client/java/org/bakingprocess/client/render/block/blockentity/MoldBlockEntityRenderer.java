@@ -15,7 +15,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.bakingprocess.block.entity.MoldBlockEntity;
 import org.bakingprocess.client.render.model.ModModelLoader;
-import org.bakingprocess.contentsystem.content.ShapedDoughContent;
+import org.bakingprocess.content.ShapedDoughContent;
 
 public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEntity> {
     private final BakedModelManager modelManager;

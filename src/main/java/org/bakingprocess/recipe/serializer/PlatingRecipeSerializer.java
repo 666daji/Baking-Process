@@ -9,10 +9,10 @@ import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import org.bakingprocess.contentsystem.content.AbstractContent;
-import org.bakingprocess.contentsystem.registry.ContentRegistry;
 import org.bakingprocess.recipe.PlatingRecipe;
 import org.twcore.api.process.PlayerAction;
+import org.twcore.content.Content;
+import org.twcore.registry.TWRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +73,7 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
             throw new JsonParseException("Invalid result ID: " + resultId);
         }
 
-        AbstractContent output = ContentRegistry.get(result);
+        Content output = TWRegistries.CONTENT.get(result);
         if (output == null) {
             throw new JsonParseException("No content found: " + resultId);
         }
@@ -99,7 +99,7 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
         }
 
         // 3. 读取输出结果
-        AbstractContent output = ContentRegistry.get(buf.readIdentifier());
+        Content output = TWRegistries.CONTENT.get(buf.readIdentifier());
         if (output == null) {
             throw new IllegalArgumentException("No output found");
         }
@@ -121,6 +121,6 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
         }
 
         // 3. 写入输出内容ID
-        buf.writeIdentifier(recipe.getDishes().getId());
+        buf.writeIdentifier(TWRegistries.CONTENT.getId(recipe.getDishes()));
     }
 }

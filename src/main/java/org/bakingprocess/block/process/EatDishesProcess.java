@@ -10,7 +10,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.world.World;
 import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.block.entity.PlatableBlockEntity;
-import org.bakingprocess.contentsystem.content.DishesContent;
+import org.bakingprocess.content.DishesContent;
 import org.bakingprocess.food.SimpleFoodComponent;
 import org.twcore.api.process.AbstractProcess;
 import org.twcore.process.step.Step;

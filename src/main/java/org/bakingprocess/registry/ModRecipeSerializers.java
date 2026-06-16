@@ -10,7 +10,6 @@ import org.bakingprocess.recipe.serializer.*;
 public class ModRecipeSerializers {
     public static final RecipeSerializer<?> GRINDING = register("grinding", new GrindingRecipeSerializer());
     public static final RecipeSerializer<?> STOVE = register("stove", new StoveRecipeSerializer());
-    public static final RecipeSerializer<?> MOLD = register("mold", new MoldRecipeSerializer());
     public static final RecipeSerializer<?> CUT = register("cut", new CutRecipeSerializer());
     public static final RecipeSerializer<?> DOUGH_MAKING = register("dough_making", new DoughRecipeSerializer());
     public static final RecipeSerializer<?> PLATING = register("plating", new PlatingRecipeSerializer());
