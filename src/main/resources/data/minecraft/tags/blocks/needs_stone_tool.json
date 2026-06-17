@@ -1,8 +1,8 @@
 {
+  "replace": false,
   "values": [
     "baking_process:salt_ore",
     "baking_process:deepslate_salt_ore",
-    "baking_process:grinding_stone",
     "baking_process:heat_resistant_slate"
   ]
 }

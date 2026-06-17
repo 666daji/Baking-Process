@@ -23,7 +23,6 @@ public class ModItems {
 
     // 工具
     public static final Item IRON_GARNISH_DISHES = registerItem(ModBlocks.IRON_GARNISH_DISHES);
-    public static final Item WOODEN_SHELF = registerItem(ModBlocks.WOODEN_SHELF);
     public static final Item CUTTING_BOARD = registerItem(ModBlocks.CUTTING_BOARD);
     public static final Item IRON_POTS = registerItem(ModBlocks.IRON_POTS);
     public static final Item PLATE_LID = registerItem("plate_lid", new Item(new Item.Settings()));
@@ -44,7 +43,7 @@ public class ModItems {
     public static final Item AMETHYST_FLOUR = registerItem("amethyst_flour",
             new FlourItem(new Item.Settings(), 0x8A2BE2, FlourItem.FlourType.AMETHYST));
     public static final Item SUGAR_FLOUR = registerItem("sugar_flour",
-            new FlourItem(new Item.Settings(), 0xFFF5F5F0, FlourItem.FlourType.SUGAR));
+            new FlourItem(new Item.Settings().food(ModFoodComponents.SUGAR_FLOUR), 0xFFF5F5F0, FlourItem.FlourType.SUGAR));
     public static final Item SALT_FLOUR = registerItem("salt_flour",
             new FlourItem(new Item.Settings(), 0xFFFDFCF5, FlourItem.FlourType.SUGAR));
 
@@ -94,7 +93,7 @@ public class ModItems {
     public static final Item SALT_ORE = registerItem(ModBlocks.SALT_ORE);
     public static final Item DEEPSLATE_SALT_ORE = registerItem(ModBlocks.DEEPSLATE_SALT_ORE);
 
-    // 陶制品
+    // 园艺联动
     public static final Item CLAY_POTS_EMBRYO = registerItem(ModBlocks.CLAY_POTS_EMBRYO);
     public static final Item CLAY_POTS = registerItem(ModBlocks.CLAY_POTS);
 

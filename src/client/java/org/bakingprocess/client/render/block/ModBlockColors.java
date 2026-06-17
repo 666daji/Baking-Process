@@ -10,13 +10,13 @@ import net.minecraft.world.BlockRenderView;
 import org.bakingprocess.block.FlourSackBlock;
 import org.bakingprocess.block.entity.FlourSackBlockEntity;
 import org.bakingprocess.block.entity.PotsBlockEntity;
-import org.bakingprocess.block.entity.ShelfBlockEntity;
 import org.bakingprocess.block.process.KneadingProcess;
 import org.bakingprocess.integration.dfood.AssistedBlocks;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.item.FlourSackItem;
 import org.bakingprocess.registry.ModBlocks;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.block.UpPlaceBlockEntity;
 import org.twcore.content.Content;
 import org.twcore.content.HaveColorContent;
 
@@ -38,7 +38,7 @@ public class ModBlockColors {
 
         // 检查是否是放在木架子上的粉尘袋
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof ShelfBlockEntity shelfBlockEntity) {
+        if (blockEntity instanceof UpPlaceBlockEntity shelfBlockEntity) {
             // 处理架子上的粉尘袋染色
             return getShelfFlourSackColor(shelfBlockEntity, state);
         }
@@ -51,7 +51,7 @@ public class ModBlockColors {
         }
     }
 
-    private static int getShelfFlourSackColor(ShelfBlockEntity shelfBlockEntity, BlockState state) {
+    private static int getShelfFlourSackColor(UpPlaceBlockEntity shelfBlockEntity, BlockState state) {
         // 获取架子索引
         int shelfIndex = 0;
         if (state.contains(FlourSackBlock.SHELF_INDEX)) {

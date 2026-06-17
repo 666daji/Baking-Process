@@ -6,7 +6,6 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.bakingprocess.BakingProcess;
-import org.bakingprocess.content.DishesContent;
 import org.jetbrains.annotations.Nullable;
 import org.twcore.api.process.PlayerAction;
 import org.twcore.content.Content;

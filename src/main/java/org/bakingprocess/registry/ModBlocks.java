@@ -25,45 +25,41 @@ public class ModBlocks {
     // 工作方块
     public static final Block GRINDING_STONE = registerBlock("grinding_stone",
             new GrindingStoneBlock(AbstractBlock.Settings.create()
-                    .sounds(BlockSoundGroup.STONE).strength(1.5F, 6.0F).requiresTool()
-                    .nonOpaque().pistonBehavior(PistonBehavior.BLOCK)));
+                    .sounds(BlockSoundGroup.STONE).strength(1.5F, 6.0F)
+                    .requiresTool().mapColor(MapColor.STONE_GRAY)));
     public static final Block HEAT_RESISTANT_SLATE = registerBlock("heat_resistant_slate",
-            new HeatResistantSlateBlock(AbstractBlock.Settings.create().requiresTool()
-                    .sounds(BlockSoundGroup.STONE).strength(1.2F, 6.0F)));
+            new HeatResistantSlateBlock(AbstractBlock.Settings.create()
+                    .sounds(BlockSoundGroup.STONE).strength(1.0F, 6.0F)
+                    .requiresTool().mapColor(MapColor.DEEPSLATE_GRAY)));
     public static final Block COMBUSTION_FIREWOOD = registerBlock("combustion_firewood",
             new CombustionFirewoodBlock(AbstractBlock.Settings.create()
-                    .sounds(BlockSoundGroup.STONE).strength(0.5F, 0.5F)
-                    .nonOpaque().pistonBehavior(PistonBehavior.BLOCK)
-                    .luminance(state -> state.get(CombustionFirewoodBlock.COMBUSTION_STATE).isBurning()? 15: 0)));
+                    .sounds(BlockSoundGroup.WOOD).strength(0.5F, 0.5F)
+                    .mapColor(MapColor.ORANGE)
+                    .nonOpaque().luminance(state -> state.get(CombustionFirewoodBlock.COMBUSTION_STATE).isBurning()? 15: 0)));
     public static final Block FIREWOOD = registerBlock("firewood",
             FirewoodBlock.Builder.create()
                     .maxFood(6)
                     .targetBlock(COMBUSTION_FIREWOOD)
                     .settings(AbstractBlock.Settings.create()
-                            .sounds(BlockSoundGroup.STONE).strength(0.5F, 2.0F)
-                            .nonOpaque().requiresTool().pistonBehavior(PistonBehavior.BLOCK))
+                            .mapColor(MapColor.BROWN)
+                            .sounds(BlockSoundGroup.WOOD).strength(0.5F, 0.5F))
                     .build());
     public static final Block IRON_PLATE = registerBlock("iron_plate",
             new PlateBlock(AbstractBlock.Settings.create().sounds(BlockSoundGroup.METAL)
-                    .strength(0.2F, 0.6F)
-                    .nonOpaque().pistonBehavior(PistonBehavior.BLOCK)));
+                    .strength(0.2F, 0.6F).mapColor(MapColor.IRON_GRAY)));
 
     // 工具
     public static final Block IRON_GARNISH_DISHES = registerBlock("iron_garnish_dishes",
             new GarnishDishesBlock(AbstractBlock.Settings.create()
-                    .sounds(BlockSoundGroup.WOOD).strength(0.5F)
-                    .nonOpaque().pistonBehavior(PistonBehavior.DESTROY)));
-    public static final Block WOODEN_SHELF = registerBlock("wooden_shelf",
-            new ShelfBlock(AbstractBlock.Settings.create()
-                    .sounds(BlockSoundGroup.WOOD).strength(0.5F)
-                    .nonOpaque().pistonBehavior(PistonBehavior.DESTROY)));
+                    .sounds(BlockSoundGroup.METAL).strength(0.5F)
+                    .pistonBehavior(PistonBehavior.DESTROY)));
     public static final Block CUTTING_BOARD = registerBlock("cutting_board",
             new CuttingBoardBlock(AbstractBlock.Settings.create()
-                    .sounds(BlockSoundGroup.WOOL).sounds(BlockSoundGroup.WOOL).strength(0.2F)
-                    .nonOpaque().pistonBehavior(PistonBehavior.DESTROY)));
+                    .sounds(BlockSoundGroup.WOOD).sounds(BlockSoundGroup.WOOL).strength(0.2F)
+                    .pistonBehavior(PistonBehavior.DESTROY)));
     public static final Block IRON_POTS = registerBlock("iron_pots",
             new PotsBlock(AbstractBlock.Settings.create()
-                    .sounds(BlockSoundGroup.STONE).strength(0.5F, 0.6F).nonOpaque()));
+                    .sounds(BlockSoundGroup.METAL).strength(1.5F, 0.6F)));
 
     // 厨具
     public static final Block BREAD_SPATULA = registerBlock("bread_spatula",
@@ -72,7 +68,7 @@ public class ModBlocks {
                     .simpleShape(Block.createCuboidShape(0, 0, 0, 16, 1, 16))
                     .settings(AbstractBlock.Settings.create()
                             .sounds(BlockSoundGroup.STONE).strength(0.5F, 0.2F)
-                            .nonOpaque().pistonBehavior(PistonBehavior.BLOCK))
+                            .nonOpaque())
                     .build());
     public static final Block KITCHEN_KNIFE = registerBlock("kitchen_knife",
             ComplexFoodBlock.Builder.create()
@@ -80,7 +76,7 @@ public class ModBlocks {
                     .simpleShape(Block.createCuboidShape(2, 0, 2, 14, 1, 14))
                     .settings(AbstractBlock.Settings.create()
                             .sounds(ModBlockSoundGroup.KITCHEN_KNIFE).strength(0.5F, 0.2F)
-                            .nonOpaque().pistonBehavior(PistonBehavior.BLOCK))
+                            .nonOpaque())
                     .build());
 
     // 粉尘袋
@@ -215,12 +211,10 @@ public class ModBlocks {
     // 模具
     public static final Block CAKE_EMBRYO_MOLD = registerBlock("cake_embryo_mold",
             new MoldBlock(AbstractBlock.Settings.create()
-                    .sounds(ModSoundGroups.BUCKET).strength(0.2F)
-                    .nonOpaque().pistonBehavior(PistonBehavior.DESTROY)));
+                    .sounds(BlockSoundGroup.METAL).strength(0.5F).nonOpaque()));
     public static final Block TOAST_EMBRYO_MOLD = registerBlock("toast_embryo_mold",
             new MoldBlock(AbstractBlock.Settings.create()
-                    .sounds(ModSoundGroups.BUCKET).sounds(BlockSoundGroup.WOOL).strength(0.2F)
-                    .nonOpaque().pistonBehavior(PistonBehavior.DESTROY)));
+                    .sounds(BlockSoundGroup.METAL).strength(0.5F).nonOpaque()));
 
     // 矿物
     public static final Block SALT_ORE = registerBlock("salt_ore",
@@ -230,12 +224,12 @@ public class ModBlocks {
             new ExperienceDroppingBlock(AbstractBlock.Settings.create()
                     .sounds(BlockSoundGroup.STONE).strength(2.0F, 6.0F).requiresTool()));
 
-    // 陶制品
+    // 园艺联动
     public static final Block CLAY_POTS_EMBRYO = registerBlock("clay_pots_embryo",
             new SimpleFoodBlock(DFoodUtils.getFoodBlockSettings(), false, PotsBlock.SHAPE));
     public static final Block CLAY_POTS = registerBlock("clay_pots",
             new PotsBlock(AbstractBlock.Settings.create()
-                    .sounds(BlockSoundGroup.STONE).strength(0.5F, 0.6F).nonOpaque()));
+                    .sounds(BlockSoundGroup.STONE).strength(0.5F, 0.6F)));
 
     public static Block registerBlock(String name, Block block) {
         return Registry.register(Registries.BLOCK, new Identifier(BakingProcess.MOD_ID, name), block);

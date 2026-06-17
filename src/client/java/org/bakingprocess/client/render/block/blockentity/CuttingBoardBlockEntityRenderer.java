@@ -11,13 +11,15 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.random.Random;
 import org.bakingprocess.block.CuttingBoardBlock;
 import org.bakingprocess.block.entity.CuttingBoardBlockEntity;
 import org.bakingprocess.block.process.CuttingProcess;
-import org.bakingprocess.client.util.RenderUtils;
+import org.bakingprocess.client.render.model.ModModelLoader;
 import org.twcore.client.api.render.UpPlaceBlockEntityRenderer;
 
 import java.util.HashMap;
@@ -40,6 +42,33 @@ public class CuttingBoardBlockEntityRenderer extends UpPlaceBlockEntityRenderer<
         super(ctx);
         this.modelManager = ctx.getRenderManager().getModels().getModelManager();
         this.modelRenderer = ctx.getRenderManager().getModelRenderer();
+    }
+
+    /**
+     * 获取切割模型
+     * @param itemStack 正在切割的物品
+     * @param cutCount 当前切割次数（从1开始）
+     * @param manager BakedModelManager
+     * @return 对应的切割模型，如果不存在则返回null
+     */
+    public static BakedModel getCuttingModel(ItemStack itemStack, int cutCount, BakedModelManager manager) {
+        if (itemStack.isEmpty() || cutCount < 1) {
+            return null;
+        }
+
+        // 获取物品的完整标识符
+        Identifier itemId = Registries.ITEM.getId(itemStack.getItem());
+
+        // 构建切割模型ID
+        Identifier modelId = ModModelLoader.createCuttingModel(itemId, cutCount);
+        BakedModel model = manager.getModel(modelId);
+
+        // 检查是否是有效模型（不是错误模型）
+        if (model == manager.getMissingModel()) {
+            return null;
+        }
+
+        return model;
     }
 
     @Override
@@ -98,7 +127,7 @@ public class CuttingBoardBlockEntityRenderer extends UpPlaceBlockEntityRenderer<
             return;
         }
 
-        BakedModel model = RenderUtils.getCuttingModel(state.inputStack(), currentCut, modelManager);
+        BakedModel model = getCuttingModel(state.inputStack(), currentCut, modelManager);
 
         if (model == null || model == modelManager.getMissingModel()) {
             return;

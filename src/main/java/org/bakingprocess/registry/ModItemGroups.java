@@ -9,6 +9,7 @@ import net.minecraft.util.Identifier;
 import org.bakingprocess.BakingProcess;
 import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.item.BreadBoatItem;
+import org.twcore.api.TwModManager;
 
 public class ModItemGroups {
 
@@ -88,9 +89,11 @@ public class ModItemGroups {
                             entries.add(ModItems.SALT_ORE);
                             entries.add(ModItems.DEEPSLATE_SALT_ORE);
 
-                            // 陶制品
-                            entries.add(ModItems.CLAY_POTS_EMBRYO);
-                            entries.add(ModItems.CLAY_POTS);
+                            // 园艺联动
+                            if (TwModManager.IMPL.isRegistered("gardening")) {
+                                entries.add(ModItems.CLAY_POTS_EMBRYO);
+                                entries.add(ModItems.CLAY_POTS);
+                            }
                         }))
                         .build()
         );

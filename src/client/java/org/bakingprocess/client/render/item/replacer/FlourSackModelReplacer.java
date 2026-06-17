@@ -4,9 +4,9 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.bakingprocess.BakingProcess;
-import org.bakingprocess.client.util.RenderUtils;
 import org.bakingprocess.item.FlourSackItem;
 import org.twcore.client.api.render.ReplaceItemModel;
 
@@ -28,7 +28,7 @@ public class FlourSackModelReplacer {
 
             if (content.isPresent()) {
                 ItemStack flourStack = content.get();
-                String flourName = RenderUtils.getFlourModelName(flourStack);
+                String flourName = getFlourModelName(flourStack);
 
                 if (flourName != null) {
                     // 使用 MOD_ID 常量创建自定义模型标识符
@@ -50,5 +50,21 @@ public class FlourSackModelReplacer {
 
         // 返回原始模型
         return context.originalModel();
+    }
+
+    /**
+     * 根据粉尘物品获取对应的粉尘袋模型名称。
+     * @apiNote 粉尘物品ID + "_sack" = 粉尘袋模型名称
+     */
+    public static String getFlourModelName(ItemStack flourStack) {
+        // 获取粉尘物品的注册表ID
+        Identifier itemId = Registries.ITEM.getId(flourStack.getItem());
+
+        if (itemId.getNamespace().equals(BakingProcess.MOD_ID)) {
+            // 直接在粉尘物品ID后添加"_sack"作为粉尘袋模型名称
+            return itemId.getPath() + "_sack";
+        }
+
+        return null;
     }
 }

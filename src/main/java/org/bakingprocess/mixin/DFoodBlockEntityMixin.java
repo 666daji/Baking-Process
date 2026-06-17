@@ -1,4 +1,4 @@
-package org.bakingprocess.mixin.dfood;
+package org.bakingprocess.mixin;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;

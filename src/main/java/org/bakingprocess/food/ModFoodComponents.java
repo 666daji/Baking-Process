@@ -47,6 +47,11 @@ public class ModFoodComponents {
     public static final FoodComponent MILK = new FoodComponent.Builder()
             .hunger(1).saturationModifier(0.4f).build();
 
+    // 调料
+    public static final FoodComponent SUGAR_FLOUR = new FoodComponent.Builder()
+            .hunger(7).saturationModifier(0.7f).meat()
+            .build();
+
     // 菜肴
     public static final FoodComponent COOKED_BEEF_BERRIES = new FoodComponent.Builder()
             .hunger(7).saturationModifier(0.7f).meat()

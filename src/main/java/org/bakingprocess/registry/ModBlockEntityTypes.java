@@ -43,12 +43,6 @@ public class ModBlockEntityTypes {
                     ModBlocks.IRON_GARNISH_DISHES
             )
     );
-    public static final BlockEntityType<ShelfBlockEntity> SHELF = create("shelf",
-            BlockEntityType.Builder.create(
-                    ShelfBlockEntity::new,
-                    ModBlocks.WOODEN_SHELF
-            )
-    );
     public static final BlockEntityType<MoldBlockEntity> MOLD = create("mold",
             BlockEntityType.Builder.create(
                     MoldBlockEntity::new,
