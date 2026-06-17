@@ -12,6 +12,7 @@ import org.bakingprocess.block.ShelfBlock;
 import org.bakingprocess.block.entity.ShelfBlockEntity;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
+import org.twcore.client.api.render.UpPlaceBlockEntityRenderer;
 
 public class ShelfBlockEntityRenderer extends UpPlaceBlockEntityRenderer<ShelfBlockEntity> {
     private final BlockRenderManager blockRenderManager;

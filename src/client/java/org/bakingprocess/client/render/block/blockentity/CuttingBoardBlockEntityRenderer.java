@@ -18,6 +18,7 @@ import org.bakingprocess.block.CuttingBoardBlock;
 import org.bakingprocess.block.entity.CuttingBoardBlockEntity;
 import org.bakingprocess.block.process.CuttingProcess;
 import org.bakingprocess.client.util.RenderUtils;
+import org.twcore.client.api.render.UpPlaceBlockEntityRenderer;
 
 import java.util.HashMap;
 import java.util.Map;

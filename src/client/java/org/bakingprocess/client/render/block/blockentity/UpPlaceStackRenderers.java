@@ -12,6 +12,7 @@ import org.bakingprocess.client.render.model.ModModelLoader;
 import org.bakingprocess.container.BreadBoatContainer;
 import org.bakingprocess.registry.ModItems;
 import org.twcore.api.content.ContainerUtil;
+import org.twcore.client.api.render.UpPlaceStackRenderer;
 import org.twcore.content.Content;
 
 public class UpPlaceStackRenderers {

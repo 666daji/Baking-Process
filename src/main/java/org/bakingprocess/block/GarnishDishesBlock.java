@@ -19,8 +19,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.bakingprocess.block.entity.DishesBlockEntity;
-import org.bakingprocess.block.entity.UpPlaceBlockEntity;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.block.UpPlaceBlock;
+import org.twcore.api.block.UpPlaceBlockEntity;
 
 import java.util.Optional;
 

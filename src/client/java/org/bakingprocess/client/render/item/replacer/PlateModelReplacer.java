@@ -5,6 +5,7 @@ import net.minecraft.client.render.model.BakedModel;
 import org.dfood.util.DFoodUtils;
 import org.bakingprocess.block.PlateBlock;
 import org.twcore.api.content.ContainerUtil;
+import org.twcore.client.api.render.ReplaceItemModel;
 import org.twcore.content.Content;
 
 import java.util.Objects;

@@ -8,6 +8,7 @@ import net.minecraft.util.Identifier;
 import org.bakingprocess.BakingProcess;
 import org.bakingprocess.client.util.RenderUtils;
 import org.bakingprocess.item.FlourSackItem;
+import org.twcore.client.api.render.ReplaceItemModel;
 
 import java.util.Optional;
 

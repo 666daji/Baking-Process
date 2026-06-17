@@ -7,6 +7,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import org.bakingprocess.block.entity.HeatResistantSlateBlockPileEntity;
 import org.twcore.api.blockpile.CubeBlockPileReference;
 import org.twcore.client.api.render.CubeBlockPileDebugRenderer;
+import org.twcore.client.api.render.UpPlaceBlockEntityRenderer;
 
 public class HeatResistantSlateBlockPileEntityRenderer extends UpPlaceBlockEntityRenderer<HeatResistantSlateBlockPileEntity> implements CubeBlockPileDebugRenderer<HeatResistantSlateBlockPileEntity> {
 

@@ -20,8 +20,9 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.bakingprocess.block.entity.CuttingBoardBlockEntity;
-import org.bakingprocess.block.entity.UpPlaceBlockEntity;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.block.UpPlaceBlock;
+import org.twcore.api.block.UpPlaceBlockEntity;
 
 public class CuttingBoardBlock extends UpPlaceBlock {
     protected static final VoxelShape SHAPE_X = Block.createCuboidShape(0.0, 0.0, 0.5, 16.0, 1.5, 15.5);

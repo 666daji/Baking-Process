@@ -20,8 +20,8 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.bakingprocess.block.entity.PotsBlockEntity;
-import org.bakingprocess.util.BakingProcessUtils;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.sound.Item2BlockSounds;
 
 public class PotsBlock extends BlockWithEntity {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
@@ -85,12 +85,10 @@ public class PotsBlock extends BlockWithEntity {
                 ItemStack storedStack = potsBlockEntity.removeStack(0);
                 player.giveItemStack(storedStack);
 
-                BlockSoundGroup sounds = BakingProcessUtils.getSoundGroupFromItem(storedStack);
-                if (sounds != null) {
-                    world.playSound(null, pos,
-                            sounds.getBreakSound(),
-                            SoundCategory.BLOCKS, 0.5F, 1.0F);
-                }
+                BlockSoundGroup sounds = Item2BlockSounds.getSoundGroup(storedStack);
+                world.playSound(null, pos,
+                        sounds.getBreakSound(),
+                        SoundCategory.BLOCKS, 0.5F, 1.0F);
 
                 return ActionResult.SUCCESS;
             }

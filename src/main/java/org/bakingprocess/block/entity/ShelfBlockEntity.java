@@ -12,6 +12,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -24,6 +25,7 @@ import org.bakingprocess.item.FlourSackItem;
 import org.bakingprocess.registry.ModBlockEntityTypes;
 import org.bakingprocess.util.BakingProcessUtils;
 import org.bakingprocess.mixin.FlowerPotBlockAccessor;
+import org.twcore.api.block.UpPlaceBlockEntity;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -180,7 +182,7 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
     }
 
     @Override
-    public Result tryAddItem(ItemStack stack) {
+    public Result tryAddItem(ItemStack stack, BlockHitResult hit) {
         if (stack.isEmpty() || !isValidItem(stack)) {
             return Result.of(ActionResult.PASS);
         }
@@ -241,7 +243,7 @@ public class ShelfBlockEntity extends UpPlaceBlockEntity {
     }
 
     @Override
-    public Result tryFetchItem(PlayerEntity player) {
+    public Result tryFetchItem(PlayerEntity player, BlockHitResult hit) {
 //        for (int i = this.size() - 1; i >= 0; i--) {
 //            ItemStack stack = this.getStack(i);
 //            if (!stack.isEmpty()) {

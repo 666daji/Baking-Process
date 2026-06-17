@@ -22,8 +22,8 @@ import net.minecraft.world.World;
 import org.bakingprocess.recipe.GrindingRecipe;
 import org.bakingprocess.registry.ModRecipeTypes;
 import org.bakingprocess.registry.ModBlockEntityTypes;
-import org.bakingprocess.util.EnhancedAnimationState;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.animation.EnhancedAnimationState;
 
 public class GrindingStoneBlockEntity extends BlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider {
     protected static final int INPUT_SLOT_INDEX = 0;

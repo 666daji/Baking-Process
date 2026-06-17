@@ -44,6 +44,7 @@ import org.bakingprocess.util.BakingProcessUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.twcore.api.block.UpPlaceBlockEntity;
 import org.twcore.api.blockpile.*;
 import org.twcore.blockpile.*;
 
@@ -194,7 +195,7 @@ public class HeatResistantSlateBlockPileEntity extends UpPlaceBlockEntity implem
     }
 
     @Override
-    public Result tryAddItem(ItemStack stack) {
+    public Result tryAddItem(ItemStack stack, BlockHitResult hit) {
         if (stack.isEmpty() || !isValidItem(stack)) {
             return Result.of(ActionResult.PASS);
         }
@@ -223,7 +224,7 @@ public class HeatResistantSlateBlockPileEntity extends UpPlaceBlockEntity implem
     }
 
     @Override
-    public Result tryFetchItem(PlayerEntity player) {
+    public Result tryFetchItem(PlayerEntity player, BlockHitResult hit) {
         ItemStack contentStack = this.getStack(0);
 
         if (contentStack.isEmpty()) {

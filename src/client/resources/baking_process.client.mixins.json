@@ -5,8 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "BlockEntityRendererFactoriesMixin",
-    "BlockModelRendererMixin",
-    "ItemRendererMixin"
+    "BlockModelRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -26,11 +26,12 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.bakingprocess.block.entity.CombustionFirewoodBlockEntity;
 import org.bakingprocess.block.entity.HeatResistantSlateBlockPileEntity;
-import org.bakingprocess.block.entity.UpPlaceBlockEntity;
 import org.bakingprocess.registry.ModBlockEntityTypes;
 import org.bakingprocess.registry.ModItems;
 import org.bakingprocess.registry.ModSounds;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.block.UpPlaceBlock;
+import org.twcore.api.block.UpPlaceBlockEntity;
 import org.twcore.api.blockpile.CubeBlockPileHelper;
 
 import java.util.function.Predicate;

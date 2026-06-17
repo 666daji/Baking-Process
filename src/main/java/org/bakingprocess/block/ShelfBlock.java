@@ -16,8 +16,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.bakingprocess.block.entity.ShelfBlockEntity;
-import org.bakingprocess.block.entity.UpPlaceBlockEntity;
 import org.jetbrains.annotations.Nullable;
+import org.twcore.api.block.UpPlaceBlock;
+import org.twcore.api.block.UpPlaceBlockEntity;
 
 public class ShelfBlock extends UpPlaceBlock {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;

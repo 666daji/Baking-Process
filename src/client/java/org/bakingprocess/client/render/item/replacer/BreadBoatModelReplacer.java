@@ -8,6 +8,7 @@ import org.bakingprocess.block.EmptyBreadBoatBlock;
 import org.bakingprocess.container.BreadBoatContainer;
 import org.bakingprocess.item.BreadBoatItem;
 import org.twcore.api.content.ContainerUtil;
+import org.twcore.client.api.render.ReplaceItemModel;
 import org.twcore.content.Content;
 
 public class BreadBoatModelReplacer {

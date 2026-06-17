@@ -26,6 +26,7 @@ import org.bakingprocess.registry.ModBlockEntityTypes;
 import org.bakingprocess.registry.ModItems;
 import org.bakingprocess.registry.ModRecipeTypes;
 import org.bakingprocess.registry.ModSounds;
+import org.twcore.api.block.UpPlaceBlockEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +69,7 @@ public class CuttingBoardBlockEntity extends UpPlaceBlockEntity {
     }
 
     @Override
-    public Result tryAddItem(ItemStack stack) {
+    public Result tryAddItem(ItemStack stack, BlockHitResult hit) {
         if (isEmpty() && isValidItem(stack)) {
             ItemStack placedStack = stack.copy();
             placedStack.setCount(1);
@@ -97,7 +98,7 @@ public class CuttingBoardBlockEntity extends UpPlaceBlockEntity {
     }
 
     @Override
-    public Result tryFetchItem(PlayerEntity player) {
+    public Result tryFetchItem(PlayerEntity player, BlockHitResult hit) {
         // 如果切菜流程在进行中，不允许取出物品
         if (cuttingProcess.isActive() ) {
             return Result.of(ActionResult.PASS);

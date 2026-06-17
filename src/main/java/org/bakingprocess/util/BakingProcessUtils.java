@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -51,16 +52,15 @@ public class BakingProcessUtils {
     /**
      * 获取物品对应方块的声音事件组
      * @param itemStack 要获取的物品堆栈
-     * @return 获取的声音组，如果物品不是一个
+     * @return 获取的声音组
      */
-    @Nullable
-    public static BlockSoundGroup getSoundGroupFromItem(ItemStack itemStack) {
+    public static Optional<BlockSoundGroup> getSoundGroupFromItem(ItemStack itemStack) {
         BlockState state = DFoodUtils.getBlockStateFromItem(itemStack.getItem());
         if (state != null) {
-            return state.getBlock().getSoundGroup(state);
+            return Optional.of(state.getSoundGroup());
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**

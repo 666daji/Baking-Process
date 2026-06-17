@@ -3,10 +3,12 @@ package org.bakingprocess;
 import net.fabricmc.api.ModInitializer;
 import org.bakingprocess.registry.*;
 import org.bakingprocess.integration.dfood.DFoodInit;
+import org.bakingprocess.util.BakingProcessUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.twcore.api.TwModManager;
 import org.twcore.api.event.TwCoreRegisterEvent;
+import org.twcore.api.sound.Item2BlockSounds;
 import org.twcore.container.AbstractMappedContainer;
 import org.twcore.process.playeraction.impl.AddItemPlayerAction;
 import org.twcore.registry.ContainerTypes;
@@ -28,8 +30,8 @@ public class BakingProcess implements ModInitializer {
     public static void register() {
         TwModManager.IMPL.register(BakingProcess.MOD_ID, 1);
 
-        // 注册映射
         AddItemPlayerAction.REMAPPING.put(ModItems.SALMON_CUBES, "msa");
         ((AbstractMappedContainer) ContainerTypes.POTION).registerContentMapping(Contents.MILK, ModItems.MILK_POTION);
+        Item2BlockSounds.registerParser(BakingProcessUtils::getSoundGroupFromItem);
     }
 }

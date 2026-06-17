@@ -4,6 +4,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import org.bakingprocess.block.entity.DishesBlockEntity;
+import org.twcore.client.api.render.UpPlaceBlockEntityRenderer;
 
 public class GarnishDishesBlockEntityRenderer extends UpPlaceBlockEntityRenderer<DishesBlockEntity> {
 

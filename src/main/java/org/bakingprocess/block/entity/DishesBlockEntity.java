@@ -12,6 +12,7 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -22,6 +23,7 @@ import org.dfood.shape.FoodShapeHandle;
 import org.bakingprocess.block.GarnishDishesBlock;
 import org.bakingprocess.registry.ModBlockEntityTypes;
 import org.bakingprocess.util.BakingProcessUtils;
+import org.twcore.api.block.UpPlaceBlockEntity;
 
 import java.util.List;
 
@@ -79,7 +81,8 @@ public class DishesBlockEntity extends UpPlaceBlockEntity {
         return BakingProcessUtils.createCountBlockstate(stack, facing);
     }
 
-    public Result tryAddItem(ItemStack stack) {
+    @Override
+    public Result tryAddItem(ItemStack stack, BlockHitResult hit) {
         if (stack.isEmpty() || !isValidItem(stack)) {
             return Result.of(ActionResult.PASS);
         }
@@ -104,7 +107,8 @@ public class DishesBlockEntity extends UpPlaceBlockEntity {
         return Result.of(ActionResult.PASS);
     }
 
-    public Result tryFetchItem(PlayerEntity player) {
+    @Override
+    public Result tryFetchItem(PlayerEntity player, BlockHitResult hit) {
         if (!isEmpty()) {
             ItemStack stack = removeStack(0, 1);
             if (!player.isCreative() && !player.giveItemStack(stack)) {

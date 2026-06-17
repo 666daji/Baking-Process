@@ -17,6 +17,7 @@ import org.bakingprocess.BakingProcess;
 import org.bakingprocess.block.GrindingStoneBlock;
 import org.bakingprocess.block.entity.GrindingStoneBlockEntity;
 import org.bakingprocess.client.render.model.ModModelLayers;
+import org.twcore.client.api.animation.WithAnimationBlockEntityRenderer;
 
 public class GrindingStoneBlockEntityRenderer extends WithAnimationBlockEntityRenderer<GrindingStoneBlockEntity> {
     private static final Identifier TEXTURE = new Identifier(BakingProcess.MOD_ID, "textures/blockentity/grinding_stone.png");
