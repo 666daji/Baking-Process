@@ -1,6 +1,7 @@
 package org.bakingprocess.client.render.block.blockentity;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.util.math.Direction;
@@ -11,6 +12,8 @@ import org.bakingprocess.client.render.item.renderer.MoldItemRenderer;
 import org.bakingprocess.client.render.model.ModModelLoader;
 import org.bakingprocess.container.BreadBoatContainer;
 import org.bakingprocess.registry.ModItems;
+import org.bakingprocess.util.BakingProcessUtils;
+import org.dfood.block.FoodBlocks;
 import org.twcore.api.content.ContainerUtil;
 import org.twcore.client.api.render.UpPlaceStackRenderer;
 import org.twcore.content.Content;
@@ -46,18 +49,29 @@ public class UpPlaceStackRenderers {
             context.renderBlockStateOrItem(state);
         });
 
+        // 食物方块
+        FoodBlocks.FOOD_BLOCK_REGISTRY.forEach((s, block) ->
+                UpPlaceStackRenderer.register(block.asItem(), createSpecialItemRenderer()));
+
         // 模具
-        UpPlaceStackRenderer.register(ModItems.TOAST_EMBRYO_MOLD, context -> {
-            MoldItemRenderer.renderMold(context.stack(), ModelTransformationMode.GUI, context.matrices(),
-                    context.vertexConsumers(), context.light(), context.overlay());
-        });
-        UpPlaceStackRenderer.register(ModItems.CAKE_EMBRYO_MOLD, context -> {
-            MoldItemRenderer.renderMold(context.stack(), ModelTransformationMode.GUI,
-                    context.matrices(), context.vertexConsumers(), context.light(), context.overlay());
-        });
+        UpPlaceStackRenderer.register(ModItems.TOAST_EMBRYO_MOLD, context -> MoldItemRenderer.renderMold(context.stack(), ModelTransformationMode.GUI, context.matrices(),
+                context.vertexConsumers(), context.light(), context.overlay()));
+        UpPlaceStackRenderer.register(ModItems.CAKE_EMBRYO_MOLD, context -> MoldItemRenderer.renderMold(context.stack(), ModelTransformationMode.GUI,
+                context.matrices(), context.vertexConsumers(), context.light(), context.overlay()));
     }
 
-    private static UpPlaceStackRenderer createKitchenKnifeRenderer() {
+    public static UpPlaceStackRenderer createSpecialItemRenderer() {
+        return context -> {
+            BlockState renderState = BakingProcessUtils.createCountBlockstate(context.stack(), context.getFacing());
+            if (!renderState.isOf(Blocks.AIR)) {
+                context.renderBlockState(renderState);
+            } else {
+                context.renderItem();
+            }
+        };
+    }
+
+    public static UpPlaceStackRenderer createKitchenKnifeRenderer() {
         return context -> {
             BakedModel model = context.getModelManager()
                     .getModel(ModModelLoader.BOARD_KITCHEN_KNIFE);

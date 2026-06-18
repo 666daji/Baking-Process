@@ -65,9 +65,13 @@ public class ModItemGroups {
                             entries.add(ModItems.SALTY_DOUGH);
                             entries.add(ModItems.HARD_BREAD_BOAT);
                             entries.addAll(BreadBoatItem.getAll((BreadBoatItem) ModItems.HARD_BREAD_BOAT));
+
+                            // 切片
                             entries.add(ModItems.CARROT_SLICES);
                             entries.add(ModItems.CARROT_HEAD);
+                            entries.add(ModItems.SEPARATE_POTATO_CUBES);
                             entries.add(ModItems.POTATO_CUBES);
+                            entries.add(ModItems.SEPARATE_BAKED_POTATO_CUBES);
                             entries.add(ModItems.BAKED_POTATO_CUBES);
                             entries.add(ModItems.APPLE_SLICES);
                             entries.add(ModItems.COD_CUBES);

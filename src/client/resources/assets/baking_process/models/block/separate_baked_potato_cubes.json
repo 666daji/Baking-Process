@@ -1,0 +1,7 @@
+{
+  "parent": "baking_process:block/separate_potato_cubes",
+  "textures": {
+    "potato_cubes": "baking_process:block/baked_potato_cubes",
+    "particle": "baking_process:item/separate_baked_potato_cubes"
+  }
+}

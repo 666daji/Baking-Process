@@ -36,10 +36,14 @@ public class ModFoodComponents {
             .hunger(1).saturationModifier(0.1f).build();
     public static final FoodComponent COOKED_SALMON_CUBES = new FoodComponent.Builder()
             .hunger(2).saturationModifier(0.4f).build();
+    public static final FoodComponent SEPARATE_POTATO_CUBES = new FoodComponent.Builder()
+            .hunger(1).saturationModifier(0.1f).build();
     public static final FoodComponent POTATO_CUBES = new FoodComponent.Builder()
             .hunger(1).saturationModifier(0.1f)
             .statusEffect(new StatusEffectInstance(StatusEffects.POISON, 60, 0), 0.3f)
             .build();
+    public static final FoodComponent SEPARATE_COOKED_POTATO_CUBES = new FoodComponent.Builder()
+            .hunger(2).saturationModifier(0.3f).build();
     public static final FoodComponent COOKED_POTATO_CUBES = new FoodComponent.Builder()
             .hunger(2).saturationModifier(0.3f).build();
 

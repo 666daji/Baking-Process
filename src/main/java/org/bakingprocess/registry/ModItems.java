@@ -71,7 +71,9 @@ public class ModItems {
     // 切片食物
     public static final Item CARROT_SLICES = registerItem(ModBlocks.CARROT_SLICES, new Item.Settings().food(ModFoodComponents.CARROT_SLICES));
     public static final Item CARROT_HEAD = registerItem("carrot_head", new Item(new Item.Settings().food(ModFoodComponents.CARROT_HEAD)));
+    public static final Item SEPARATE_POTATO_CUBES = registerItem(ModBlocks.SEPARATE_POTATO_CUBES, new Item.Settings().food(ModFoodComponents.SEPARATE_POTATO_CUBES));
     public static final Item POTATO_CUBES = registerItem(ModBlocks.POTATO_CUBES, new Item.Settings().food(ModFoodComponents.POTATO_CUBES));
+    public static final Item SEPARATE_BAKED_POTATO_CUBES = registerItem(ModBlocks.SEPARATE_BAKED_POTATO_CUBES, new Item.Settings().food(ModFoodComponents.SEPARATE_COOKED_POTATO_CUBES));
     public static final Item BAKED_POTATO_CUBES = registerItem(ModBlocks.BAKED_POTATO_CUBES, new Item.Settings().food(ModFoodComponents.COOKED_POTATO_CUBES));
     public static final Item APPLE_SLICES = registerItem(ModBlocks.APPLE_SLICES, new Item.Settings().food(FoodComponents.APPLE));
     public static final Item COD_CUBES = registerItem(ModBlocks.COD_CUBES, new Item.Settings().food(ModFoodComponents.COD_CUBES));
@@ -86,8 +88,8 @@ public class ModItems {
     public static final Item CAKE_EMBRYO_MOLD = registerItem(ModBlocks.CAKE_EMBRYO_MOLD, new Item.Settings(), MoldItem::new);
     public static final Item TOAST_EMBRYO_MOLD = registerItem(ModBlocks.TOAST_EMBRYO_MOLD, new Item.Settings(), MoldItem::new);
 
-    // 调味料
-    public static final Item SALT_CUBES = registerItem("salt_cubes", new Item(new Item.Settings()));
+    // 调料
+    public static final Item SALT_CUBES = registerItem(ModBlocks.SALT_CUBES);
 
     // 矿物
     public static final Item SALT_ORE = registerItem(ModBlocks.SALT_ORE);

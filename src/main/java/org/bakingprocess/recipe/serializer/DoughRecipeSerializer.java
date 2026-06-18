@@ -12,7 +12,6 @@ import net.minecraft.util.JsonHelper;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.recipe.DoughRecipe;
 import org.twcore.content.Content;
-import org.twcore.content.ContentCategories;
 import org.twcore.registry.Contents;
 import org.twcore.registry.TWRegistries;
 

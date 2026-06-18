@@ -1,0 +1,32 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"particle": "baking_process:block/salt_cubes",
+		"salt_cubes": "baking_process:block/salt_cubes"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 7],
+			"to": [9, 2, 9],
+			"rotation": {"angle": -22.5, "axis": "y", "origin": [8, 1, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 2], "texture": "#salt_cubes"},
+				"east": {"uv": [0, 2, 2, 4], "texture": "#salt_cubes"},
+				"south": {"uv": [2, 0, 4, 2], "texture": "#salt_cubes"},
+				"west": {"uv": [2, 2, 4, 4], "texture": "#salt_cubes"},
+				"up": {"uv": [2, 6, 0, 4], "texture": "#salt_cubes"},
+				"down": {"uv": [6, 0, 4, 2], "texture": "#salt_cubes"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "group",
+			"origin": [8, 0, 7],
+			"scope": 0,
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

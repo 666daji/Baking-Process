@@ -319,32 +319,6 @@ public class CombustionFirewoodBlockEntity extends BlockEntity {
     }
 
     /**
-     * 检查柴火堆上方6格内是否为空气
-     * @param world 世界
-     * @param pos 柴火堆位置
-     * @return 上方6格内是否全部为空气
-     */
-    public static boolean hasClearSpaceAbove(World world, BlockPos pos) {
-        for (int i = 1; i <= 6; i++) {
-            BlockPos checkPos = pos.up(i);
-            BlockState state = world.getBlockState(checkPos);
-
-            if (!state.isAir()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 检查是否可以点燃（包括上方空间检查）
-     */
-    public boolean canIgnite(World world, BlockPos pos) {
-        return hasClearSpaceAbove(world, pos);
-    }
-
-
-    /**
      * 检查是否可以添柴
      */
     public boolean canAddFirewood() {

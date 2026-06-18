@@ -158,9 +158,21 @@ public class ModBlocks {
                     .useItemTranslationKey(false)
                     .settings(DFoodUtils.getFoodBlockSettings())
                     .build());
+    public static final Block SEPARATE_POTATO_CUBES = registerBlock("separate_potato_cubes",
+            FoodBlock.Builder.create()
+                    .maxFood(4)
+                    .useItemTranslationKey(false)
+                    .settings(DFoodUtils.getFoodBlockSettings())
+                    .build());
     public static final Block POTATO_CUBES = registerBlock("potato_cubes",
             FoodBlock.Builder.create()
                     .maxFood(1)
+                    .useItemTranslationKey(false)
+                    .settings(DFoodUtils.getFoodBlockSettings())
+                    .build());
+    public static final Block SEPARATE_BAKED_POTATO_CUBES = registerBlock("separate_baked_potato_cubes",
+            FoodBlock.Builder.create()
+                    .maxFood(4)
                     .useItemTranslationKey(false)
                     .settings(DFoodUtils.getFoodBlockSettings())
                     .build());
@@ -215,6 +227,14 @@ public class ModBlocks {
     public static final Block TOAST_EMBRYO_MOLD = registerBlock("toast_embryo_mold",
             new MoldBlock(AbstractBlock.Settings.create()
                     .sounds(BlockSoundGroup.METAL).strength(0.5F).nonOpaque()));
+
+    // 调料
+    public static final Block SALT_CUBES = registerBlock("salt_cubes",
+            FoodBlock.Builder.create()
+                    .maxFood(2)
+                    .useItemTranslationKey(true)
+                    .settings(DFoodUtils.getFoodBlockSettings())
+                    .build());
 
     // 矿物
     public static final Block SALT_ORE = registerBlock("salt_ore",
