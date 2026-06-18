@@ -6,11 +6,11 @@ import org.bakingprocess.integration.dfood.AssistedBlocks;
 import org.bakingprocess.registry.ModBlocks;
 
 public class ModRenderLayers {
-    private static final BlockRenderLayerMap instance = BlockRenderLayerMap.INSTANCE;
+    private static final BlockRenderLayerMap INSTANCE = BlockRenderLayerMap.INSTANCE;
 
     public static void registryRenderLayer() {
-        instance.putBlock(AssistedBlocks.CRIPPLED_SUSPICIOUS_STEW, RenderLayer.getCutout());
-        instance.putBlock(ModBlocks.COMBUSTION_FIREWOOD, RenderLayer.getCutout());
-        instance.putBlock(ModBlocks.MILK_POTION, RenderLayer.getCutout());
+        INSTANCE.putBlock(AssistedBlocks.CRIPPLED_SUSPICIOUS_STEW, RenderLayer.getCutout());
+        INSTANCE.putBlock(ModBlocks.COMBUSTION_FIREWOOD, RenderLayer.getCutout());
+        INSTANCE.putBlock(ModBlocks.MILK_POTION, RenderLayer.getCutout());
     }
 }
