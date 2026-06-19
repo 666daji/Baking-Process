@@ -16,7 +16,7 @@ import org.twcore.registry.Contents;
 
 public class BakingProcess implements ModInitializer {
     public static final String MOD_ID = "baking_process";
-    public static final Logger LOGGER = LoggerFactory.getLogger("TW`s Baking Process");
+    public static final Logger LOGGER = LoggerFactory.getLogger("TW's Baking Process");
 
     @Override
     public void onInitialize() {
