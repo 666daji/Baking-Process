@@ -8,23 +8,20 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.GenerationStep;
 import org.bakingprocess.BakingProcess;
 
-public class ModOreGeneration {
+public class ModBiomeFeatures {
 
     public static void registerAll() {
-        // 注册盐矿生成
         BiomeModifications.addFeature(
                 BiomeSelectors.foundInOverworld(),
                 GenerationStep.Feature.UNDERGROUND_ORES,
                 RegistryKey.of(RegistryKeys.PLACED_FEATURE,
                         new Identifier(BakingProcess.MOD_ID, "ore_salt_middle"))
         );
-
-        // 注册小型盐矿生成
         BiomeModifications.addFeature(
                 BiomeSelectors.foundInOverworld(),
                 GenerationStep.Feature.UNDERGROUND_ORES,
                 RegistryKey.of(RegistryKeys.PLACED_FEATURE,
-                        new Identifier(BakingProcess.MOD_ID, "ore_salt_small"))
+                        new Identifier(BakingProcess.MOD_ID, "ore_salt_upper"))
         );
     }
 }
