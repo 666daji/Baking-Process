@@ -34,14 +34,14 @@ public class ModBlocks {
     public static final Block COMBUSTION_FIREWOOD = registerBlock("combustion_firewood",
             new CombustionFirewoodBlock(AbstractBlock.Settings.create()
                     .sounds(BlockSoundGroup.WOOD).strength(0.5F, 0.5F)
-                    .mapColor(MapColor.ORANGE)
+                    .mapColor(MapColor.ORANGE).nonOpaque()
                     .nonOpaque().luminance(state -> state.get(CombustionFirewoodBlock.COMBUSTION_STATE).isBurning()? 15: 0)));
     public static final Block FIREWOOD = registerBlock("firewood",
             FirewoodBlock.Builder.create()
                     .maxFood(6)
                     .targetBlock(COMBUSTION_FIREWOOD)
                     .settings(AbstractBlock.Settings.create()
-                            .mapColor(MapColor.BROWN)
+                            .mapColor(MapColor.BROWN).nonOpaque()
                             .sounds(BlockSoundGroup.WOOD).strength(0.5F, 0.5F))
                     .build());
     public static final Block IRON_PLATE = registerBlock("iron_plate",
