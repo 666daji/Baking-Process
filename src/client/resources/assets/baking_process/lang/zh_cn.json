@@ -1,5 +1,6 @@
 {
   "itemgroup.baking_process": "TW的烘培工艺",
+  "itemgroup.baking_process.plating": "TW的烘培工艺:菜肴",
   "jade.modName.baking_process": "TW的烘培工艺",
 
   "item.baking_process.wheat_flour": "小麦粉",
@@ -45,7 +46,9 @@
 
   "block.baking_process.carrot_slices": "胡萝卜片",
   "item.baking_process.carrot_head": "胡萝卜头",
+  "block.baking_process.separate_potato_cubes": "一块马铃薯块",
   "block.baking_process.potato_cubes": "马铃薯块",
+  "block.baking_process.separate_baked_potato_cubes": "一块烤马铃薯块",
   "block.baking_process.baked_potato_cubes": "烤马铃薯块",
   "block.baking_process.apple_slices": "苹果片",
   "block.baking_process.cod_cubes": "鳕鱼块",
@@ -79,14 +82,6 @@
   "subtitle.baking_process.kitchen_knife_board_place": "菜刀:插入案板",
   "subtitle.baking_process.kitchen_knife_fetch": "菜刀:取出",
   "subtitle.baking_process.kitchen_knife_place": "菜刀:放置",
-  "subtitle.baking_process.soup_fill": "汤:倾倒",
-
-  "content.baking_process.mushroom_stew": "蘑菇煲",
-  "content.baking_process.beetroot_soup": "甜菜汤",
-  "content.baking_process.rabbit_stew": "兔肉煲",
-
-  "content.baking_process.water": "水",
-  "content.baking_process.milk": "牛奶",
 
   "content.baking_process.beef_berries": "未烤制的浆果牛排",
   "content.baking_process.cooked_beef_berries": "浆果牛排",
@@ -102,21 +97,13 @@
   "content.baking_process.cooked_deluxe_roasted_rabbit": "豪华烤兔",
   "content.baking_process.honey_roasted_mutton": "未烤制的蜜烤羊排",
   "content.baking_process.cooked_honey_roasted_mutton": "蜜烤羊排",
+  "content.baking_process.deluxe_roast_chicken": "未烤制的豪华烤鸡",
+  "content.baking_process.cooked_deluxe_roast_chicken": "豪华烤鸡",
 
   "content.baking_process.toast_embryo": "吐司胚",
   "content.baking_process.toast": "吐司",
   "content.baking_process.cake_embryo": "蛋糕胚",
   "content.baking_process.baked_cake_embryo": "烤熟的蛋糕胚",
-
-  "content.baking_process.honey": "蜂蜜",
-
-  "player_action.add_content": "添加%s:%s份",
-  "player_action.add_item": "添加%s:%s份",
-
-  "grinding_stone.add.refused": "这东西可不能磨哦",
-  "grinding_stone.add.full": "已经满了!",
-  "grinding_stone.energy.full": "现在不需要推动石磨...",
-  "grinding_stone.add.not_enough": "这些好像不太够哦",
 
   "item.baking_process.flour_sack.fullness": "容量: %s/%s",
   "item.baking_process.flour_sack.content": "%s x%s",
