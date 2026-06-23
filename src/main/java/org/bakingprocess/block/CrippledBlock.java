@@ -1,19 +1,19 @@
 package org.bakingprocess.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContextParameterSet;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.phys.BlockHitResult;
 import org.dfood.util.IntPropertyManager;
 
 import java.util.Collections;
@@ -23,14 +23,14 @@ import java.util.List;
  * 该类的实例是一个过渡方块，表示不完整的方块
  */
 public abstract class CrippledBlock extends Block {
-    public final IntProperty NUMBER_OF_USE;
+    public final IntegerProperty NUMBER_OF_USE;
     public final int useNumber;
     /** 表示被使用之前的方块 */
     protected final Block baseBlock;
     /** 破坏方块后的掉落物 */
     protected final List<ItemStack> Remainder;
 
-    public CrippledBlock(Settings settings, int useNumber, Block baseBlock, ItemStack... Remainder) {
+    public CrippledBlock(Properties settings, int useNumber, Block baseBlock, ItemStack... Remainder) {
         super(settings);
         this.useNumber = useNumber;
         this.baseBlock = baseBlock;
@@ -39,15 +39,15 @@ public abstract class CrippledBlock extends Block {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        ItemStack itemStack = player.getStackInHand(hand);
-        if (world.isClient) {
-            if (tryUse(world, pos, state, player).isAccepted()) {
-                return ActionResult.SUCCESS;
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        ItemStack itemStack = player.getItemInHand(hand);
+        if (world.isClientSide) {
+            if (tryUse(world, pos, state, player).consumesAction()) {
+                return InteractionResult.SUCCESS;
             }
 
             if (itemStack.isEmpty()) {
-                return ActionResult.CONSUME;
+                return InteractionResult.CONSUME;
             }
         }
 
@@ -62,7 +62,7 @@ public abstract class CrippledBlock extends Block {
      * @param player 使用方块的玩家实体
      * @return 使用的结果
      */
-    protected abstract ActionResult tryUse(WorldAccess world, BlockPos pos, BlockState state, PlayerEntity player);
+    protected abstract InteractionResult tryUse(LevelAccessor world, BlockPos pos, BlockState state, Player player);
 
     /**
      * 获取方块使用完之后方块状态
@@ -72,8 +72,8 @@ public abstract class CrippledBlock extends Block {
      * @param player 使用方块的玩家实体
      * @return 使用完之后的方块状态
      */
-    protected BlockState getUseFinishesState(WorldAccess world, BlockPos pos, BlockState state, PlayerEntity player){
-        return Blocks.AIR.getDefaultState();
+    protected BlockState getUseFinishesState(LevelAccessor world, BlockPos pos, BlockState state, Player player){
+        return Blocks.AIR.defaultBlockState();
     }
 
     public boolean isBaseBlock(BlockState state) {
@@ -81,12 +81,12 @@ public abstract class CrippledBlock extends Block {
     }
 
     @Override
-    public List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         return Remainder;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(IntPropertyManager.take());
     }
 

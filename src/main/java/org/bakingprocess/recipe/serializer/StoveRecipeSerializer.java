@@ -2,13 +2,13 @@ package org.bakingprocess.recipe.serializer;
 
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.bakingprocess.recipe.StoveRecipe;
 import org.twcore.content.Content;
 import org.twcore.registry.TWRegistries;
@@ -18,30 +18,30 @@ import java.util.Objects;
 public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
 
     @Override
-    public StoveRecipe read(Identifier id, JsonObject json) {
+    public StoveRecipe fromJson(ResourceLocation id, JsonObject json) {
         // 读取输入物品（可以是普通物品或内容物）
-        String inputString = JsonHelper.getString(json, "ingredient");
+        String inputString = GsonHelper.getAsString(json, "ingredient");
         Either<ItemStack, Content> input = readStackFromString(inputString);
 
         // 读取结果物品（可以是普通物品或内容物）
-        String resultString = JsonHelper.getString(json, "result");
+        String resultString = GsonHelper.getAsString(json, "result");
         Either<ItemStack, Content> result = readStackFromString(resultString);
 
         // 读取烘烤时间、最大输入数量和模具信息
-        int inputCount = JsonHelper.getInt(json, "MaxInputCount", 1);
-        int stoveTime = JsonHelper.getInt(json, "stoveTime", 200);
+        int inputCount = GsonHelper.getAsInt(json, "MaxInputCount", 1);
+        int stoveTime = GsonHelper.getAsInt(json, "stoveTime", 200);
 
         return new StoveRecipe(id, input, result, inputCount, stoveTime);
     }
 
     @Override
-    public StoveRecipe read(Identifier id, PacketByteBuf buf) {
+    public StoveRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
         // 读取输入物品
-        String inputString = buf.readString();
+        String inputString = buf.readUtf();
         Either<ItemStack, Content> input = readStackFromString(inputString);
 
         // 读取结果物品
-        String resultString = buf.readString();
+        String resultString = buf.readUtf();
         Either<ItemStack, Content> result = readStackFromString(resultString);
 
         // 读取额外数据
@@ -52,10 +52,10 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     }
 
     @Override
-    public void write(PacketByteBuf buf, StoveRecipe recipe) {
+    public void write(FriendlyByteBuf buf, StoveRecipe recipe) {
         // 将组件转换为 "type|value" 字符串后直接写入
-        buf.writeString(componentToString(recipe.getInput()));
-        buf.writeString(componentToString(recipe.getOutput()));
+        buf.writeUtf(componentToString(recipe.getInput()));
+        buf.writeUtf(componentToString(recipe.getOutput()));
 
         buf.writeInt(recipe.getMaxInputCount());
         buf.writeVarInt(recipe.getBakingTime());
@@ -66,8 +66,8 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
      */
     private static String componentToString(Either<ItemStack, Content> component) {
         return component.map(
-                stack -> "item|" + Registries.ITEM.getId(stack.getItem()),
-                content -> "content|" + TWRegistries.CONTENT.getId(content)
+                stack -> "item|" + BuiltInRegistries.ITEM.getKey(stack.getItem()),
+                content -> "content|" + TWRegistries.CONTENT.getKey(content)
         );
     }
 
@@ -119,12 +119,12 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
      * @throws IllegalArgumentException 如果物品不存在
      */
     private static Either<ItemStack, Content> parseItemStack(String itemId) {
-        Identifier identifier = Identifier.tryParse(itemId);
+        ResourceLocation identifier = ResourceLocation.tryParse(itemId);
         if (identifier == null) {
             throw new IllegalArgumentException("Invalid item ID format: '" + itemId + "'");
         }
 
-        Item item = Registries.ITEM.getOrEmpty(identifier)
+        Item item = BuiltInRegistries.ITEM.getOptional(identifier)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found: " + itemId));
 
         return Either.left(new ItemStack(item));
@@ -137,7 +137,7 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
      * @throws IllegalArgumentException 如果内容物不存在
      */
     private static Either<ItemStack, Content> parseContentStack(String contentId) {
-        Identifier identifier = Identifier.tryParse(contentId);
+        ResourceLocation identifier = ResourceLocation.tryParse(contentId);
         if (identifier == null) {
             throw new IllegalArgumentException("Invalid content ID format: '" + contentId + "'");
         }

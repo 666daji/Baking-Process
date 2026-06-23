@@ -1,17 +1,24 @@
-package org.bakingprocess.registry;
+﻿package org.bakingprocess.registry;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.bakingprocess.BakingProcess;
 
-public class ModEntityTypes {
+import java.util.function.Supplier;
 
-    private static <T extends Entity> EntityType<T> register(String id, EntityType.Builder<T> type) {
-        return Registry.register(Registries.ENTITY_TYPE, new Identifier(BakingProcess.MOD_ID, id), type.build(id));
+public class ModEntityTypes {
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
+            DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, BakingProcess.MOD_ID);
+
+    private static <T extends Entity> RegistryObject<EntityType<T>> register(String id, Supplier<EntityType<T>> supplier) {
+        return ENTITY_TYPES.register(id, supplier);
     }
 
-    public static void registerAll() {}
+    public static void registerAll(IEventBus modEventBus) {
+        ENTITY_TYPES.register(modEventBus);
+    }
 }

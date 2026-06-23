@@ -1,36 +1,36 @@
 package org.bakingprocess.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Items;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.bakingprocess.block.entity.CombustionFirewoodBlockEntity;
 import org.dfood.block.FoodBlock;
 import org.dfood.block.FoodBlockBuilder;
 import org.dfood.shape.FoodShapeHandle;
-import org.bakingprocess.block.entity.CombustionFirewoodBlockEntity;
 
 public class FirewoodBlock extends FoodBlock {
-    public static final DirectionProperty HORIZONTAL_FACING = Properties.HORIZONTAL_FACING;
-    protected static final VoxelShape SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 7.0, 16.0);
+    public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
+    protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 7.0, 16.0);
 
     /** 被点燃后变成的方块 */
     protected final Block targetBlock;
 
-    protected FirewoodBlock(Settings settings, int maxFood, Block targetBlock) {
+    protected FirewoodBlock(Properties settings, int maxFood, Block targetBlock) {
         super(settings, maxFood, false, null, false, null);
         this.targetBlock = targetBlock;
     }
@@ -73,7 +73,7 @@ public class FirewoodBlock extends FoodBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return SHAPE_HANDLE.getShape(state, NUMBER_OF_FOOD, Shapes.class);
     }
 
@@ -81,12 +81,12 @@ public class FirewoodBlock extends FoodBlock {
      * 使用打火石点燃柴火堆
      */
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (state.getBlock() instanceof FirewoodBlock firewoodBlock && player.getStackInHand(hand).getItem() == Items.FLINT_AND_STEEL){
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (state.getBlock() instanceof FirewoodBlock firewoodBlock && player.getItemInHand(hand).getItem() == Items.FLINT_AND_STEEL){
             boolean bl = firewoodBlock.tryIgnite(state, world, pos, player);
-            return bl? ActionResult.SUCCESS: ActionResult.PASS;
+            return bl? InteractionResult.SUCCESS: InteractionResult.PASS;
         }
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.use(state, world, pos, player, hand, hit);
     }
 
     /**
@@ -97,8 +97,8 @@ public class FirewoodBlock extends FoodBlock {
      * @param player 触发点燃的玩家
      * @return 是否成功点燃
      */
-    public boolean tryIgnite(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-        int currentCount = state.get(NUMBER_OF_FOOD);
+    public boolean tryIgnite(BlockState state, Level world, BlockPos pos, Player player) {
+        int currentCount = state.getValue(NUMBER_OF_FOOD);
         if (currentCount != 2) {
             return false;
         }
@@ -106,16 +106,16 @@ public class FirewoodBlock extends FoodBlock {
         // 检查上方空间
         if (!hasClearSpaceAbove(world, pos)) {
             // 播放失败音效或给玩家提示
-            world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 1.0f);
+            world.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5f, 1.0f);
             return false;
         }
 
-        world.playSound(player, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, world.getRandom().nextFloat() * 0.4F + 0.8F);
+        world.playSound(player, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, world.getRandom().nextFloat() * 0.4F + 0.8F);
 
         // 设置燃烧柴火方块状态为首次点燃
-        world.setBlockState(pos, targetBlock.getDefaultState()
-                .with(HORIZONTAL_FACING, state.get(HORIZONTAL_FACING))
-                .with(CombustionFirewoodBlock.COMBUSTION_STATE, CombustionFirewoodBlock.CombustionState.FIRST_IGNITED));
+        world.setBlockAndUpdate(pos, targetBlock.defaultBlockState()
+                .setValue(HORIZONTAL_FACING, state.getValue(HORIZONTAL_FACING))
+                .setValue(CombustionFirewoodBlock.COMBUSTION_STATE, CombustionFirewoodBlock.CombustionState.FIRST_IGNITED));
 
         // 设置方块实体的初始能量
         BlockEntity blockEntity = world.getBlockEntity(pos);
@@ -125,7 +125,7 @@ public class FirewoodBlock extends FoodBlock {
             firewoodEntity.setCycleCount(0);
         }
 
-        world.emitGameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+        world.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
         return true;
     }
 
@@ -135,9 +135,9 @@ public class FirewoodBlock extends FoodBlock {
      * @param pos 柴火堆位置
      * @return 上方6格内是否全部为空气
      */
-    public static boolean hasClearSpaceAbove(World world, BlockPos pos) {
+    public static boolean hasClearSpaceAbove(Level world, BlockPos pos) {
         for (int i = 1; i <= 6; i++) {
-            BlockPos checkPos = pos.up(i);
+            BlockPos checkPos = pos.above(i);
             BlockState state = world.getBlockState(checkPos);
 
             // 检查方块是否为空气或可替换方块
@@ -151,16 +151,16 @@ public class FirewoodBlock extends FoodBlock {
     /**
      * 检查是否可以点燃（包括上方空间检查）
      */
-    public boolean canIgnite(World world, BlockPos pos) {
+    public boolean canIgnite(Level world, BlockPos pos) {
         return hasClearSpaceAbove(world, pos);
     }
 
     public enum Shapes implements FoodShapeHandle.ShapeConvertible {
-        SHAPE_A(1, Block.createCuboidShape(0,0,0,16,4,16)),
-        SHAPE_B(2, Block.createCuboidShape(0,0,0,16,8,16)),
-        SHAPE_C(3, Block.createCuboidShape(0,0,0,16,9,16)),
-        SHAPE_D(4, Block.createCuboidShape(0,0,0,16,13,16)),
-        SHAPE_E(5, Block.createCuboidShape(0,0,0,16,16,16));
+        SHAPE_A(1, Block.box(0,0,0,16,4,16)),
+        SHAPE_B(2, Block.box(0,0,0,16,8,16)),
+        SHAPE_C(3, Block.box(0,0,0,16,9,16)),
+        SHAPE_D(4, Block.box(0,0,0,16,13,16)),
+        SHAPE_E(5, Block.box(0,0,0,16,16,16));
 
         private final VoxelShape shape;
         private final int id;

@@ -1,47 +1,47 @@
 package org.bakingprocess.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.bakingprocess.block.entity.CuttingBoardBlockEntity;
 import org.jetbrains.annotations.Nullable;
 import org.twcore.api.block.UpPlaceBlock;
 import org.twcore.api.block.UpPlaceBlockEntity;
 
 public class CuttingBoardBlock extends UpPlaceBlock {
-    protected static final VoxelShape SHAPE_X = Block.createCuboidShape(0.0, 0.0, 0.5, 16.0, 1.5, 15.5);
-    protected static final VoxelShape SHAPE_Z = Block.createCuboidShape(0.5, 0.0, 0.0, 15.5, 1.5, 16.0);
-    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    protected static final VoxelShape SHAPE_X = Block.box(0.0, 0.0, 0.5, 16.0, 1.5, 15.5);
+    protected static final VoxelShape SHAPE_Z = Block.box(0.5, 0.0, 0.0, 15.5, 1.5, 16.0);
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public CuttingBoardBlock(Settings settings) {
+    public CuttingBoardBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState()
-                .with(FACING, ctx.getHorizontalPlayerFacing());
+    public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return this.defaultBlockState()
+                .setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Override
-    public VoxelShape getBaseShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return state.get(FACING).getAxis() == Direction.Axis.X ? SHAPE_X : SHAPE_Z;
+    public VoxelShape getBaseShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return state.getValue(FACING).getAxis() == Direction.Axis.X ? SHAPE_X : SHAPE_Z;
     }
 
     @Override
@@ -70,35 +70,35 @@ public class CuttingBoardBlock extends UpPlaceBlock {
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new CuttingBoardBlockEntity(pos, state);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        ItemStack handStack = player.getStackInHand(hand);
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        ItemStack handStack = player.getItemInHand(hand);
         BlockEntity blockEntity = world.getBlockEntity(pos);
 
         if (blockEntity instanceof CuttingBoardBlockEntity cuttingBoard) {
             // 尝试切割操作
-            if (cuttingBoard.tryCutItem(player, handStack, hand, hit).isAccepted()) {
-                return ActionResult.SUCCESS;
+            if (cuttingBoard.tryCutItem(player, handStack, hand, hit).consumesAction()) {
+                return InteractionResult.SUCCESS;
             }
 
             // 如果切割失败或条件不满足，执行父类逻辑（取出和放置）
-            return super.onUse(state, world, pos, player, hand, hit);
+            return super.use(state, world, pos, player, hand, hit);
         }
 
-        return ActionResult.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 }

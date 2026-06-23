@@ -1,41 +1,39 @@
 package org.bakingprocess.integration.dfood;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.FoodComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.dfood.block.entity.SuspiciousStewBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
-public class CrippledSuspiciousStewBlock extends CrippledStewBlock implements BlockEntityProvider {
-    public CrippledSuspiciousStewBlock(Settings settings, int maxUse, FoodComponent foodComponent, Block baseBlock) {
+public class CrippledSuspiciousStewBlock extends CrippledStewBlock implements EntityBlock {
+    public CrippledSuspiciousStewBlock(Properties settings, int maxUse, FoodProperties foodComponent, Block baseBlock) {
         super(settings, maxUse, foodComponent, baseBlock);
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SuspiciousStewBlockEntity(pos, state);
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(world, pos, state, placer, itemStack);
 
         // 将物品NBT中的效果数据传递给方块实体
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof SuspiciousStewBlockEntity suspiciousStewBlockEntity) {
-            NbtCompound stackNbt = itemStack.getNbt();
+            CompoundTag stackNbt = itemStack.getTag();
             if (stackNbt != null) {
                 suspiciousStewBlockEntity.readCustomDataFromItem(stackNbt);
             }
@@ -43,19 +41,19 @@ public class CrippledSuspiciousStewBlock extends CrippledStewBlock implements Bl
     }
 
     @Override
-    protected ActionResult tryUse(WorldAccess world, BlockPos pos, BlockState state, PlayerEntity player) {
-        if (!player.canConsume(false)) {
-            return ActionResult.PASS;
+    protected InteractionResult tryUse(LevelAccessor world, BlockPos pos, BlockState state, Player player) {
+        if (!player.canEat(false)) {
+            return InteractionResult.PASS;
         }
         // 应用迷之炖菜的效果
-        if (world instanceof World) {
+        if (world instanceof Level) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof SuspiciousStewBlockEntity suspiciousStewBlockEntity) {
                 // 应用所有存储的效果
                 suspiciousStewBlockEntity.getEffectMap().forEach((effectId, duration) -> {
-                    StatusEffect effect = StatusEffect.byRawId(effectId);
+                    MobEffect effect = MobEffect.byId(effectId);
                     if (effect != null) {
-                        player.addStatusEffect(new StatusEffectInstance(effect, (duration / 4) + 1));
+                        player.addEffect(new MobEffectInstance(effect, (duration / 4) + 1));
                     }
                 });
             }
@@ -65,23 +63,23 @@ public class CrippledSuspiciousStewBlock extends CrippledStewBlock implements Bl
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         // 在破坏方块时也应用效果
-        if (!world.isClient && state.get(NUMBER_OF_USE) > 0) {
+        if (!world.isClientSide && state.getValue(NUMBER_OF_USE) > 0) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof SuspiciousStewBlockEntity suspiciousStewBlockEntity) {
                 // 应用所有存储的效果
                 suspiciousStewBlockEntity.getEffectMap().forEach((effectId, duration) -> {
-                    StatusEffect effect = StatusEffect.byRawId(effectId);
+                    MobEffect effect = MobEffect.byId(effectId);
                     if (effect != null) {
                         int Duration = duration / 4;
-                        int numberOfEat = state.get(NUMBER_OF_USE);
-                        player.addStatusEffect(new StatusEffectInstance(effect, Duration * numberOfEat));
+                        int numberOfEat = state.getValue(NUMBER_OF_USE);
+                        player.addEffect(new MobEffectInstance(effect, Duration * numberOfEat));
                     }
                 });
             }
         }
 
-        super.onBreak(world, pos, state, player);
+        super.playerWillDestroy(world, pos, state, player);
     }
 }

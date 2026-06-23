@@ -1,23 +1,26 @@
 package org.bakingprocess.block;
 
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContextParameterSet;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.bakingprocess.block.entity.MoldBlockEntity;
 import org.bakingprocess.content.ShapedDoughContent;
 import org.bakingprocess.registry.ModBlocks;
@@ -28,52 +31,52 @@ import org.twcore.content.Content;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MoldBlock extends BlockWithEntity {
-    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-    public static final VoxelShape CAKE_EMBRYO_MOLD_SHAPE = Block.createCuboidShape(0, 0, 0, 16, 9, 16);
-    public static final VoxelShape TOAST_EMBRYO_MOLD_SHAPE_X = Block.createCuboidShape(3, 0, 0, 13, 8, 16);
-    public static final VoxelShape TOAST_EMBRYO_MOLD_SHAPE_Z = Block.createCuboidShape(0, 0, 3, 16, 8, 13);
+public class MoldBlock extends BaseEntityBlock {
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final VoxelShape CAKE_EMBRYO_MOLD_SHAPE = Block.box(0, 0, 0, 16, 9, 16);
+    public static final VoxelShape TOAST_EMBRYO_MOLD_SHAPE_X = Block.box(3, 0, 0, 13, 8, 16);
+    public static final VoxelShape TOAST_EMBRYO_MOLD_SHAPE_Z = Block.box(0, 0, 3, 16, 8, 13);
 
-    public MoldBlock(Settings settings) {
+    public MoldBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockEntity entity = world.getBlockEntity(pos);
         if (!(entity instanceof MoldBlockEntity moldBlockEntity)) {
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
 
         ItemStack contentStack = moldBlockEntity.getAndClearResultStack();
-        ItemStack heldStack = player.getStackInHand(hand);
+        ItemStack heldStack = player.getItemInHand(hand);
 
         if (!contentStack.isEmpty()) {
-            player.giveItemStack(contentStack);
-            return ActionResult.SUCCESS;
+            player.addItem(contentStack);
+            return InteractionResult.SUCCESS;
         }
 
         if (moldBlockEntity.addDough(heldStack)) {
             if (!player.isCreative()) {
-                heldStack.decrement(1);
+                heldStack.shrink(1);
             }
 
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState()
-                .with(FACING, ctx.getHorizontalPlayerFacing());
+    public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return this.defaultBlockState()
+                .setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        if (state.getBlock() == ModBlocks.TOAST_EMBRYO_MOLD) {
-            return state.get(FACING).getAxis() ==
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        if (state.getBlock() == ModBlocks.TOAST_EMBRYO_MOL.get()D.get()) {
+            return state.getValue(FACING).getAxis() ==
                     Direction.Axis.Z ? TOAST_EMBRYO_MOLD_SHAPE_Z : TOAST_EMBRYO_MOLD_SHAPE_X;
         }
         return CAKE_EMBRYO_MOLD_SHAPE;
@@ -81,7 +84,7 @@ public class MoldBlock extends BlockWithEntity {
 
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         Content content = ContainerUtil.extractContent(itemStack);
         BlockEntity entity = world.getBlockEntity(pos);
 
@@ -91,9 +94,9 @@ public class MoldBlock extends BlockWithEntity {
     }
 
     @Override
-    public List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
-        List<ItemStack> result = super.getDroppedStacks(state, builder);
-        BlockEntity entity = builder.get(LootContextParameters.BLOCK_ENTITY);
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+        List<ItemStack> result = super.getDrops(state, builder);
+        BlockEntity entity = builder.getParameter(LootContextParams.BLOCK_ENTITY);
 
         if (entity instanceof MoldBlockEntity moldBlockEntity) {
             List<ItemStack> newList = new ArrayList<>();
@@ -111,27 +114,27 @@ public class MoldBlock extends BlockWithEntity {
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
-        return state.with(FACING, rotation.rotate(state.get(FACING)));
+    public BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return state.rotate(mirror.getRotation(state.get(FACING)));
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new MoldBlockEntity(pos, state);
     }
 }

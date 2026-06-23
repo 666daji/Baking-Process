@@ -1,149 +1,301 @@
-package org.bakingprocess.item;
+﻿package org.bakingprocess.item;
+
+
 
 import net.fabricmc.yarn.constants.MiningLevels;
-import net.minecraft.block.Block;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+
 import net.minecraft.item.*;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.world.World;
-import org.dfood.item.HaveBlock;
-import org.dfood.util.DFoodUtils;
+
+import net.minecraft.nbt.CompoundTag;
+
+import net.minecraft.nbt.ListTag;
+
+import net.minecraft.nbt.Tag;
+
+import net.minecraft.network.chat.Component;
+
+import net.minecraft.world.InteractionResult;
+
+import net.minecraft.world.entity.EquipmentSlot;
+
+import net.minecraft.world.entity.LivingEntity;
+
+import net.minecraft.world.entity.item.ItemEntity;
+
+import net.minecraft.world.entity.player.Player;
+
+import net.minecraft.world.flag.FeatureFlagSet;
+
+import net.minecraft.world.item.*;
+
+import net.minecraft.world.item.context.BlockPlaceContext;
+
+import net.minecraft.world.item.context.UseOnContext;
+
+import net.minecraft.world.item.crafting.Ingredient;
+
+import net.minecraft.world.level.Level;
+
+import net.minecraft.world.level.block.Block;
+
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+
 import org.bakingprocess.registry.ModItems;
+
+import org.dfood.item.HaveBlock;
+
+import org.dfood.util.DFoodUtils;
+
 import org.jetbrains.annotations.Nullable;
 
+
+
 import java.util.List;
+
 import java.util.function.Supplier;
 
+
+
 /**
- * 表示可以作为武器的锋利厨具
+
+ * 琛ㄧず鍙�浠ヤ綔涓烘�﹀櫒鐨勯攱鍒╁帹鍏?
  */
+
 public class ModSharpKitchenwareItem extends SwordItem implements HaveBlock {
+
     protected final Block block;
 
-    public ModSharpKitchenwareItem(Block block, Settings settings, SpatulaMaterials materials) {
+
+
+    public ModSharpKitchenwareItem(Block block, Properties settings, SpatulaMaterials materials) {
+
         super(materials, materials.attackDamage, materials.miningSpeed, settings);
+
         this.block = block;
+
     }
 
+
+
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        PlayerEntity player = context.getPlayer();
-        Item item = context.getStack().getItem();
-        // 仅当父类方法失败时才尝试放置方块
-        if (super.useOnBlock(context) != ActionResult.PASS || (player != null && !player.isSneaking() && DFoodUtils.isModFoodItem(item))){
-            return ActionResult.PASS;
+
+    public InteractionResult useOn(UseOnContext context) {
+
+        Player player = context.getPlayer();
+
+        Item item = context.getItemInHand().getItem();
+
+        // 浠呭綋鐖剁被鏂规硶澶辫触鏃舵墠灏濊瘯鏀剧疆鏂瑰潡
+
+        if (super.useOn(context) != InteractionResult.PASS || (player != null && !player.isShiftKeyDown() && DFoodUtils.isModFoodItem(item))){
+
+            return InteractionResult.PASS;
+
         }
-        ActionResult actionResult = this.place(new ItemPlacementContext(context));
-        if (!actionResult.isAccepted() && this.isFood()) {
-            ActionResult actionResult2 = this.use(context.getWorld(), context.getPlayer(), context.getHand()).getResult();
-            return actionResult2 == ActionResult.CONSUME ? ActionResult.CONSUME_PARTIAL : actionResult2;
+
+        InteractionResult actionResult = this.place(new BlockPlaceContext(context));
+
+        if (!actionResult.consumesAction() && this.isEdible()) {
+
+            InteractionResult actionResult2 = this.use(context.getLevel(), context.getPlayer(), context.getHand()).getResult();
+
+            return actionResult2 == InteractionResult.CONSUME ? InteractionResult.CONSUME_PARTIAL : actionResult2;
+
         } else {
+
             return actionResult;
+
         }
+
     }
 
-    @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
-        this.getBlock().appendTooltip(stack, world, tooltip, context);
-    }
+
 
     @Override
+
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
+
+        super.appendHoverText(stack, world, tooltip, context);
+
+        this.getBlock().appendHoverText(stack, world, tooltip, context);
+
+    }
+
+
+
+    @Override
+
     public Block getBlock() {
+
         return this.block;
+
     }
 
+
+
     @Override
-    public boolean canBeNested() {
+
+    public boolean canFitInsideContainerItems() {
+
         return !(this.block instanceof ShulkerBoxBlock);
+
     }
 
+
+
     @Override
-    public void onItemEntityDestroyed(ItemEntity entity) {
+
+    public void onDestroyed(ItemEntity entity) {
+
         if (this.block instanceof ShulkerBoxBlock) {
-            ItemStack itemStack = entity.getStack();
-            NbtCompound nbtCompound = HaveBlock.getBlockEntityNbt(itemStack);
-            if (nbtCompound != null && nbtCompound.contains("Items", NbtElement.LIST_TYPE)) {
-                NbtList nbtList = nbtCompound.getList("Items", NbtElement.COMPOUND_TYPE);
-                ItemUsage.spawnItemContents(entity, nbtList.stream().map(NbtCompound.class::cast).map(ItemStack::fromNbt));
+
+            ItemStack itemStack = entity.getItem();
+
+            CompoundTag nbtCompound = HaveBlock.getBlockEntityNbt(itemStack);
+
+            if (nbtCompound != null && nbtCompound.contains("Items", Tag.TAG_LIST)) {
+
+                ListTag nbtList = nbtCompound.getList("Items", Tag.TAG_COMPOUND);
+
+                ItemUtils.onContainerDestroyed(entity, nbtList.stream().map(CompoundTag.class::cast).map(ItemStack::of));
+
             }
+
         }
+
     }
 
-    @Override
-    public FeatureSet getRequiredFeatures() {
-        return this.getBlock().getRequiredFeatures();
-    }
+
 
     @Override
-    public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        if (stack.getItem() == ModItems.KITCHEN_KNIFE) {
-            stack.damage(1, attacker, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+
+    public FeatureFlagSet requiredFeatures() {
+
+        return this.getBlock().requiredFeatures();
+
+    }
+
+
+
+    @Override
+
+    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+
+        if (stack.getItem() == ModItems.KITCHEN_KNIFE.get()) {
+
+            stack.hurtAndBreak(1, attacker, e -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+
             return true;
+
         }
 
-        return super.postHit(stack, target, attacker);
+
+
+        return super.hurtEnemy(stack, target, attacker);
+
     }
 
-    public enum SpatulaMaterials implements ToolMaterial {
-        KITCHEN_KNIFE(MiningLevels.IRON, 1400, 1.0F, 1, 5, () -> Ingredient.ofItems(Items.IRON_INGOT)),
-        BREAD_SPATULA(MiningLevels.IRON, 100, -3.5F, 4, 14, () -> Ingredient.ofItems(Items.IRON_INGOT));
+
+
+    public enum SpatulaMaterials implements Tier {
+
+        KITCHEN_KNIFE(MiningLevels.IRON, 1400, 1.0F, 1, 5, () -> Tiers.IRON.getRepairIngredient()),
+
+        BREAD_SPATULA(MiningLevels.IRON, 100, -3.5F, 4, 14, () -> Tiers.IRON.getRepairIngredient());
+
+
 
         private final int miningLevel;
+
         private final int itemDurability;
+
         private final float miningSpeed;
+
         private final int attackDamage;
+
         private final int enchantAbility;
+
         private final Supplier<Ingredient> repairIngredient;
 
+
+
         SpatulaMaterials(int miningLevel, int itemDurability, float miningSpeed, int attackDamage, int enchantAbility, Supplier<Ingredient> repairIngredient) {
+
             this.miningLevel = miningLevel;
+
             this.itemDurability = itemDurability;
+
             this.miningSpeed = miningSpeed;
+
             this.attackDamage = attackDamage;
+
             this.enchantAbility = enchantAbility;
+
             this.repairIngredient = repairIngredient;
+
         }
 
+
+
         @Override
-        public int getDurability() {
+
+        public int getUses() {
+
             return this.itemDurability;
+
         }
 
+
+
         @Override
-        public float getMiningSpeedMultiplier() {
+
+        public float getSpeed() {
+
             return this.miningSpeed;
+
         }
 
+
+
         @Override
-        public float getAttackDamage() {
+
+        public float getAttackDamageBonus() {
+
             return this.attackDamage;
+
         }
 
+
+
         @Override
-        public int getMiningLevel() {
+
+        public int getLevel() {
+
             return this.miningLevel;
+
         }
 
+
+
         @Override
-        public int getEnchantability() {
+
+        public int getEnchantmentValue() {
+
             return this.enchantAbility;
+
         }
 
+
+
         @Override
+
         public Ingredient getRepairIngredient() {
+
             return this.repairIngredient.get();
+
         }
+
     }
+
 }
+

@@ -1,12 +1,12 @@
 package org.bakingprocess.recipe;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.util.Identifier;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 import org.bakingprocess.registry.ModRecipeSerializers;
 import org.bakingprocess.registry.ModRecipeTypes;
 
@@ -14,15 +14,15 @@ public class GrindingRecipe extends SimpleCraftRecipe {
     protected final int inputCount;
     protected final int grindingTime;
 
-    public GrindingRecipe(Identifier id, Ingredient input, int inputCount, ItemStack output, int grindingTime) {
+    public GrindingRecipe(ResourceLocation id, Ingredient input, int inputCount, ItemStack output, int grindingTime) {
         super(id, input, output);
         this.inputCount = inputCount;
         this.grindingTime = grindingTime;
     }
 
     @Override
-    public boolean matches(Inventory inventory, World world) {
-        ItemStack stack = inventory.getStack(0);
+    public boolean matches(Container inventory, Level world) {
+        ItemStack stack = inventory.getItem(0);
         return this.input.test(stack) && stack.getCount() >= this.inputCount;
     }
 
@@ -36,11 +36,11 @@ public class GrindingRecipe extends SimpleCraftRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipeSerializers.GRINDING;
+        return ModRecipeSerializers.GRINDING.get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return ModRecipeTypes.GRINDING;
+        return ModRecipeTypes.GRINDING.get();
     }
 }

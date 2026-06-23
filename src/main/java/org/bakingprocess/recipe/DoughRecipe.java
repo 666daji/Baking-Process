@@ -1,13 +1,13 @@
 package org.bakingprocess.recipe;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 import org.bakingprocess.block.process.KneadingProcess;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.registry.ModRecipeSerializers;
@@ -20,7 +20,7 @@ import java.util.*;
  * 面团配方
  */
 public class DoughRecipe implements Recipe<KneadingProcess<?>> {
-    private final Identifier id;
+    private final ResourceLocation id;
     private final ItemStack output;
 
     // 使用Map来统计每种面粉的数量
@@ -32,7 +32,7 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
     // 额外物品要求：物品 -> 数量
     private final Map<Ingredient, Integer> extraRequirements;
 
-    public DoughRecipe(Identifier id, ItemStack output,
+    public DoughRecipe(ResourceLocation id, ItemStack output,
                        Map<FlourItem.FlourType, Integer> flourRequirements,
                        Map<Content, Integer> liquidRequirements,
                        Map<Ingredient, Integer> extraRequirements) {
@@ -44,7 +44,7 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
     }
 
     @Override
-    public boolean matches(KneadingProcess<?> process, World world) {
+    public boolean matches(KneadingProcess<?> process, Level world) {
         // 检查面粉
         if (!matchesFlours(process.getFlourCounts())) {
             return false;
@@ -132,33 +132,33 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
     }
 
     @Override
-    public ItemStack craft(KneadingProcess<?> inventory, DynamicRegistryManager registryManager) {
+    public ItemStack assemble(KneadingProcess<?> inventory, RegistryAccess registryManager) {
         return output.copy();
     }
 
     @Override
-    public boolean fits(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResultItem(RegistryAccess registryManager) {
         return output;
     }
 
     @Override
-    public Identifier getId() {
+    public ResourceLocation getId() {
         return id;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipeSerializers.DOUGH_MAKING;
+        return ModRecipeSerializers.DOUGH_MAKING.get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return ModRecipeTypes.DOUGH_MAKING;
+        return ModRecipeTypes.DOUGH_MAKING.get();
     }
 
     // Getters

@@ -1,21 +1,22 @@
 package org.bakingprocess.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.pattern.BlockPattern;
-import net.minecraft.block.pattern.CachedBlockPosition;
-import net.minecraft.item.*;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import net.minecraft.world.level.block.state.pattern.BlockPattern;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.bakingprocess.BakingProcess;
 import org.dfood.block.FoodBlock;
 import org.dfood.util.DFoodUtils;
-import org.bakingprocess.BakingProcess;
 import org.slf4j.Logger;
 
 import java.util.HashSet;
@@ -37,10 +38,10 @@ public class BakingProcessUtils {
 
         if (state.getBlock() instanceof FoodBlock foodBlock) {
             return state
-                    .with(FoodBlock.FACING, facing)
-                    .with(foodBlock.NUMBER_OF_FOOD, foodCount);
+                    .setValue(FoodBlock.FACING, facing)
+                    .setValue(foodBlock.NUMBER_OF_FOOD, foodCount);
         }
-        return Blocks.AIR.getDefaultState();
+        return Blocks.AIR.defaultBlockState();
     }
 
     /**
@@ -48,10 +49,10 @@ public class BakingProcessUtils {
      * @param itemStack 要获取的物品堆栈
      * @return 获取的声音组
      */
-    public static Optional<BlockSoundGroup> getSoundGroupFromItem(ItemStack itemStack) {
+    public static Optional<SoundType> getSoundGroupFromItem(ItemStack itemStack) {
         BlockState state = DFoodUtils.getBlockStateFromItem(itemStack.getItem());
         if (state != null) {
-            return Optional.of(state.getSoundGroup());
+            return Optional.of(state.getSoundType());
         }
 
         return Optional.empty();
@@ -63,17 +64,17 @@ public class BakingProcessUtils {
      * @param isTargetPositionPredicate 用于判断是否为目标位置的谓词
      * @return 符合条件的方块位置集合
      */
-    public static Set<BlockPos> findTargetPositionsFromPattern(BlockPattern.Result result, Predicate<CachedBlockPosition> isTargetPositionPredicate) {
+    public static Set<BlockPos> findTargetPositionsFromPattern(BlockPattern.BlockPatternMatch result, Predicate<BlockInWorld> isTargetPositionPredicate) {
         Set<BlockPos> TargetPos = new HashSet<>();
         for (int depth = 0; depth < result.getDepth(); depth++) {
             for (int height = 0; height < result.getHeight(); height++) {
                 for (int width = 0; width < result.getWidth(); width++) {
                     // 获取该位置的缓存方块
-                    CachedBlockPosition cachedPos = result.translate(width, height, depth);
+                    BlockInWorld cachedPos = result.getBlock(width, height, depth);
 
                     if (isTargetPositionPredicate.test(cachedPos)) {
                         // 找到匹配的位置，返回对应的世界坐标
-                        TargetPos.add(cachedPos.getBlockPos());
+                        TargetPos.add(cachedPos.getPos());
                     }
                 }
             }
@@ -84,8 +85,8 @@ public class BakingProcessUtils {
     /**
      * 序列化BlockPos为NbtCompound
      */
-    public static NbtCompound serializeBlockPos(BlockPos pos) {
-        NbtCompound tag = new NbtCompound();
+    public static CompoundTag serializeBlockPos(BlockPos pos) {
+        CompoundTag tag = new CompoundTag();
         tag.putInt("x", pos.getX());
         tag.putInt("y", pos.getY());
         tag.putInt("z", pos.getZ());
@@ -95,7 +96,7 @@ public class BakingProcessUtils {
     /**
      * 从NbtCompound反序列化BlockPos
      */
-    public static BlockPos deserializeBlockPos(NbtCompound tag) {
+    public static BlockPos deserializeBlockPos(CompoundTag tag) {
         if (tag.contains("x") && tag.contains("y") && tag.contains("z")) {
             return new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
         }
@@ -113,7 +114,7 @@ public class BakingProcessUtils {
         BlockState blockState = DFoodUtils.getBlockStateFromItem(item);
 
         if (blockState == null) {
-            return Blocks.AIR.getDefaultState();
+            return Blocks.AIR.defaultBlockState();
         }
 
         Block block = blockState.getBlock();
@@ -124,8 +125,8 @@ public class BakingProcessUtils {
         }
 
         // 处理其他方块，检查是否有水平朝向属性
-        if (blockState.contains(Properties.HORIZONTAL_FACING)) {
-            return blockState.with(Properties.HORIZONTAL_FACING, facing);
+        if (blockState.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+            return blockState.setValue(BlockStateProperties.HORIZONTAL_FACING, facing);
         }
 
         return blockState;
@@ -139,12 +140,12 @@ public class BakingProcessUtils {
      */
     public static VoxelShape scale(VoxelShape shape, double scale) {
         if (shape.isEmpty()) {
-            return VoxelShapes.empty();
+            return Shapes.empty();
         }
 
-        VoxelShape[] result = new VoxelShape[]{VoxelShapes.empty()};
+        VoxelShape[] result = new VoxelShape[]{Shapes.empty()};
 
-        shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
+        shape.forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> {
             // 计算中心点
             double centerX = (minX + maxX) / 2;
             double centerY = (minY + maxY) / 2;
@@ -158,8 +159,8 @@ public class BakingProcessUtils {
             double newMaxY = centerY + (maxY - centerY) * scale;
             double newMaxZ = centerZ + (maxZ - centerZ) * scale;
 
-            VoxelShape scaledBox = VoxelShapes.cuboid(newMinX, newMinY, newMinZ, newMaxX, newMaxY, newMaxZ);
-            result[0] = VoxelShapes.union(result[0], scaledBox);
+            VoxelShape scaledBox = Shapes.box(newMinX, newMinY, newMinZ, newMaxX, newMaxY, newMaxZ);
+            result[0] = Shapes.or(result[0], scaledBox);
         });
 
         return result[0];
@@ -173,12 +174,12 @@ public class BakingProcessUtils {
      */
     public static VoxelShape scaleFromOrigin(VoxelShape shape, double scale) {
         if (shape.isEmpty()) {
-            return VoxelShapes.empty();
+            return Shapes.empty();
         }
 
-        VoxelShape[] result = new VoxelShape[]{VoxelShapes.empty()};
+        VoxelShape[] result = new VoxelShape[]{Shapes.empty()};
 
-        shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
+        shape.forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> {
             double newMinX = minX * scale;
             double newMinY = minY * scale;
             double newMinZ = minZ * scale;
@@ -186,8 +187,8 @@ public class BakingProcessUtils {
             double newMaxY = maxY * scale;
             double newMaxZ = maxZ * scale;
 
-            VoxelShape scaledBox = VoxelShapes.cuboid(newMinX, newMinY, newMinZ, newMaxX, newMaxY, newMaxZ);
-            result[0] = VoxelShapes.union(result[0], scaledBox);
+            VoxelShape scaledBox = Shapes.box(newMinX, newMinY, newMinZ, newMaxX, newMaxY, newMaxZ);
+            result[0] = Shapes.or(result[0], scaledBox);
         });
 
         return result[0];

@@ -1,81 +1,57 @@
-package org.bakingprocess.registry;
+﻿package org.bakingprocess.registry;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.bakingprocess.BakingProcess;
 import org.bakingprocess.block.entity.*;
 
+import java.util.Arrays;
+
 public class ModBlockEntityTypes {
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
+            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, BakingProcess.MOD_ID);
+
     // 工作方块
-    public static final BlockEntityType<GrindingStoneBlockEntity> GRINDING_STONE = create("grinding_stone",
-            BlockEntityType.Builder.create(
-                    GrindingStoneBlockEntity::new,
-                    ModBlocks.GRINDING_STONE
-            )
-    );
-    public static final BlockEntityType<PotsBlockEntity> POTS = create("pots",
-            BlockEntityType.Builder.create(
-                    PotsBlockEntity::new,
-                    ModBlocks.IRON_POTS,
-                    ModBlocks.CLAY_POTS
-            )
-    );
-    public static final BlockEntityType<PlateBlockEntity> PLATE = create("plate",
-            BlockEntityType.Builder.create(
-                    PlateBlockEntity::new,
-                    ModBlocks.IRON_PLATE
-            )
-    );
+    public static final RegistryObject<BlockEntityType<GrindingStoneBlockEntity>> GRINDING_STONE = register(
+            "grinding_stone", GrindingStoneBlockEntity::new, ModBlocks.GRINDING_STONE);
+    public static final RegistryObject<BlockEntityType<PotsBlockEntity>> POTS = register(
+            "pots", PotsBlockEntity::new, ModBlocks.IRON_POTS, ModBlocks.CLAY_POTS);
+    public static final RegistryObject<BlockEntityType<PlateBlockEntity>> PLATE = register(
+            "plate", PlateBlockEntity::new, ModBlocks.IRON_PLATE);
 
     // UpPlaceBlock
-    public static final BlockEntityType<HeatResistantSlateBlockPileEntity> HEAT_RESISTANT_SLATE = create("heat_resistant_slate",
-            BlockEntityType.Builder.create(
-                    HeatResistantSlateBlockPileEntity::new,
-                    ModBlocks.HEAT_RESISTANT_SLATE
-            )
-    );
-    public static final BlockEntityType<DishesBlockEntity> GARNISH_DISHES = create("garnish_dishes",
-            BlockEntityType.Builder.create(
-                    DishesBlockEntity::new,
-                    ModBlocks.IRON_GARNISH_DISHES
-            )
-    );
-    public static final BlockEntityType<MoldBlockEntity> MOLD = create("mold",
-            BlockEntityType.Builder.create(
-                    MoldBlockEntity::new,
-                    ModBlocks.CAKE_EMBRYO_MOLD,
-                    ModBlocks.TOAST_EMBRYO_MOLD
-            )
-    );
-    public static final BlockEntityType<CuttingBoardBlockEntity> CUTTING_BOARD = create("cutting_board",
-            BlockEntityType.Builder.create(
-                    CuttingBoardBlockEntity::new,
-                    ModBlocks.CUTTING_BOARD
-            )
-    );
+    public static final RegistryObject<BlockEntityType<HeatResistantSlateBlockPileEntity>> HEAT_RESISTANT_SLATE = register(
+            "heat_resistant_slate", HeatResistantSlateBlockPileEntity::new, ModBlocks.HEAT_RESISTANT_SLATE);
+    public static final RegistryObject<BlockEntityType<DishesBlockEntity>> GARNISH_DISHES = register(
+            "garnish_dishes", DishesBlockEntity::new, ModBlocks.IRON_GARNISH_DISHES);
+    public static final RegistryObject<BlockEntityType<MoldBlockEntity>> MOLD = register(
+            "mold", MoldBlockEntity::new, ModBlocks.CAKE_EMBRYO_MOLD, ModBlocks.TOAST_EMBRYO_MOLD);
+    public static final RegistryObject<BlockEntityType<CuttingBoardBlockEntity>> CUTTING_BOARD = register(
+            "cutting_board", CuttingBoardBlockEntity::new, ModBlocks.CUTTING_BOARD);
 
     // FoodBlock
-    public static final BlockEntityType<FlourSackBlockEntity> FLOUR_SACK = create("flour_sack",
-            BlockEntityType.Builder.create(
-                    FlourSackBlockEntity::new,
-                    ModBlocks.FLOUR_SACK
-            )
-    );
+    public static final RegistryObject<BlockEntityType<FlourSackBlockEntity>> FLOUR_SACK = register(
+            "flour_sack", FlourSackBlockEntity::new, ModBlocks.FLOUR_SACK);
 
     // 其他
-    public static final BlockEntityType<CombustionFirewoodBlockEntity> COMBUSTION_FIREWOOD = create("combustion_firewood",
-            BlockEntityType.Builder.create(
-                    CombustionFirewoodBlockEntity::new,
-                    ModBlocks.COMBUSTION_FIREWOOD
-            )
-    );
+    public static final RegistryObject<BlockEntityType<CombustionFirewoodBlockEntity>> COMBUSTION_FIREWOOD = register(
+            "combustion_firewood", CombustionFirewoodBlockEntity::new, ModBlocks.COMBUSTION_FIREWOOD);
 
-    private static <T extends BlockEntity> BlockEntityType<T> create(String id, BlockEntityType.Builder<T> builder) {
-        return Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(BakingProcess.MOD_ID, id), builder.build(null));
+    @SafeVarargs
+    private static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> register(
+            String name, BlockEntityType.BlockEntitySupplier<T> factory, RegistryObject<? extends Block>... blocks) {
+        return BLOCK_ENTITY_TYPES.register(name, () -> {
+            Block[] blockArray = Arrays.stream(blocks).map(RegistryObject::get).toArray(Block[]::new);
+            return BlockEntityType.Builder.of(factory, blockArray).build(null);
+        });
     }
 
-    public static void registerAll() {}
+    public static void registerAll(IEventBus modEventBus) {
+        BLOCK_ENTITY_TYPES.register(modEventBus);
+    }
 }

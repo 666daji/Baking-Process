@@ -1,16 +1,16 @@
 package org.bakingprocess.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import org.dfood.block.SimpleFoodBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.bakingprocess.container.BreadBoatContainer;
+import org.dfood.block.SimpleFoodBlock;
 import org.twcore.api.content.ContainerUtil;
 import org.twcore.container.ContainerType;
 import org.twcore.content.Content;
@@ -19,7 +19,7 @@ public class EmptyBreadBoatBlock extends SimpleFoodBlock {
     /** 对应的装了内容物的方块 */
     protected final BreadBoatBlock targetBlock;
 
-    public EmptyBreadBoatBlock(Settings settings, BreadBoatBlock targetBlock) {
+    public EmptyBreadBoatBlock(Properties settings, BreadBoatBlock targetBlock) {
         super(settings, true, targetBlock.simpleShape, targetBlock.useItemTranslationKey, null);
         this.targetBlock = targetBlock;
     }
@@ -32,18 +32,18 @@ public class EmptyBreadBoatBlock extends SimpleFoodBlock {
      */
     public static BlockState asTargetState(BlockState originalState, BreadBoatContainer.BreadBoatSoupType soupType) {
         if (originalState.getBlock() instanceof EmptyBreadBoatBlock edibleContainerBlock) {
-            return edibleContainerBlock.targetBlock.getDefaultState()
-                    .with(FACING, originalState.get(FACING))
-                    .with(BreadBoatBlock.SOUP_TYPE, soupType)
-                    .with(edibleContainerBlock.targetBlock.BITES, 0);
+            return edibleContainerBlock.targetBlock.defaultBlockState()
+                    .setValue(FACING, originalState.getValue(FACING))
+                    .setValue(BreadBoatBlock.SOUP_TYPE, soupType)
+                    .setValue(edibleContainerBlock.targetBlock.BITES, 0);
         }
 
         return originalState;
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        ItemStack handStack = player.getStackInHand(hand);
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        ItemStack handStack = player.getItemInHand(hand);
         Content content = ContainerUtil.extractContent(handStack);
         BreadBoatContainer.BreadBoatSoupType soupType = BreadBoatContainer.BreadBoatSoupType.fromContent(content);
 
@@ -51,23 +51,23 @@ public class EmptyBreadBoatBlock extends SimpleFoodBlock {
             ContainerType containerType = ContainerUtil.getContainerType(handStack);
             if (containerType != null) {
                 // 尝试清空容器
-                handStack.decrement(1);
+                handStack.shrink(1);
                 if (handStack.isEmpty()) {
-                    player.setStackInHand(hand, containerType.remainder());
+                    player.setItemInHand(hand, containerType.remainder());
                 } else {
-                    player.giveItemStack(containerType.remainder());
+                    player.addItem(containerType.remainder());
                 }
 
                 // 播放使用声音
-                world.playSound(player, pos, containerType.getUseSound(), SoundCategory.PLAYERS, 1.0F, 1.0F);
+                world.playSound(player, pos, containerType.getUseSound(), SoundSource.PLAYERS, 1.0F, 1.0F);
             }
 
             // 将汤盛进来
-            if (world.setBlockState(pos, asTargetState(state, soupType))) {
-                return ActionResult.SUCCESS;
+            if (world.setBlockAndUpdate(pos, asTargetState(state, soupType))) {
+                return InteractionResult.SUCCESS;
             }
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.use(state, world, pos, player, hand, hit);
     }
 }

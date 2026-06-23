@@ -2,13 +2,13 @@ package org.bakingprocess.recipe.serializer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.bakingprocess.recipe.CutRecipe;
 
 import java.util.HashMap;
@@ -61,22 +61,22 @@ import java.util.Map;
 public class CutRecipeSerializer implements RecipeSerializer<CutRecipe> {
 
     @Override
-    public CutRecipe read(Identifier id, JsonObject json) {
+    public CutRecipe fromJson(ResourceLocation id, JsonObject json) {
         // 读取输入物品
-        Ingredient input = Ingredient.fromJson(JsonHelper.getObject(json, "input"));
+        Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
 
         // 读取总切菜次数
-        int totalCuts = JsonHelper.getInt(json, "totalCuts", 1);
+        int totalCuts = GsonHelper.getAsInt(json, "totalCuts", 1);
 
         // 读取默认库存状态
-        DefaultedList<ItemStack> defaultState = readInventoryState(
-                JsonHelper.getObject(json, "defaultState", new JsonObject())
+        NonNullList<ItemStack> defaultState = readInventoryState(
+                GsonHelper.getAsJsonObject(json, "defaultState", new JsonObject())
         );
 
         // 读取特定切菜次数的库存状态映射
-        Map<Integer, DefaultedList<ItemStack>> cutStateMap = new HashMap<>();
+        Map<Integer, NonNullList<ItemStack>> cutStateMap = new HashMap<>();
         if (json.has("cutStates")) {
-            JsonObject cutStates = JsonHelper.getObject(json, "cutStates");
+            JsonObject cutStates = GsonHelper.getAsJsonObject(json, "cutStates");
             for (Map.Entry<String, JsonElement> entry : cutStates.entrySet()) {
                 try {
                     int cutIndex = Integer.parseInt(entry.getKey());
@@ -98,29 +98,29 @@ public class CutRecipeSerializer implements RecipeSerializer<CutRecipe> {
     }
 
     @Override
-    public CutRecipe read(Identifier id, PacketByteBuf buf) {
+    public CutRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
         // 读取输入物品
-        Ingredient input = Ingredient.fromPacket(buf);
+        Ingredient input = Ingredient.fromNetwork(buf);
 
         // 读取总切菜次数
         int totalCuts = buf.readVarInt();
 
         // 读取默认库存状态
         int defaultSize = buf.readVarInt();
-        DefaultedList<ItemStack> defaultState = DefaultedList.ofSize(defaultSize, ItemStack.EMPTY);
+        NonNullList<ItemStack> defaultState = NonNullList.withSize(defaultSize, ItemStack.EMPTY);
         for (int i = 0; i < defaultSize; i++) {
-            defaultState.set(i, buf.readItemStack());
+            defaultState.set(i, buf.readItem());
         }
 
         //  读取特定切菜次数的库存状态映射
         int stateCount = buf.readVarInt();
-        Map<Integer, DefaultedList<ItemStack>> cutStateMap = new HashMap<>();
+        Map<Integer, NonNullList<ItemStack>> cutStateMap = new HashMap<>();
         for (int i = 0; i < stateCount; i++) {
             int cutIndex = buf.readVarInt();
             int stateSize = buf.readVarInt();
-            DefaultedList<ItemStack> state = DefaultedList.ofSize(stateSize, ItemStack.EMPTY);
+            NonNullList<ItemStack> state = NonNullList.withSize(stateSize, ItemStack.EMPTY);
             for (int j = 0; j < stateSize; j++) {
-                state.set(j, buf.readItemStack());
+                state.set(j, buf.readItem());
             }
             cutStateMap.put(cutIndex, state);
         }
@@ -135,28 +135,28 @@ public class CutRecipeSerializer implements RecipeSerializer<CutRecipe> {
     }
 
     @Override
-    public void write(PacketByteBuf buf, CutRecipe recipe) {
+    public void write(FriendlyByteBuf buf, CutRecipe recipe) {
         // 写入输入物品
-        recipe.getInput().write(buf);
+        recipe.getInput().toNetwork(buf);
 
         // 写入总切菜次数
         buf.writeVarInt(recipe.getTotalCuts());
 
         // 写入默认库存状态
-        DefaultedList<ItemStack> defaultState = recipe.getDefaultState();
+        NonNullList<ItemStack> defaultState = recipe.getDefaultState();
         buf.writeVarInt(defaultState.size());
         for (ItemStack stack : defaultState) {
-            buf.writeItemStack(stack);
+            buf.writeItem(stack);
         }
 
         // 写入特定切菜次数的库存状态映射
-        Map<Integer, DefaultedList<ItemStack>> cutStateMap = recipe.getCutStateMap();
+        Map<Integer, NonNullList<ItemStack>> cutStateMap = recipe.getCutStateMap();
         buf.writeVarInt(cutStateMap.size());
-        for (Map.Entry<Integer, DefaultedList<ItemStack>> entry : cutStateMap.entrySet()) {
+        for (Map.Entry<Integer, NonNullList<ItemStack>> entry : cutStateMap.entrySet()) {
             buf.writeVarInt(entry.getKey());
             buf.writeVarInt(entry.getValue().size());
             for (ItemStack stack : entry.getValue()) {
-                buf.writeItemStack(stack);
+                buf.writeItem(stack);
             }
         }
     }
@@ -170,8 +170,8 @@ public class CutRecipeSerializer implements RecipeSerializer<CutRecipe> {
      * @param jsonObject JSON对象，包含槽位索引到物品的映射
      * @return DefaultedList<ItemStack> 包含5个槽位的库存状态
      */
-    private DefaultedList<ItemStack> readInventoryState(JsonObject jsonObject) {
-        DefaultedList<ItemStack> state = DefaultedList.ofSize(5, ItemStack.EMPTY);
+    private NonNullList<ItemStack> readInventoryState(JsonObject jsonObject) {
+        NonNullList<ItemStack> state = NonNullList.withSize(5, ItemStack.EMPTY);
 
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
             try {
@@ -179,8 +179,8 @@ public class CutRecipeSerializer implements RecipeSerializer<CutRecipe> {
                 if (slot >= 0 && slot < 5) {
                     JsonObject itemObj = entry.getValue().getAsJsonObject();
                     state.set(slot, new ItemStack(
-                            JsonHelper.getItem(itemObj, "item"),
-                            JsonHelper.getInt(itemObj, "count", 1)
+                            GsonHelper.getAsItem(itemObj, "item"),
+                            GsonHelper.getAsInt(itemObj, "count", 1)
                     ));
                 }
             } catch (NumberFormatException e) {

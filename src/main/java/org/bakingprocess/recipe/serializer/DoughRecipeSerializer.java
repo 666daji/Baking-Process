@@ -1,14 +1,17 @@
 package org.bakingprocess.recipe.serializer;
 
-import com.google.gson.*;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.recipe.DoughRecipe;
 import org.twcore.content.Content;
@@ -69,19 +72,19 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
      * <h3>从JSON对象读取面团配方</h3>
      */
     @Override
-    public DoughRecipe read(Identifier id, JsonObject json) {
+    public DoughRecipe fromJson(ResourceLocation id, JsonObject json) {
         // 1. 读取输出物品
-        JsonObject outputObj = JsonHelper.getObject(json, "output");
+        JsonObject outputObj = GsonHelper.getAsJsonObject(json, "output");
         ItemStack output = new ItemStack(
-                Registries.ITEM.get(new Identifier(
-                        JsonHelper.getString(outputObj, "item")
+                BuiltInRegistries.ITEM.get(new ResourceLocation(
+                        GsonHelper.getAsString(outputObj, "item")
                 )),
-                JsonHelper.getInt(outputObj, "count", 1)
+                GsonHelper.getAsInt(outputObj, "count", 1)
         );
 
         // 2. 读取面粉要求（面粉类型 -> 数量）
         Map<FlourItem.FlourType, Integer> flourRequirements = new HashMap<>();
-        JsonObject floursObj = JsonHelper.getObject(json, "flours");
+        JsonObject floursObj = GsonHelper.getAsJsonObject(json, "flours");
         for (Map.Entry<String, JsonElement> entry : floursObj.entrySet()) {
             FlourItem.FlourType flourType = FlourItem.FlourType.fromId(entry.getKey());
             int count = entry.getValue().getAsInt();
@@ -90,10 +93,10 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
 
         // 3. 读取液体要求（内容物标识符 -> 数量）
         Map<Content, Integer> liquidRequirements = new HashMap<>();
-        JsonObject liquidsObj = JsonHelper.getObject(json, "liquids");
+        JsonObject liquidsObj = GsonHelper.getAsJsonObject(json, "liquids");
         for (Map.Entry<String, JsonElement> entry : liquidsObj.entrySet()) {
             try {
-                Identifier contentId = Identifier.tryParse(entry.getKey());
+                ResourceLocation contentId = ResourceLocation.tryParse(entry.getKey());
                 Content content = TWRegistries.CONTENT.get(contentId);
 
                 if (content == null) {
@@ -113,7 +116,7 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
 
         // 4. 读取额外物品要求
         Map<Ingredient, Integer> extraRequirements = new HashMap<>();
-        JsonObject extrasObj = JsonHelper.getObject(json, "extra_items", new JsonObject());
+        JsonObject extrasObj = GsonHelper.getAsJsonObject(json, "extra_items", new JsonObject());
 
         // 方法1：支持数组格式（推荐）
         if (extrasObj.has("items") && extrasObj.get("items").isJsonArray()) {
@@ -124,17 +127,17 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
             // 统计每个物品的总数量
             for (JsonElement element : itemsArray) {
                 JsonObject itemObj = element.getAsJsonObject();
-                String itemId = JsonHelper.getString(itemObj, "item");
-                int count = JsonHelper.getInt(itemObj, "count", 1);
+                String itemId = GsonHelper.getAsString(itemObj, "item");
+                int count = GsonHelper.getAsInt(itemObj, "count", 1);
                 // 使用merge方法合并相同物品的数量
                 itemCounts.merge(itemId, count, Integer::sum);
             }
 
             // 创建Ingredient并合并数量
             for (Map.Entry<String, Integer> entry : itemCounts.entrySet()) {
-                Identifier itemIdentifier = new Identifier(entry.getKey());
-                Item item = Registries.ITEM.get(itemIdentifier);
-                Ingredient ingredient = Ingredient.ofItems(item);
+                ResourceLocation itemIdentifier = new ResourceLocation(entry.getKey());
+                Item item = BuiltInRegistries.ITEM.get(itemIdentifier);
+                Ingredient ingredient = Ingredient.of(item);
                 extraRequirements.put(ingredient, entry.getValue());
             }
         } else {
@@ -142,7 +145,7 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
             for (Map.Entry<String, JsonElement> entry : extrasObj.entrySet()) {
                 JsonObject itemObj = entry.getValue().getAsJsonObject();
                 Ingredient ingredient = Ingredient.fromJson(itemObj);
-                int count = JsonHelper.getInt(itemObj, "count", 1);
+                int count = GsonHelper.getAsInt(itemObj, "count", 1);
                 extraRequirements.put(ingredient, count);
             }
         }
@@ -152,15 +155,15 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
     }
 
     @Override
-    public DoughRecipe read(Identifier id, PacketByteBuf buf) {
+    public DoughRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
         // 1. 读取输出物品
-        ItemStack output = buf.readItemStack();
+        ItemStack output = buf.readItem();
 
         // 2. 读取面粉要求
         int flourCount = buf.readVarInt();
         Map<FlourItem.FlourType, Integer> flourRequirements = new HashMap<>(flourCount);
         for (int i = 0; i < flourCount; i++) {
-            FlourItem.FlourType flourType = buf.readEnumConstant(FlourItem.FlourType.class);
+            FlourItem.FlourType flourType = buf.readEnum(FlourItem.FlourType.class);
             int count = buf.readVarInt();
             flourRequirements.put(flourType, count);
         }
@@ -169,7 +172,7 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
         int liquidCount = buf.readVarInt();
         Map<Content, Integer> liquidRequirements = new HashMap<>(liquidCount);
         for (int i = 0; i < liquidCount; i++) {
-            Identifier contentId = buf.readIdentifier();
+            ResourceLocation contentId = buf.readResourceLocation();
             int count = buf.readVarInt();
 
             Content content = TWRegistries.CONTENT.get(contentId);
@@ -182,10 +185,10 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
         int extraCount = buf.readVarInt();
         Map<Ingredient, Integer> extraRequirements = new HashMap<>(extraCount);
         for (int i = 0; i < extraCount; i++) {
-            String itemId = buf.readString();
+            String itemId = buf.readUtf();
             int count = buf.readVarInt();
-            Item item = Registries.ITEM.get(new Identifier(itemId));
-            Ingredient ingredient = Ingredient.ofItems(item);
+            Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(itemId));
+            Ingredient ingredient = Ingredient.of(item);
             extraRequirements.put(ingredient, count);
         }
 
@@ -194,21 +197,21 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
     }
 
     @Override
-    public void write(PacketByteBuf buf, DoughRecipe recipe) {
+    public void write(FriendlyByteBuf buf, DoughRecipe recipe) {
         // 1. 写入输出物品
-        buf.writeItemStack(recipe.getOutput(null));
+        buf.writeItem(recipe.getResultItem(null));
 
         // 2. 写入面粉要求
         buf.writeVarInt(recipe.getFlourRequirements().size());
         for (Map.Entry<FlourItem.FlourType, Integer> entry : recipe.getFlourRequirements().entrySet()) {
-            buf.writeEnumConstant(entry.getKey());
+            buf.writeEnum(entry.getKey());
             buf.writeVarInt(entry.getValue());
         }
 
         // 3. 写入液体要求
         buf.writeVarInt(recipe.getLiquidRequirements().size());
         for (Map.Entry<Content, Integer> entry : recipe.getLiquidRequirements().entrySet()) {
-            buf.writeIdentifier(TWRegistries.CONTENT.getId(entry.getKey()));
+            buf.writeResourceLocation(TWRegistries.CONTENT.getKey(entry.getKey()));
             buf.writeVarInt(entry.getValue());
         }
 
@@ -216,10 +219,10 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
         buf.writeVarInt(recipe.getExtraRequirements().size());
         for (Map.Entry<Ingredient, Integer> entry : recipe.getExtraRequirements().entrySet()) {
             // 获取物品ID（简化处理，假设Ingredient只包含单个物品）
-            ItemStack[] items = entry.getKey().getMatchingStacks();
+            ItemStack[] items = entry.getKey().getItems();
             if (items.length > 0) {
-                Identifier itemId = Registries.ITEM.getId(items[0].getItem());
-                buf.writeString(itemId.toString());
+                ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(items[0].getItem());
+                buf.writeUtf(itemId.toString());
                 buf.writeVarInt(entry.getValue());
             }
         }

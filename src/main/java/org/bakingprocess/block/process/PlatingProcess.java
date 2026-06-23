@@ -1,427 +1,427 @@
-package org.bakingprocess.block.process;
-
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeManager;
-import net.minecraft.util.ActionResult;
-import net.minecraft.world.World;
-import org.bakingprocess.block.entity.PlatableBlockEntity;
-import org.bakingprocess.recipe.PlatingRecipe;
-import org.bakingprocess.registry.ModRecipeTypes;
-import org.jetbrains.annotations.Nullable;
-import org.twcore.api.process.AbstractProcess;
-import org.twcore.api.process.PlayerAction;
-import org.twcore.process.playeraction.PlayerActionCreators;
-import org.twcore.process.playeraction.PlayerActionFactory;
-import org.twcore.process.playeraction.impl.AddContentPlayerAction;
-import org.twcore.process.playeraction.impl.AddItemPlayerAction;
-import org.twcore.process.step.Step;
-import org.twcore.process.step.StepExecutionContext;
-import org.twcore.process.step.StepResult;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-/**
- * 摆盘流程类，管理摆盘的多步骤交互流程。
- *
- * <p><strong>设计特点：</strong></p>
- * <ul>
- *   <li>通用候选配方初始化：支持从任意状态恢复流程</li>
- *   <li>简化的状态管理：方块实体只存储操作，流程只管理候选列表</li>
- *   <li>无需NBT恢复：退出重进后自动重新初始化候选列表</li>
- *   <li>支持撤销操作：完成物品放置后仍可撤回继续</li>
- * </ul>
- */
-public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends AbstractProcess<T> {
-    /** 执行操作步骤的ID */
-    public static final String STEP_PERFORM_ACTION = "perform_action";
-    /** 完成流程步骤的ID */
-    public static final String STEP_COMPLETE = "complete";
-
-    /** 当前步骤的候选配方列表 */
-    private final List<PlatingRecipe> candidateRecipes = new ArrayList<>();
-
-    /** 当前完全匹配的配方（如果存在） */
-    @Nullable
-    private PlatingRecipe matchedRecipe = null;
-
-    /** 标志：是否已初始化候选配方列表 */
-    private boolean hasInitializedCandidates = false;
-
-    /** 标志：是否正在匹配配方，防止重入 */
-    private boolean isMatchingRecipes = false;
-
-    // ==================== 构造器和初始化 ====================
-
-    public PlatingProcess() {
-        registerSteps();
-    }
-
-    private void registerSteps() {
-        registerStep(STEP_PERFORM_ACTION, new PerformActionStep());
-        registerStep(STEP_COMPLETE, new CompleteStep());
-    }
-
-    // ==================== 步骤实现类 ====================
-
-    /**
-     * 执行操作步骤，处理配方操作的执行。
-     *
-     * <p>此步骤按照严格顺序执行：</p>
-     * <ol>
-     *   <li>防止重入</li>
-     *   <li>如果候选列表未初始化，调用 initializeCandidates 初始化</li>
-     *   <li>从上下文创建 PlayerAction</li>
-     *   <li>根据是否已初始化选择不同逻辑</li>
-     * </ol>
-     */
-    protected class PerformActionStep implements Step<T> {
-        private static final PlayerActionFactory.PlayerActionCreator CREATOR =
-                PlayerActionCreators.firstNonNull(
-                        PlayerActionFactory.getRegisteredCreator(AddContentPlayerAction.TYPE),
-                        PlayerActionFactory.getRegisteredCreator(AddItemPlayerAction.TYPE)
-                );
-
-        @Override
-        public StepResult execute(StepExecutionContext<T> context) {
-            // 防止重入逻辑
-            if (isMatchingRecipes) {
-                return StepResult.continueSameStep(ActionResult.PASS);
-            }
-
-            // 操作的方块实体
-            PlatableBlockEntity plate = context.blockEntity();
-
-            // 从上下文创建预期操作
-            PlayerAction expectedAction = CREATOR.create(context);
-
-            // 已执行操作列表
-            List<PlayerAction> performedActions = plate.getPerformedActions();
-            int currentStep = plate.getStepCount();
-
-            // 如果候选列表未初始化，尝试初始化
-            if (!hasInitializedCandidates) {
-                // 使用预期操作（可能为null）初始化候选列表
-                if (!initializeCandidates(context.world(), plate, expectedAction)) {
-                    // 初始化失败，尝试不包含当前操作的初始化
-                    initializeCandidates(context.world(), plate);
-
-                    if (performedActions.isEmpty()) {
-                        // 如果此时操作列表为空则重置流程
-                        reset();
-                    }
-
-                    return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.PASS);
-                }
-
-                // 如果预期操作为null，步骤返回PASS（无感知初始化）
-                if (expectedAction == null) {
-                    return StepResult.continueSameStep(ActionResult.PASS);
-                }
-            }
-            // 候选列表已初始化
-            else {
-                // 如果预期操作为null，步骤直接返回PASS
-                if (expectedAction == null) {
-                    return StepResult.continueSameStep(ActionResult.PASS);
-                }
-
-                // 使用预期操作过滤候选列表
-                List<PlatingRecipe> matchingRecipes = filterCandidatesByNextAction(
-                        expectedAction, performedActions
-                );
-
-                // 过滤到的列表为空时，步骤失败
-                if (matchingRecipes.isEmpty()) {
-                    return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
-                }
-
-                // 更新候选列表
-                candidateRecipes.clear();
-                candidateRecipes.addAll(matchingRecipes);
-            }
-
-            return executeAction(context, plate, expectedAction, currentStep);
-        }
-
-        /**
-         * 执行操作逻辑的公共部分。
-         */
-        private StepResult executeAction(StepExecutionContext<T> context, PlatableBlockEntity plate,
-                                         PlayerAction action, int currentStep) {
-            // 验证是否可以在此步骤执行操作
-            if (!plate.canPerformActionAtStep(currentStep)) {
-                resetCandidateState();
-                return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
-            }
-
-            // 尝试执行操作
-            if (!plate.performAction(currentStep, action)) {
-                resetCandidateState();
-                return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
-            }
-
-            // 执行操作的消耗逻辑
-            action.consume(context);
-            plate.markDirty();
-
-            // 检查是否有完全匹配的配方
-            checkForExactMatch(plate, null);
-
-            return StepResult.continueSameStep(ActionResult.SUCCESS);
-        }
-    }
-
-    /**
-     * 完成流程步骤，处理配方的完成和输出。
-     */
-    private class CompleteStep implements Step<T> {
-        @Override
-        public StepResult execute(StepExecutionContext<T> context) {
-            PlatableBlockEntity plate = context.blockEntity();
-            ItemStack heldItem = context.getHeldItemStack();
-
-            // 检查是否为完成物品
-            if (!plate.isCompletionItem(heldItem) || heldItem.isEmpty()) {
-                return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
-            }
-
-            // 检查是否有完全匹配的配方
-            if (matchedRecipe == null) {
-                // 如果没有匹配的配方，但玩家手持完成物品，尝试重新检查
-                checkForExactMatch(plate, context.world());
-                if (matchedRecipe == null) {
-                    return StepResult.fail(STEP_PERFORM_ACTION, ActionResult.FAIL);
-                }
-            }
-
-            // 执行完成逻辑
-            plate.onPlatingComplete(context.world(), context.pos(), matchedRecipe, context.player(), context.hand(), context.hit());
-            return StepResult.complete(ActionResult.SUCCESS);
-        }
-    }
-
-    // ==================== 核心算法方法 ====================
-
-    /**
-     * 通用候选配方初始化方法。
-     *
-     * @param world 世界实例
-     * @param plate 摆盘方块实体
-     * @param expectedAction 当前要执行的操作（可能为空）
-     * @return 如果找到至少一个候选配方返回 {@code true}
-     */
-    public boolean initializeCandidates(World world, PlatableBlockEntity plate, @Nullable PlayerAction expectedAction) {
-        isMatchingRecipes = true;
-        try {
-            RecipeManager recipeManager = world.getRecipeManager();
-            List<PlatingRecipe> allRecipes = recipeManager.listAllOfType(ModRecipeTypes.PLATING);
-
-            if (allRecipes.isEmpty()) {
-                return false;
-            }
-
-            List<PlayerAction> performedActions = plate.getPerformedActions();
-            Item containerType = plate.getContainerType();
-
-            // 构建临时匹配列表：已执行操作 + 预期操作（如果不为null）
-            List<PlayerAction> tempMatchingList = new ArrayList<>(performedActions);
-
-            if (expectedAction != null) {
-                tempMatchingList.add(expectedAction);
-            }
-
-            // 如果临时列表为空，无法匹配任何配方
-            if (tempMatchingList.isEmpty()) {
-                return false;
-            }
-
-            List<PlatingRecipe> candidates = allRecipes.stream()
-                    .filter(recipe -> recipe.getContainer() == containerType)
-                    .filter(recipe -> recipe.matchesPrefix(tempMatchingList))
-                    .toList();
-
-            if (candidates.isEmpty()) {
-                return false;
-            }
-
-            candidateRecipes.clear();
-            candidateRecipes.addAll(candidates);
-            hasInitializedCandidates = true;
-
-            // 检查完全匹配
-            checkForExactMatch(plate, world);
-            return true;
-        } finally {
-            isMatchingRecipes = false;
-        }
-    }
-
-    public boolean initializeCandidates(World world, PlatableBlockEntity plate) {
-        return initializeCandidates(world, plate, null);
-    }
-
-    /**
-     * 根据下一步操作过滤候选配方。
-     *
-     * @param nextAction 下一步要执行的操作
-     * @param performedActions 已执行的操作列表
-     * @return 过滤后的候选配方列表，只包含下一步匹配的配方
-     */
-    private List<PlatingRecipe> filterCandidatesByNextAction(PlayerAction nextAction, List<PlayerAction> performedActions) {
-        return candidateRecipes.stream()
-                .filter(recipe -> {
-                    // 如果已执行操作数量 >= 配方操作数量，不是有效候选
-                    if (performedActions.size() >= recipe.getActionCount()) {
-                        return false;
-                    }
-
-                    // 检查已执行操作是否是配方的有效前缀
-                    if (!recipe.matchesPrefix(performedActions)) {
-                        return false;
-                    }
-
-                    // 检查下一步是否匹配
-                    PlayerAction nextRecipeAction = recipe.getNextAction(performedActions.size());
-                    return nextRecipeAction != null && nextAction.matches(nextRecipeAction);
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 检查当前摆盘状态是否有完全匹配的配方。
-     */
-    public void checkForExactMatch(PlatableBlockEntity plate, World world) {
-        matchedRecipe = candidateRecipes.stream()
-                .filter(recipe -> recipe.matches(plate, world))
-                .findFirst()
-                .orElse(null);
-    }
-
-    /**
-     * 重置候选配方状态。
-     */
-    private void resetCandidateState() {
-        candidateRecipes.clear();
-        matchedRecipe = null;
-        hasInitializedCandidates = false;
-        isMatchingRecipes = false;
-    }
-
-    // ==================== 流程控制钩子 ====================
-
-    /**
-     * 步骤获取前的预处理钩子。
-     *
-     * <p>当玩家手持完成物品时，如果当前摆盘状态匹配某个配方，
-     * 直接跳转到完成步骤。</p>
-     */
-    @Override
-    protected void beforeGetStep(StepExecutionContext<T> context) {
-        T plate = context.blockEntity();
-        ItemStack heldItem = context.getHeldItemStack();
-
-        // 如果候选列表未初始化，尝试初始化
-        if (!hasInitializedCandidates) {
-            initializeCandidates(context.world(), plate);
-        }
-
-        // 检查是否是完成物品
-        if (plate.isCompletionItem(heldItem) && !heldItem.isEmpty()) {
-            if (matchedRecipe != null) {
-                // 跳转到完成步骤
-                jumpToStep(STEP_COMPLETE);
-            }
-        }
-    }
-
-    // ==================== 生命周期方法 ====================
-
-    @Override
-    protected String getInitialStepId() {
-        return STEP_PERFORM_ACTION;
-    }
-
-    @Override
-    protected void onStart(World world, T blockEntity) {
-        // 开始新流程时重置状态
-        resetCandidateState();
-    }
-
-    @Override
-    protected void onReset() {
-        resetCandidateState();
-    }
-
-    // ==================== 状态查询方法 ====================
-
-    /**
-     * 获取当前候选配方数量。
-     */
-    public int getCandidateRecipeCount() {
-        return candidateRecipes.size();
-    }
-
-    /**
-     * 获取当前匹配的配方。
-     */
-    public @Nullable PlatingRecipe getMatchedRecipe() {
-        return matchedRecipe;
-    }
-
-    /**
-     * 检查是否已找到完全匹配的配方。
-     */
-    public boolean hasExactMatch() {
-        return matchedRecipe != null;
-    }
-
-    /**
-     * 检查候选列表是否已初始化。
-     */
-    public boolean isCandidatesInitialized() {
-        return hasInitializedCandidates;
-    }
-
-    @Override
-    protected String getCustomStatusInfo() {
-        StringBuilder info = new StringBuilder();
-
-        // 候选配方信息
-        info.append("候选配方数量: ").append(candidateRecipes.size()).append("\n");
-
-        // 匹配的配方信息
-        if (matchedRecipe != null) {
-            info.append("完全匹配的配方: ").append(matchedRecipe.getId().getPath()).append("\n");
-            info.append("配方操作数: ").append(matchedRecipe.getActionCount()).append("\n");
-            info.append("输出菜肴: ").append(matchedRecipe.getDishes()).append("\n");
-        } else {
-            info.append("完全匹配的配方: <无>\n");
-        }
-
-        // 初始化状态
-        info.append("候选列表已初始化: ").append(hasInitializedCandidates).append("\n");
-
-        // 匹配状态
-        info.append("正在匹配配方: ").append(isMatchingRecipes).append("\n");
-
-        // 候选配方详情（仅显示前3个，避免输出过长）
-        if (!candidateRecipes.isEmpty()) {
-            info.append("候选配方列表:\n");
-            int limit = Math.min(candidateRecipes.size(), 3);
-            for (int i = 0; i < limit; i++) {
-                PlatingRecipe recipe = candidateRecipes.get(i);
-                info.append("  ").append(i + 1).append(". ")
-                        .append(recipe.getId().getPath())
-                        .append(" (操作: ").append(recipe.getActionCount()).append(")\n");
-            }
-            if (candidateRecipes.size() > limit) {
-                info.append("  ... 还有").append(candidateRecipes.size() - limit).append("个配方未显示\n");
-            }
-        }
-        return info.toString();
-    }
+package org.bakingprocess.block.process;
+
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.bakingprocess.block.entity.PlatableBlockEntity;
+import org.bakingprocess.recipe.PlatingRecipe;
+import org.bakingprocess.registry.ModRecipeTypes;
+import org.jetbrains.annotations.Nullable;
+import org.twcore.api.process.AbstractProcess;
+import org.twcore.api.process.PlayerAction;
+import org.twcore.process.playeraction.PlayerActionCreators;
+import org.twcore.process.playeraction.PlayerActionFactory;
+import org.twcore.process.playeraction.impl.AddContentPlayerAction;
+import org.twcore.process.playeraction.impl.AddItemPlayerAction;
+import org.twcore.process.step.Step;
+import org.twcore.process.step.StepExecutionContext;
+import org.twcore.process.step.StepResult;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * 鎽嗙洏娴佺▼绫伙紝绠＄悊鎽嗙洏鐨勫�氭�ラ�や氦浜掓祦绋嬨�?
+ *
+ * <p><strong>璁捐�＄壒鐐癸�?/strong></p>
+ * <ul>
+ *   <li>閫氱敤鍊欓�夐厤鏂瑰垵濮嬪寲锛氭敮鎸佷粠浠绘剰鐘舵�佹仮澶嶆祦绋?/li>
+ *   <li>绠�鍖栫殑鐘舵�佺�＄悊锛氭柟鍧楀疄浣撳彧瀛樺偍鎿嶄綔锛屾祦绋嬪彧绠＄悊鍊欓�夊垪琛?/li>
+ *   <li>鏃犻渶NBT鎭㈠�嶏細閫�鍑洪噸杩涘悗鑷�鍔ㄩ噸鏂板垵濮嬪寲鍊欓�夊垪琛?/li>
+ *   <li>鏀�鎸佹挙閿�鎿嶄綔锛氬畬鎴愮墿鍝佹斁缃�鍚庝粛鍙�鎾ゅ洖缁х画</li>
+ * </ul>
+ */
+public class PlatingProcess<T extends BlockEntity & PlatableBlockEntity> extends AbstractProcess<T> {
+    /** 鎵ц�屾搷浣滄�ラ�ょ殑ID */
+    public static final String STEP_PERFORM_ACTION = "perform_action";
+    /** 瀹屾垚娴佺▼姝ラ�ょ殑ID */
+    public static final String STEP_COMPLETE = "complete";
+
+    /** 褰撳墠姝ラ�ょ殑鍊欓�夐厤鏂瑰垪琛?*/
+    private final List<PlatingRecipe> candidateRecipes = new ArrayList<>();
+
+    /** 褰撳墠瀹屽叏鍖归厤鐨勯厤鏂癸紙濡傛灉瀛樺湪锛?*/
+    @Nullable
+    private PlatingRecipe matchedRecipe = null;
+
+    /** 鏍囧織锛氭槸鍚﹀凡鍒濆�嬪寲鍊欓�夐厤鏂瑰垪琛?*/
+    private boolean hasInitializedCandidates = false;
+
+    /** 鏍囧織锛氭槸鍚︽�ｅ湪鍖归厤閰嶆柟锛岄槻姝㈤噸鍏� */
+    private boolean isMatchingRecipes = false;
+
+    // ==================== 鏋勯�犲櫒鍜屽垵濮嬪寲 ====================
+
+    public PlatingProcess() {
+        registerSteps();
+    }
+
+    private void registerSteps() {
+        registerStep(STEP_PERFORM_ACTION, new PerformActionStep());
+        registerStep(STEP_COMPLETE, new CompleteStep());
+    }
+
+    // ==================== 姝ラ�ゅ疄鐜扮�?====================
+
+    /**
+     * 鎵ц�屾搷浣滄�ラ�わ紝澶勭悊閰嶆柟鎿嶄綔鐨勬墽琛屻�?
+     *
+     * <p>姝ゆ�ラ�ゆ寜鐓т弗鏍奸『搴忔墽琛岋細</p>
+     * <ol>
+     *   <li>闃叉�㈤噸鍏�</li>
+     *   <li>濡傛灉鍊欓�夊垪琛ㄦ湭鍒濆�嬪寲锛岃皟鐢� initializeCandidates 鍒濆�嬪�?/li>
+     *   <li>浠庝笂涓嬫枃鍒涘缓 PlayerAction</li>
+     *   <li>鏍规嵁鏄�鍚﹀凡鍒濆�嬪寲閫夋嫨涓嶅悓閫昏緫</li>
+     * </ol>
+     */
+    protected class PerformActionStep implements Step<T> {
+        private static final PlayerActionFactory.PlayerActionCreator CREATOR =
+                PlayerActionCreators.firstNonNull(
+                        PlayerActionFactory.getRegisteredCreator(AddContentPlayerAction.TYPE),
+                        PlayerActionFactory.getRegisteredCreator(AddItemPlayerAction.TYPE)
+                );
+
+        @Override
+        public StepResult execute(StepExecutionContext<T> context) {
+            // 闃叉�㈤噸鍏ラ�昏緫
+            if (isMatchingRecipes) {
+                return StepResult.continueSameStep(InteractionResult.PASS);
+            }
+
+            // 鎿嶄綔鐨勬柟鍧楀疄浣?
+            PlatableBlockEntity plate = context.blockEntity();
+
+            // 浠庝笂涓嬫枃鍒涘缓棰勬湡鎿嶄綔
+            PlayerAction expectedAction = CREATOR.create(context);
+
+            // 宸叉墽琛屾搷浣滃垪琛?
+            List<PlayerAction> performedActions = plate.getPerformedActions();
+            int currentStep = plate.getStepCount();
+
+            // 濡傛灉鍊欓�夊垪琛ㄦ湭鍒濆�嬪寲锛屽皾璇曞垵濮嬪�?
+            if (!hasInitializedCandidates) {
+                // 浣跨敤棰勬湡鎿嶄綔锛堝彲鑳戒负null锛夊垵濮嬪寲鍊欓�夊垪琛?
+                if (!initializeCandidates(context.world(), plate, expectedAction)) {
+                    // 鍒濆�嬪寲澶辫触锛屽皾璇曚笉鍖呭惈褰撳墠鎿嶄綔鐨勫垵濮嬪�?
+                    initializeCandidates(context.world(), plate);
+
+                    if (performedActions.isEmpty()) {
+                        // 濡傛灉姝ゆ椂鎿嶄綔鍒楄〃涓虹┖鍒欓噸缃�娴佺�?
+                        reset();
+                    }
+
+                    return StepResult.fail(STEP_PERFORM_ACTION, InteractionResult.PASS);
+                }
+
+                // 濡傛灉棰勬湡鎿嶄綔涓簄ull锛屾�ラ�よ繑鍥濸ASS锛堟棤鎰熺煡鍒濆�嬪寲锛�
+                if (expectedAction == null) {
+                    return StepResult.continueSameStep(InteractionResult.PASS);
+                }
+            }
+            // 鍊欓�夊垪琛ㄥ凡鍒濆�嬪�?
+            else {
+                // 濡傛灉棰勬湡鎿嶄綔涓簄ull锛屾�ラ�ょ洿鎺ヨ繑鍥濸ASS
+                if (expectedAction == null) {
+                    return StepResult.continueSameStep(InteractionResult.PASS);
+                }
+
+                // 浣跨敤棰勬湡鎿嶄綔杩囨护鍊欓�夊垪琛?
+                List<PlatingRecipe> matchingRecipes = filterCandidatesByNextAction(
+                        expectedAction, performedActions
+                );
+
+                // 杩囨护鍒扮殑鍒楄〃涓虹┖鏃讹紝姝ラ�ゅけ璐�
+                if (matchingRecipes.isEmpty()) {
+                    return StepResult.fail(STEP_PERFORM_ACTION, InteractionResult.FAIL);
+                }
+
+                // 鏇存柊鍊欓�夊垪琛?
+                candidateRecipes.clear();
+                candidateRecipes.addAll(matchingRecipes);
+            }
+
+            return executeAction(context, plate, expectedAction, currentStep);
+        }
+
+        /**
+         * 鎵ц�屾搷浣滈�昏緫鐨勫叕鍏遍儴鍒嗐�?
+         */
+        private StepResult executeAction(StepExecutionContext<T> context, PlatableBlockEntity plate,
+                                         PlayerAction action, int currentStep) {
+            // 楠岃瘉鏄�鍚﹀彲浠ュ湪姝ゆ�ラ�ゆ墽琛屾搷浣�
+            if (!plate.canPerformActionAtStep(currentStep)) {
+                resetCandidateState();
+                return StepResult.fail(STEP_PERFORM_ACTION, InteractionResult.FAIL);
+            }
+
+            // 灏濊瘯鎵ц�屾搷浣�
+            if (!plate.performAction(currentStep, action)) {
+                resetCandidateState();
+                return StepResult.fail(STEP_PERFORM_ACTION, InteractionResult.FAIL);
+            }
+
+            // 鎵ц�屾搷浣滅殑娑堣�楅�昏緫
+            action.consume(context);
+            plate.setChanged();
+
+            // 妫�鏌ユ槸鍚︽湁瀹屽叏鍖归厤鐨勯厤鏂?
+            checkForExactMatch(plate, null);
+
+            return StepResult.continueSameStep(InteractionResult.SUCCESS);
+        }
+    }
+
+    /**
+     * 瀹屾垚娴佺▼姝ラ�わ紝澶勭悊閰嶆柟鐨勫畬鎴愬拰杈撳嚭銆?
+     */
+    private class CompleteStep implements Step<T> {
+        @Override
+        public StepResult execute(StepExecutionContext<T> context) {
+            PlatableBlockEntity plate = context.blockEntity();
+            ItemStack heldItem = context.getHeldItemStack();
+
+            // 妫�鏌ユ槸鍚︿负瀹屾垚鐗╁搧
+            if (!plate.isCompletionItem(heldItem) || heldItem.isEmpty()) {
+                return StepResult.fail(STEP_PERFORM_ACTION, InteractionResult.FAIL);
+            }
+
+            // 妫�鏌ユ槸鍚︽湁瀹屽叏鍖归厤鐨勯厤鏂?
+            if (matchedRecipe == null) {
+                // 濡傛灉娌℃湁鍖归厤鐨勯厤鏂癸紝浣嗙帺瀹舵墜鎸佸畬鎴愮墿鍝侊紝灏濊瘯閲嶆柊妫�鏌?
+                checkForExactMatch(plate, context.world());
+                if (matchedRecipe == null) {
+                    return StepResult.fail(STEP_PERFORM_ACTION, InteractionResult.FAIL);
+                }
+            }
+
+            // 鎵ц�屽畬鎴愰�昏緫
+            plate.onPlatingComplete(context.world(), context.pos(), matchedRecipe, context.player(), context.hand(), context.hit());
+            return StepResult.complete(InteractionResult.SUCCESS);
+        }
+    }
+
+    // ==================== 鏍稿績绠楁硶鏂规硶 ====================
+
+    /**
+     * 閫氱敤鍊欓�夐厤鏂瑰垵濮嬪寲鏂规硶銆?
+     *
+     * @param world 涓栫晫瀹炰緥
+     * @param plate 鎽嗙洏鏂瑰潡瀹炰綋
+     * @param expectedAction 褰撳墠瑕佹墽琛岀殑鎿嶄綔锛堝彲鑳戒负绌猴級
+     * @return 濡傛灉鎵惧埌鑷冲皯涓�涓�鍊欓�夐厤鏂硅繑鍥?{@code true}
+     */
+    public boolean initializeCandidates(Level world, PlatableBlockEntity plate, @Nullable PlayerAction expectedAction) {
+        isMatchingRecipes = true;
+        try {
+            RecipeManager recipeManager = world.getRecipeManager();
+            List<PlatingRecipe> allRecipes = recipeManager.getAllRecipesFor(ModRecipeTypes.PLATING.get());
+
+            if (allRecipes.isEmpty()) {
+                return false;
+            }
+
+            List<PlayerAction> performedActions = plate.getPerformedActions();
+            Item containerType = plate.getContainerType();
+
+            // 鏋勫缓涓存椂鍖归厤鍒楄〃锛氬凡鎵ц�屾搷浣� + 棰勬湡鎿嶄綔锛堝�傛灉涓嶄负null锛?
+            List<PlayerAction> tempMatchingList = new ArrayList<>(performedActions);
+
+            if (expectedAction != null) {
+                tempMatchingList.add(expectedAction);
+            }
+
+            // 濡傛灉涓存椂鍒楄〃涓虹┖锛屾棤娉曞尮閰嶄换浣曢厤鏂?
+            if (tempMatchingList.isEmpty()) {
+                return false;
+            }
+
+            List<PlatingRecipe> candidates = allRecipes.stream()
+                    .filter(recipe -> recipe.getContainer() == containerType)
+                    .filter(recipe -> recipe.matchesPrefix(tempMatchingList))
+                    .toList();
+
+            if (candidates.isEmpty()) {
+                return false;
+            }
+
+            candidateRecipes.clear();
+            candidateRecipes.addAll(candidates);
+            hasInitializedCandidates = true;
+
+            // 妫�鏌ュ畬鍏ㄥ尮閰?
+            checkForExactMatch(plate, world);
+            return true;
+        } finally {
+            isMatchingRecipes = false;
+        }
+    }
+
+    public boolean initializeCandidates(Level world, PlatableBlockEntity plate) {
+        return initializeCandidates(world, plate, null);
+    }
+
+    /**
+     * 鏍规嵁涓嬩竴姝ユ搷浣滆繃婊ゅ�欓�夐厤鏂广�?
+     *
+     * @param nextAction 涓嬩竴姝ヨ�佹墽琛岀殑鎿嶄�?
+     * @param performedActions 宸叉墽琛岀殑鎿嶄綔鍒楄〃
+     * @return 杩囨护鍚庣殑鍊欓�夐厤鏂瑰垪琛�锛屽彧鍖呭惈涓嬩竴姝ュ尮閰嶇殑閰嶆柟
+     */
+    private List<PlatingRecipe> filterCandidatesByNextAction(PlayerAction nextAction, List<PlayerAction> performedActions) {
+        return candidateRecipes.stream()
+                .filter(recipe -> {
+                    // 濡傛灉宸叉墽琛屾搷浣滄暟閲?>= 閰嶆柟鎿嶄綔鏁伴噺锛屼笉鏄�鏈夋晥鍊欓�?
+                    if (performedActions.size() >= recipe.getActionCount()) {
+                        return false;
+                    }
+
+                    // 妫�鏌ュ凡鎵ц�屾搷浣滄槸鍚︽槸閰嶆柟鐨勬湁鏁堝墠缂�
+                    if (!recipe.matchesPrefix(performedActions)) {
+                        return false;
+                    }
+
+                    // 妫�鏌ヤ笅涓�姝ユ槸鍚﹀尮閰?
+                    PlayerAction nextRecipeAction = recipe.getNextAction(performedActions.size());
+                    return nextRecipeAction != null && nextAction.matches(nextRecipeAction);
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 妫�鏌ュ綋鍓嶆憜鐩樼姸鎬佹槸鍚︽湁瀹屽叏鍖归厤鐨勯厤鏂广�?
+     */
+    public void checkForExactMatch(PlatableBlockEntity plate, Level world) {
+        matchedRecipe = candidateRecipes.stream()
+                .filter(recipe -> recipe.matches(plate, world))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * 閲嶇疆鍊欓�夐厤鏂圭姸鎬併�?
+     */
+    private void resetCandidateState() {
+        candidateRecipes.clear();
+        matchedRecipe = null;
+        hasInitializedCandidates = false;
+        isMatchingRecipes = false;
+    }
+
+    // ==================== 娴佺▼鎺у埗閽╁瓙 ====================
+
+    /**
+     * 姝ラ�よ幏鍙栧墠鐨勯�勫�勭悊閽╁瓙銆?
+     *
+     * <p>褰撶帺瀹舵墜鎸佸畬鎴愮墿鍝佹椂锛屽�傛灉褰撳墠鎽嗙洏鐘舵�佸尮閰嶆煇涓�閰嶆柟锛�
+     * 鐩存帴璺宠浆鍒板畬鎴愭�ラ�ゃ�?/p>
+     */
+    @Override
+    protected void beforeGetStep(StepExecutionContext<T> context) {
+        T plate = context.blockEntity();
+        ItemStack heldItem = context.getHeldItemStack();
+
+        // 濡傛灉鍊欓�夊垪琛ㄦ湭鍒濆�嬪寲锛屽皾璇曞垵濮嬪�?
+        if (!hasInitializedCandidates) {
+            initializeCandidates(context.world(), plate);
+        }
+
+        // 妫�鏌ユ槸鍚︽槸瀹屾垚鐗╁搧
+        if (plate.isCompletionItem(heldItem) && !heldItem.isEmpty()) {
+            if (matchedRecipe != null) {
+                // 璺宠浆鍒板畬鎴愭�ラ�?
+                jumpToStep(STEP_COMPLETE);
+            }
+        }
+    }
+
+    // ==================== 鐢熷懡鍛ㄦ湡鏂规硶 ====================
+
+    @Override
+    protected String getInitialStepId() {
+        return STEP_PERFORM_ACTION;
+    }
+
+    @Override
+    protected void onStart(Level world, T blockEntity) {
+        // 寮�濮嬫柊娴佺▼鏃堕噸缃�鐘舵�?
+        resetCandidateState();
+    }
+
+    @Override
+    protected void onReset() {
+        resetCandidateState();
+    }
+
+    // ==================== 鐘舵�佹煡璇㈡柟娉?====================
+
+    /**
+     * 鑾峰彇褰撳墠鍊欓�夐厤鏂规暟閲忋�?
+     */
+    public int getCandidateRecipeCount() {
+        return candidateRecipes.size();
+    }
+
+    /**
+     * 鑾峰彇褰撳墠鍖归厤鐨勯厤鏂广�?
+     */
+    public @Nullable PlatingRecipe getMatchedRecipe() {
+        return matchedRecipe;
+    }
+
+    /**
+     * 妫�鏌ユ槸鍚﹀凡鎵惧埌瀹屽叏鍖归厤鐨勯厤鏂广�?
+     */
+    public boolean hasExactMatch() {
+        return matchedRecipe != null;
+    }
+
+    /**
+     * 妫�鏌ュ�欓�夊垪琛ㄦ槸鍚﹀凡鍒濆�嬪寲銆?
+     */
+    public boolean isCandidatesInitialized() {
+        return hasInitializedCandidates;
+    }
+
+    @Override
+    protected String getCustomStatusInfo() {
+        StringBuilder info = new StringBuilder();
+
+        // 鍊欓�夐厤鏂逛俊鎭?
+        info.append("鍊欓�夐厤鏂规暟閲? ").append(candidateRecipes.size()).append("\n");
+
+        // 鍖归厤鐨勯厤鏂逛俊鎭?
+        if (matchedRecipe != null) {
+            info.append("瀹屽叏鍖归厤鐨勯厤鏂? ").append(matchedRecipe.getId().getPath()).append("\n");
+            info.append("閰嶆柟鎿嶄綔鏁? ").append(matchedRecipe.getActionCount()).append("\n");
+            info.append("杈撳嚭鑿滆偞: ").append(matchedRecipe.getDishes()).append("\n");
+        } else {
+            info.append("瀹屽叏鍖归厤鐨勯厤鏂? <鏃?\n");
+        }
+
+        // 鍒濆�嬪寲鐘舵�?
+        info.append("鍊欓�夊垪琛ㄥ凡鍒濆�嬪�? ").append(hasInitializedCandidates).append("\n");
+
+        // 鍖归厤鐘舵�?
+        info.append("姝ｅ湪鍖归厤閰嶆柟: ").append(isMatchingRecipes).append("\n");
+
+        // 鍊欓�夐厤鏂硅�︽儏锛堜粎鏄剧ず鍓�3涓�锛岄伩鍏嶈緭鍑鸿繃闀匡�?
+        if (!candidateRecipes.isEmpty()) {
+            info.append("鍊欓�夐厤鏂瑰垪琛?\n");
+            int limit = Math.min(candidateRecipes.size(), 3);
+            for (int i = 0; i < limit; i++) {
+                PlatingRecipe recipe = candidateRecipes.get(i);
+                info.append("  ").append(i + 1).append(". ")
+                        .append(recipe.getId().getPath())
+                        .append(" (鎿嶄綔: ").append(recipe.getActionCount()).append(")\n");
+            }
+            if (candidateRecipes.size() > limit) {
+                info.append("  ... 杩樻湁").append(candidateRecipes.size() - limit).append("涓�閰嶆柟鏈�鏄剧ず\n");
+            }
+        }
+        return info.toString();
+    }
 }

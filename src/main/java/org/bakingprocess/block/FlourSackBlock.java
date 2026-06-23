@@ -1,32 +1,32 @@
 package org.bakingprocess.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import org.dfood.block.ComplexFoodBlock;
-import org.dfood.block.FoodBlockBuilder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.bakingprocess.block.entity.FlourSackBlockEntity;
 import org.bakingprocess.item.FlourSackItem;
+import org.dfood.block.ComplexFoodBlock;
+import org.dfood.block.FoodBlockBuilder;
 import org.jetbrains.annotations.Nullable;
 
-public class FlourSackBlock extends ComplexFoodBlock implements BlockEntityProvider {
-    public static final IntProperty SHELF_INDEX = IntProperty.of("shelf_index", 0, 1);
+public class FlourSackBlock extends ComplexFoodBlock implements EntityBlock {
+    public static final IntegerProperty SHELF_INDEX = IntegerProperty.create("shelf_index", 0, 1);
 
-    protected FlourSackBlock(Settings settings, int maxFood) {
+    protected FlourSackBlock(Properties settings, int maxFood) {
         super(settings, maxFood, true, null, false, null);
 
-        this.setDefaultState(this.getStateManager().getDefaultState()
-                .with(FACING, Direction.NORTH)
-                .with(NUMBER_OF_FOOD, 1)
-                .with(SHELF_INDEX, 0));
+        this.registerDefaultState(this.getStateDefinition().any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(NUMBER_OF_FOOD, 1)
+                .setValue(SHELF_INDEX, 0));
     }
 
     public static class Builder extends FoodBlockBuilder<FlourSackBlock, Builder> {
@@ -43,13 +43,13 @@ public class FlourSackBlock extends ComplexFoodBlock implements BlockEntityProvi
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new FlourSackBlockEntity(pos, state);
     }
 
     @Override
     public boolean isSame(ItemStack stack, BlockState state, @Nullable BlockEntity blockEntity) {
-        NbtCompound nbt = stack.getNbt();
+        CompoundTag nbt = stack.getTag();
 
         if (nbt == null || !nbt.contains(FlourSackItem.STORED_ITEM_KEY)) {
             return false;
@@ -61,7 +61,7 @@ public class FlourSackBlock extends ComplexFoodBlock implements BlockEntityProvi
     /**
      * 获取指定位置的粉尘袋物品堆栈
      */
-    public ItemStack getSackStack(World world, BlockPos pos, int index) {
+    public ItemStack getSackStack(Level world, BlockPos pos, int index) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof FlourSackBlockEntity flourSackEntity) {
             return flourSackEntity.getSackStack(index);
@@ -70,8 +70,8 @@ public class FlourSackBlock extends ComplexFoodBlock implements BlockEntityProvi
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(SHELF_INDEX);
     }
 }

@@ -1,0 +1,9 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": [
+    "baking_process:ore_salt_middle",
+    "baking_process:ore_salt_upper"
+  ],
+  "step": "underground_ores"
+}

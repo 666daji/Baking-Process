@@ -1,23 +1,25 @@
 package org.bakingprocess.block;
 
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.DoubleInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.CompoundContainer;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.bakingprocess.block.entity.DishesBlockEntity;
 import org.jetbrains.annotations.Nullable;
 import org.twcore.api.block.UpPlaceBlock;
@@ -26,37 +28,37 @@ import org.twcore.api.block.UpPlaceBlockEntity;
 import java.util.Optional;
 
 public class GarnishDishesBlock extends UpPlaceBlock {
-    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-    public static final EnumProperty<DishesType> TYPE = EnumProperty.of("type", DishesType.class);
-    private static final VoxelShape BASE_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 1.5, 16.0);
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<DishesType> TYPE = EnumProperty.create("type", DishesType.class);
+    private static final VoxelShape BASE_SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 1.5, 16.0);
 
-    private static final DoubleBlockProperties.PropertyRetriever<DishesBlockEntity, Optional<Inventory>> INVENTORY_RETRIEVER =
-            new DoubleBlockProperties.PropertyRetriever<>() {
+    private static final DoubleBlockCombiner.Combiner<DishesBlockEntity, Optional<Container>> INVENTORY_RETRIEVER =
+            new DoubleBlockCombiner.Combiner<>() {
                 @Override
-                public Optional<Inventory> getFromBoth(DishesBlockEntity first, DishesBlockEntity second) {
-                    return Optional.of(new DoubleInventory(first, second));
+                public Optional<Container> getFromBoth(DishesBlockEntity first, DishesBlockEntity second) {
+                    return Optional.of(new CompoundContainer(first, second));
                 }
 
                 @Override
-                public Optional<Inventory> getFrom(DishesBlockEntity single) {
+                public Optional<Container> getFrom(DishesBlockEntity single) {
                     return Optional.of(single);
                 }
 
                 @Override
-                public Optional<Inventory> getFallback() {
+                public Optional<Container> acceptNone() {
                     return Optional.empty();
                 }
             };
 
-    public GarnishDishesBlock(Settings settings) {
+    public GarnishDishesBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState()
-                .with(FACING, Direction.NORTH)
-                .with(TYPE, DishesType.SINGLE));
+        this.registerDefaultState(this.defaultBlockState()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(TYPE, DishesType.SINGLE));
     }
 
     @Override
-    public VoxelShape getBaseShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getBaseShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return BASE_SHAPE;
     }
 
@@ -75,111 +77,111 @@ public class GarnishDishesBlock extends UpPlaceBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
             BlockState state, Direction direction, BlockState neighborState,
-            WorldAccess world, BlockPos pos, BlockPos neighborPos
+            LevelAccessor world, BlockPos pos, BlockPos neighborPos
     ) {
         // 首先检查方块是否可以放置在当前位置，如果不能则返回空气
-        if (!state.canPlaceAt(world, pos)) {
-            return Blocks.AIR.getDefaultState();
+        if (!state.canSurvive(world, pos)) {
+            return Blocks.AIR.defaultBlockState();
         }
 
-        if (neighborState.isOf(this) && direction.getAxis().isHorizontal()) {
-            DishesType neighborType = neighborState.get(TYPE);
-            if (state.get(TYPE) == DishesType.SINGLE
+        if (neighborState.is(this) && direction.getAxis().isHorizontal()) {
+            DishesType neighborType = neighborState.getValue(TYPE);
+            if (state.getValue(TYPE) == DishesType.SINGLE
                     && neighborType != DishesType.SINGLE
-                    && state.get(FACING) == neighborState.get(FACING)
+                    && state.getValue(FACING) == neighborState.getValue(FACING)
                     && getFacing(neighborState) == direction.getOpposite()) {
-                return state.with(TYPE, neighborType.getOpposite());
+                return state.setValue(TYPE, neighborType.getOpposite());
             }
         } else if (getFacing(state) == direction) {
-            return state.with(TYPE, DishesType.SINGLE);
+            return state.setValue(TYPE, DishesType.SINGLE);
         }
 
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
     }
 
     /**
      * 获取盘子方块的面朝方向
      */
     public static Direction getFacing(BlockState state) {
-        Direction direction = state.get(FACING);
-        return state.get(TYPE) == DishesType.LEFT ?
-                direction.rotateYClockwise() : direction.rotateYCounterclockwise();
+        Direction direction = state.getValue(FACING);
+        return state.getValue(TYPE) == DishesType.LEFT ?
+                direction.getClockWise() : direction.getCounterClockWise();
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new DishesBlockEntity(pos, state);
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     /**
      * 获取相邻盘子方块的方向
      */
     @Nullable
-    private Direction getNeighborDishesDirection(ItemPlacementContext ctx, Direction dir) {
-        BlockState blockState = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(dir));
-        return blockState.isOf(this) && blockState.get(TYPE) == DishesType.SINGLE ?
-                blockState.get(FACING) : null;
+    private Direction getNeighborDishesDirection(BlockPlaceContext ctx, Direction dir) {
+        BlockState blockState = ctx.getLevel().getBlockState(ctx.getClickedPos().relative(dir));
+        return blockState.is(this) && blockState.getValue(TYPE) == DishesType.SINGLE ?
+                blockState.getValue(FACING) : null;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         DishesType dishesType = DishesType.SINGLE;
-        Direction direction = ctx.getHorizontalPlayerFacing();
-        boolean isSneaking = ctx.shouldCancelInteraction();
-        Direction side = ctx.getSide();
+        Direction direction = ctx.getHorizontalDirection();
+        boolean isSneaking = ctx.isSecondaryUseActive();
+        Direction side = ctx.getClickedFace();
 
         if (side.getAxis().isHorizontal() && isSneaking) {
             Direction neighborDirection = this.getNeighborDishesDirection(ctx, side.getOpposite());
             if (neighborDirection != null && neighborDirection.getAxis() != side.getAxis()) {
                 direction = neighborDirection;
-                dishesType = neighborDirection.rotateYCounterclockwise() == side.getOpposite() ?
+                dishesType = neighborDirection.getCounterClockWise() == side.getOpposite() ?
                         DishesType.RIGHT : DishesType.LEFT;
             }
         }
 
         if (dishesType == DishesType.SINGLE && !isSneaking) {
-            if (direction == this.getNeighborDishesDirection(ctx, direction.rotateYClockwise())) {
+            if (direction == this.getNeighborDishesDirection(ctx, direction.getClockWise())) {
                 dishesType = DishesType.LEFT;
-            } else if (direction == this.getNeighborDishesDirection(ctx, direction.rotateYCounterclockwise())) {
+            } else if (direction == this.getNeighborDishesDirection(ctx, direction.getCounterClockWise())) {
                 dishesType = DishesType.RIGHT;
             }
         }
 
-        return this.getDefaultState().with(FACING, direction).with(TYPE, dishesType);
+        return this.defaultBlockState().setValue(FACING, direction).setValue(TYPE, dishesType);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-        BlockPos downPos = pos.down();
-        return !world.getBlockState(downPos).isReplaceable();
+    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+        BlockPos downPos = pos.below();
+        return !world.getBlockState(downPos).canBeReplaced();
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
-        return state.with(FACING, rotation.rotate(state.get(FACING)));
+    public BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return state.rotate(mirror.getRotation(state.get(FACING)));
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, TYPE);
     }
 
     /**
      * 盘子类型枚举
      */
-    public enum DishesType implements StringIdentifiable {
+    public enum DishesType implements StringRepresentable {
         SINGLE("single"),
         LEFT("left"),
         RIGHT("right");
@@ -191,7 +193,7 @@ public class GarnishDishesBlock extends UpPlaceBlock {
         }
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return this.name;
         }
 

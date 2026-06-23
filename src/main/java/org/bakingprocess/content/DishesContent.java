@@ -1,6 +1,6 @@
 package org.bakingprocess.content;
 
-import net.minecraft.item.FoodComponent;
+import net.minecraft.world.food.FoodProperties;
 import org.jetbrains.annotations.NotNull;
 import org.twcore.content.FoodContent;
 
@@ -9,12 +9,12 @@ public class DishesContent extends FoodContent {
      * 表示一个还未烤制的菜肴，
      * 此时玩家不能食用该菜肴。
      */
-    public static final FoodComponent RAW_DISHES = new FoodComponent.Builder()
-            .hunger(0).saturationModifier(0).build();
+    public static final FoodProperties RAW_DISHES = new FoodProperties.Builder()
+            .nutrition(0).saturationMod(0).build();
 
     protected final int eatCount;
 
-    public DishesContent(@NotNull String category, FoodComponent foodComponent, int eatCount) {
+    public DishesContent(@NotNull String category, FoodProperties foodComponent, int eatCount) {
         super(category, foodComponent);
         this.eatCount = eatCount;
     }

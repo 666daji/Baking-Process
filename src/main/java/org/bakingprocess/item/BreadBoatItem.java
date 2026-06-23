@@ -1,16 +1,16 @@
 package org.bakingprocess.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.FoodComponent;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.bakingprocess.block.EmptyBreadBoatBlock;
 import org.bakingprocess.container.BreadBoatContainer;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +24,7 @@ import org.twcore.content.FoodContent;
  */
 public class BreadBoatItem extends BlockItem {
 
-    public BreadBoatItem(Block block, Settings settings) {
+    public BreadBoatItem(Block block, Properties settings) {
         super(block, settings);
     }
 
@@ -33,8 +33,8 @@ public class BreadBoatItem extends BlockItem {
      * @param item 基础物品
      * @return 所有汤类型的物品堆栈列表
      */
-    public static DefaultedList<ItemStack> getAll(BreadBoatItem item) {
-        DefaultedList<ItemStack> result = DefaultedList.of();
+    public static NonNullList<ItemStack> getAll(BreadBoatItem item) {
+        NonNullList<ItemStack> result = NonNullList.create();
 
         for (BreadBoatContainer.BreadBoatSoupType soupType : BreadBoatContainer.BreadBoatSoupType.values()) {
             ItemStack stack = new ItemStack(item);
@@ -46,8 +46,8 @@ public class BreadBoatItem extends BlockItem {
     }
 
     @Override
-    protected @Nullable BlockState getPlacementState(ItemPlacementContext context) {
-        Content content = ContainerUtil.extractContent(context.getStack());
+    protected @Nullable BlockState getPlacementState(BlockPlaceContext context) {
+        Content content = ContainerUtil.extractContent(context.getItemInHand());
         BlockState originalState = super.getPlacementState(context);
 
         if (content != null) {
@@ -65,36 +65,36 @@ public class BreadBoatItem extends BlockItem {
     }
 
     @Override
-    public String getTranslationKey(ItemStack stack) {
+    public String getDescriptionId(ItemStack stack) {
         if (ContainerUtil.extractContent(stack) != null) {
-            return super.getTranslationKey() + ".soup";
+            return super.getDescriptionId() + ".soup";
         }
 
-        return super.getTranslationKey(stack);
+        return super.getDescriptionId(stack);
     }
 
     @Override
-    public Text getName(ItemStack stack) {
+    public Component getName(ItemStack stack) {
         Content content = ContainerUtil.extractContent(stack);
 
         if (content instanceof FoodContent soup) {
-            Text soupName = soup.getDisplayName();
-            return Text.translatable(this.getTranslationKey(stack), soupName);
+            Component soupName = soup.getDisplayName();
+            return Component.translatable(this.getDescriptionId(stack), soupName);
         }
 
         return super.getName(stack);
     }
 
     @Override
-    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+    public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
         Content soupType = ContainerUtil.extractContent(stack);
 
         // 如果容器中有汤并且使用物品的为玩家则喝汤
-        if (soupType instanceof FoodContent soupContent && user instanceof PlayerEntity player) {
-            FoodComponent soup = soupContent.getFoodComponent();
-            player.getHungerManager().add(soup.getHunger(), soup.getSaturationModifier());
+        if (soupType instanceof FoodContent soupContent && user instanceof Player player) {
+            FoodProperties soup = soupContent.getFoodComponent();
+            player.getFoodData().eat(soup.getNutrition(), soup.getSaturationModifier());
         }
 
-        return super.finishUsing(stack, world, user);
+        return super.finishUsingItem(stack, world, user);
     }
 }

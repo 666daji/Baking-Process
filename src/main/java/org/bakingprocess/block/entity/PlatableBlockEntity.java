@@ -1,14 +1,14 @@
 package org.bakingprocess.block.entity;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.HitResult;
 import org.bakingprocess.block.process.PlatingProcess;
 import org.bakingprocess.content.DishesContent;
 import org.bakingprocess.recipe.PlatingRecipe;
@@ -24,7 +24,7 @@ import java.util.List;
  * <p><strong>设计理念：</strong></p>
  * <ul>
  *   <li><strong>操作导向</strong>：方块实体管理已执行的操作（PlayerAction），而非物品</li>
- *   <li><strong>流程分离</strong>：配方匹配和流程逻辑由 {@link org.bakingprocess.block.process.PlatingProcess} 处理</li>
+ *   <li><strong>流程分离</strong>：配方匹配和流程逻辑由 {@link PlatingProcess} 处理</li>
  *   <li><strong>灵活扩展</strong>：支持各种类型的玩家操作（添加物品、剪切、倾倒等）</li>
  *   <li><strong>库存兼容</strong>：通过操作转换为物品堆栈，兼容原版库存接口</li>
  * </ul>
@@ -48,7 +48,7 @@ import java.util.List;
  * @see PlatingProcess
  * @see PlayerAction
  */
-public interface PlatableBlockEntity extends Inventory {
+public interface PlatableBlockEntity extends Container {
 
     // ==================== 容器信息方法 ====================
 
@@ -194,7 +194,7 @@ public interface PlatableBlockEntity extends Inventory {
      * @param hand 玩家的手
      * @param hit 操作的上下文
      */
-    void onPlatingComplete(World world, BlockPos pos, PlatingRecipe recipe, PlayerEntity player, Hand hand, HitResult hit);
+    void onPlatingComplete(Level world, BlockPos pos, PlatingRecipe recipe, Player player, InteractionHand hand, HitResult hit);
 
     /**
      * 当盘子中的食物被吃完时调用。
@@ -207,7 +207,7 @@ public interface PlatableBlockEntity extends Inventory {
      * @param hand 玩家的手
      * @param hit 操作的上下文
      */
-    void onEatComplete(World world, BlockPos pos, PlayerEntity player, Hand hand, HitResult hit);
+    void onEatComplete(Level world, BlockPos pos, Player player, InteractionHand hand, HitResult hit);
 
     // ==================== Inventory 接口适配 ====================
 
@@ -226,8 +226,8 @@ public interface PlatableBlockEntity extends Inventory {
      * @param stack 要设置的物品堆栈
      */
     @Override
-    default void setStack(int slot, ItemStack stack) {
-        if (slot < 0 || slot >= size()) {
+    default void setItem(int slot, ItemStack stack) {
+        if (slot < 0 || slot >= getContainerSize()) {
             return;
         }
 
@@ -252,7 +252,7 @@ public interface PlatableBlockEntity extends Inventory {
      * @return 被移除操作对应的物品堆栈
      */
     @Override
-    default ItemStack removeStack(int slot) {
+    default ItemStack removeItemNoUpdate(int slot) {
         PlayerAction action = removeAction(slot);
         return action != null ? action.toItemStack() : ItemStack.EMPTY;
     }
@@ -260,15 +260,15 @@ public interface PlatableBlockEntity extends Inventory {
     /**
      * 从指定槽位移除指定数量的物品堆栈。
      *
-     * <p>对于摆盘系统，操作是不可分割的，因此此方法与 {@link #removeStack(int)} 行为相同。</p>
+     * <p>对于摆盘系统，操作是不可分割的，因此此方法与 {@link #removeItemNoUpdate(int)} 行为相同。</p>
      *
      * @param slot 槽位索引
      * @param amount 要移除的数量（对于操作系统，此参数被忽略）
      * @return 被移除操作对应的物品堆栈
      */
     @Override
-    default ItemStack removeStack(int slot, int amount) {
-        return removeStack(slot);
+    default ItemStack removeItem(int slot, int amount) {
+        return removeItemNoUpdate(slot);
     }
 
     /**
@@ -280,7 +280,7 @@ public interface PlatableBlockEntity extends Inventory {
      * @return 如果玩家可以使用此方块实体，则返回 {@code true}
      */
     @Override
-    default boolean canPlayerUse(PlayerEntity player) {
+    default boolean stillValid(Player player) {
         return true;
     }
 
@@ -290,7 +290,7 @@ public interface PlatableBlockEntity extends Inventory {
      * <p>此方法清空所有已执行的操作。</p>
      */
     @Override
-    default void clear() {
+    default void clearContent() {
         clearPerformedActions();
     }
 
@@ -303,7 +303,7 @@ public interface PlatableBlockEntity extends Inventory {
      * @return 操作对应的物品堆栈，如果槽位为空则返回 {@link ItemStack#EMPTY}
      */
     @Override
-    default ItemStack getStack(int slot) {
+    default ItemStack getItem(int slot) {
         List<PlayerAction> actions = getPerformedActions();
         if (slot >= 0 && slot < actions.size()) {
             PlayerAction action = actions.get(slot);
@@ -352,12 +352,12 @@ public interface PlatableBlockEntity extends Inventory {
      * 获取最大可记录操作数量。
      *
      * <p>这是一个可选方法，用于限制单个摆盘的容量。
-     * 默认返回 {@link #size()} 表示和对应的方块实体容量相关。</p>
+     * 默认返回 {@link #getContainerSize()} 表示和对应的方块实体容量相关。</p>
      *
      * @return 最大可执行步骤数量
      */
     default int getMaxSteps() {
-        return size();
+        return getContainerSize();
     }
 
     /**
@@ -437,7 +437,7 @@ public interface PlatableBlockEntity extends Inventory {
      *
      * @return 操作显示名称的列表
      */
-    default List<Text> getActionDisplayNames() {
+    default List<Component> getActionDisplayNames() {
         return getPerformedActions().stream()
                 .map(PlayerAction::getDisplayName)
                 .toList();

@@ -1,26 +1,33 @@
-package org.bakingprocess.registry;
+﻿package org.bakingprocess.registry;
 
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.bakingprocess.BakingProcess;
+import org.twcore.TWCore;
 
 public class ModSounds {
-    public static final SoundEvent COOKING_SOUND = registerSoundEvent("stove_baking");
-    public static final SoundEvent GRINDING_STONE_GRINDING = registerSoundEvent("grinding_stone_grinding");
-    public static final SoundEvent CUT = registerSoundEvent("cut");
-    public static final SoundEvent CUT_MEAT = registerSoundEvent("cut_meat");
-    public static final SoundEvent KITCHEN_KNIFE_PLACE = registerSoundEvent("kitchen_knife_place");
-    public static final SoundEvent KITCHEN_KNIFE_FETCH = registerSoundEvent("kitchen_knife_fetch");
-    public static final SoundEvent KITCHEN_KNIFE_BOARD_PLACE = registerSoundEvent("kitchen_knife_board_place");
+    public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
+            DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, BakingProcess.MOD_ID);
 
-    public static final SoundEvent SOUP_FILL = registerSoundEvent("soup_fill");
+    public static final RegistryObject<SoundEvent> COOKING_SOUND = register("stove_baking");
+    public static final RegistryObject<SoundEvent> GRINDING_STONE_GRINDING = register("grinding_stone_grinding");
+    public static final RegistryObject<SoundEvent> CUT = register("cut");
+    public static final RegistryObject<SoundEvent> CUT_MEAT = register("cut_meat");
+    public static final RegistryObject<SoundEvent> KITCHEN_KNIFE_PLACE = register("kitchen_knife_place");
+    public static final RegistryObject<SoundEvent> KITCHEN_KNIFE_FETCH = register("kitchen_knife_fetch");
+    public static final RegistryObject<SoundEvent> KITCHEN_KNIFE_BOARD_PLACE = register("kitchen_knife_board_place");
+    public static final RegistryObject<SoundEvent> SOUP_FILL = register("soup_fill");
 
-    private static SoundEvent registerSoundEvent(String name) {
-        Identifier id = new Identifier(BakingProcess.MOD_ID, name);
-        return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
+    private static RegistryObject<SoundEvent> register(String name) {
+        return SOUND_EVENTS.register(name,
+                () -> SoundEvent.createVariableRangeEvent(
+                        TWCore.createResourceLocation(BakingProcess.MOD_ID, name)));
     }
 
-    public static void registerAll() {}
+    public static void registerAll(IEventBus modEventBus) {
+        SOUND_EVENTS.register(modEventBus);
+    }
 }

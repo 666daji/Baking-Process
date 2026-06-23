@@ -1,7 +1,7 @@
 package org.bakingprocess.container;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.bakingprocess.content.ShapedDoughContent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,13 +14,13 @@ import java.util.Objects;
 public class MoldContainer extends ContainerType{
     public static final String DOUGH_KEY = "dough_type";
 
-    public MoldContainer(ContainerType.ContainerSettings settings) {
+    public MoldContainer(ContainerSettings settings) {
         super(settings);
     }
 
     @Override
     public boolean matches(ItemStack stack) {
-        return stack.isOf(getEmptyItem());
+        return stack.is(getEmptyItem());
     }
 
     @Override
@@ -31,7 +31,7 @@ public class MoldContainer extends ContainerType{
 
     @Override
     public @Nullable Content extractContent(ItemStack stack) {
-        Identifier id = Identifier.tryParse(stack.getOrCreateNbt().getString(DOUGH_KEY));
+        ResourceLocation id = ResourceLocation.tryParse(stack.getOrCreateTag().getString(DOUGH_KEY));
         if (id != null) {
             return TWRegistries.CONTENT.get(id);
         }
@@ -45,15 +45,15 @@ public class MoldContainer extends ContainerType{
 
         // 清空容器
         if (content == null) {
-            if (stack.hasNbt()) {
-                stack.getOrCreateNbt().remove(DOUGH_KEY);
+            if (stack.hasTag()) {
+                stack.getOrCreateTag().remove(DOUGH_KEY);
             }
 
             return stack;
         }
 
         // 替换内容物
-        stack.getOrCreateNbt().putString(DOUGH_KEY, Objects.requireNonNull(TWRegistries.CONTENT.getId(content)).toString());
+        stack.getOrCreateTag().putString(DOUGH_KEY, Objects.requireNonNull(TWRegistries.CONTENT.getKey(content)).toString());
         return stack;
     }
 }

@@ -3,12 +3,12 @@ package org.bakingprocess.recipe.serializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.minecraft.item.Item;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.bakingprocess.recipe.PlatingRecipe;
 import org.twcore.api.process.PlayerAction;
 import org.twcore.content.Content;
@@ -48,10 +48,10 @@ import java.util.List;
 public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> {
 
     @Override
-    public PlatingRecipe read(Identifier id, JsonObject json) {
+    public PlatingRecipe fromJson(ResourceLocation id, JsonObject json) {
         // 1. 读取容器物品
-        String containerId = JsonHelper.getString(json, "container");
-        Item container = Registries.ITEM.getOrEmpty(new Identifier(containerId))
+        String containerId = GsonHelper.getAsString(json, "container");
+        Item container = BuiltInRegistries.ITEM.getOptional(new ResourceLocation(containerId))
                 .orElseThrow(() -> new JsonParseException("Unknown container item: " + containerId));
 
         // 2. 读取操作列表
@@ -60,15 +60,15 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
         }
 
         List<PlayerAction> actions = new ArrayList<>();
-        for (JsonElement element : JsonHelper.getArray(json, "actions")) {
+        for (JsonElement element : GsonHelper.getAsJsonArray(json, "actions")) {
             String actionStr = element.getAsString();
             PlayerAction action = PlayerAction.fromString(actionStr);
             actions.add(action);
         }
 
         // 3. 读取输出结果
-        String resultId = JsonHelper.getString(json, "result");
-        Identifier result = Identifier.tryParse(resultId);
+        String resultId = GsonHelper.getAsString(json, "result");
+        ResourceLocation result = ResourceLocation.tryParse(resultId);
         if (result == null) {
             throw new JsonParseException("Invalid result ID: " + resultId);
         }
@@ -83,23 +83,23 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
     }
 
     @Override
-    public PlatingRecipe read(Identifier id, PacketByteBuf buf) {
+    public PlatingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
         // 1. 读取容器物品
-        Identifier containerId = buf.readIdentifier();
-        Item container = Registries.ITEM.getOrEmpty(containerId)
+        ResourceLocation containerId = buf.readResourceLocation();
+        Item container = BuiltInRegistries.ITEM.getOptional(containerId)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown container item: " + containerId));
 
         // 2. 读取操作列表
         int actionCount = buf.readVarInt();
         List<PlayerAction> actions = new ArrayList<>(actionCount);
         for (int i = 0; i < actionCount; i++) {
-            String actionStr = buf.readString();
+            String actionStr = buf.readUtf();
             PlayerAction action = PlayerAction.fromString(actionStr);
             actions.add(action);
         }
 
         // 3. 读取输出结果
-        Content output = TWRegistries.CONTENT.get(buf.readIdentifier());
+        Content output = TWRegistries.CONTENT.get(buf.readResourceLocation());
         if (output == null) {
             throw new IllegalArgumentException("No output found");
         }
@@ -109,18 +109,18 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
     }
 
     @Override
-    public void write(PacketByteBuf buf, PlatingRecipe recipe) {
+    public void write(FriendlyByteBuf buf, PlatingRecipe recipe) {
         // 1. 写入容器物品ID
-        buf.writeIdentifier(Registries.ITEM.getId(recipe.getContainer()));
+        buf.writeResourceLocation(BuiltInRegistries.ITEM.getKey(recipe.getContainer()));
 
         // 2. 写入操作列表
         List<PlayerAction> actions = recipe.getActions();
         buf.writeVarInt(actions.size());
         for (PlayerAction action : actions) {
-            buf.writeString(action.toString());
+            buf.writeUtf(action.toString());
         }
 
         // 3. 写入输出内容ID
-        buf.writeIdentifier(TWRegistries.CONTENT.getId(recipe.getDishes()));
+        buf.writeResourceLocation(TWRegistries.CONTENT.getKey(recipe.getDishes()));
     }
 }

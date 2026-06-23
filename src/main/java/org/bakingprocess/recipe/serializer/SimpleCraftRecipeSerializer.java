@@ -2,13 +2,13 @@ package org.bakingprocess.recipe.serializer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.bakingprocess.recipe.SimpleCraftRecipe;
 
 /**
@@ -102,17 +102,17 @@ public abstract class SimpleCraftRecipeSerializer<T extends SimpleCraftRecipe> i
      * @throws IllegalStateException 如果结果物品不存在
      */
     @Override
-    public T read(Identifier id, JsonObject json) {
+    public T fromJson(ResourceLocation id, JsonObject json) {
         // 1. 读取原料（支持数组或对象格式）
-        JsonElement ingredientElement = JsonHelper.hasArray(json, "ingredient")
-                ? JsonHelper.getArray(json, "ingredient")
-                : JsonHelper.getObject(json, "ingredient");
+        JsonElement ingredientElement = GsonHelper.isArrayNode(json, "ingredient")
+                ? GsonHelper.getAsJsonArray(json, "ingredient")
+                : GsonHelper.getAsJsonObject(json, "ingredient");
         Ingredient ingredient = Ingredient.fromJson(ingredientElement, false);
 
         // 2. 读取结果物品
-        String resultId = JsonHelper.getString(json, "result");
+        String resultId = GsonHelper.getAsString(json, "result");
         ItemStack result = new ItemStack(
-                Registries.ITEM.getOrEmpty(new Identifier(resultId))
+                BuiltInRegistries.ITEM.getOptional(new ResourceLocation(resultId))
                         .orElseThrow(() -> new IllegalStateException("Item: " + resultId + " does not exist"))
         );
 
@@ -138,12 +138,12 @@ public abstract class SimpleCraftRecipeSerializer<T extends SimpleCraftRecipe> i
      * @return 解析后的配方对象
      */
     @Override
-    public T read(Identifier id, PacketByteBuf buf) {
+    public T fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
         // 1. 读取原料
-        Ingredient ingredient = Ingredient.fromPacket(buf);
+        Ingredient ingredient = Ingredient.fromNetwork(buf);
 
         // 2. 读取结果物品
-        ItemStack result = buf.readItemStack();
+        ItemStack result = buf.readItem();
 
         // 3. 调用子类方法从网络读取配方特有的额外数据
         Object extraData = readExtraData(buf);
@@ -166,12 +166,12 @@ public abstract class SimpleCraftRecipeSerializer<T extends SimpleCraftRecipe> i
      * @param recipe 要序列化的配方对象
      */
     @Override
-    public void write(PacketByteBuf buf, T recipe) {
+    public void write(FriendlyByteBuf buf, T recipe) {
         // 1. 写入原料
-        recipe.getInput().write(buf);
+        recipe.getInput().toNetwork(buf);
 
         // 2. 写入结果物品
-        buf.writeItemStack(recipe.output);
+        buf.writeItem(recipe.output);
 
         // 3. 调用子类方法写入配方特有的额外数据
         writeExtraData(buf, recipe);
@@ -204,7 +204,7 @@ public abstract class SimpleCraftRecipeSerializer<T extends SimpleCraftRecipe> i
      * @param buf 包含序列化数据的数据包缓冲区
      * @return 解析出的额外数据对象
      */
-    protected abstract Object readExtraData(PacketByteBuf buf);
+    protected abstract Object readExtraData(FriendlyByteBuf buf);
 
     /**
      * <h3>将配方特有的额外数据写入网络数据包</h3>
@@ -214,7 +214,7 @@ public abstract class SimpleCraftRecipeSerializer<T extends SimpleCraftRecipe> i
      * @param buf 目标数据包缓冲区
      * @param recipe 要序列化的配方对象
      */
-    protected abstract void writeExtraData(PacketByteBuf buf, T recipe);
+    protected abstract void writeExtraData(FriendlyByteBuf buf, T recipe);
 
     /**
      * <h3>配方工厂接口</h3>
@@ -234,6 +234,6 @@ public abstract class SimpleCraftRecipeSerializer<T extends SimpleCraftRecipe> i
          * @param extraData 额外数据
          * @return 创建的配方对象
          */
-        T create(Identifier id, Ingredient input, ItemStack output, Object extraData);
+        T create(ResourceLocation id, Ingredient input, ItemStack output, Object extraData);
     }
 }

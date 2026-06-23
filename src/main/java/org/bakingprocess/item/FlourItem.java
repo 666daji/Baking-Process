@@ -1,7 +1,7 @@
 package org.bakingprocess.item;
 
-import net.minecraft.item.Item;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +15,7 @@ public class FlourItem extends Item {
     protected final int color;
     protected final FlourType flourType;
 
-    public FlourItem(Settings settings, int color, FlourType flourType) {
+    public FlourItem(Properties settings, int color, FlourType flourType) {
         super(settings);
         this.color = color;
         this.flourType = flourType;
@@ -30,7 +30,7 @@ public class FlourItem extends Item {
         return flourType;
     }
 
-    public enum FlourType implements StringIdentifiable {
+    public enum FlourType implements StringRepresentable {
         WHEAT("wheat"),
         LAPIS_LAZULI("lapis_lazuli"),
         AMETHYST("amethyst"),
@@ -45,7 +45,7 @@ public class FlourItem extends Item {
         }
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return id;
         }
 

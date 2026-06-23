@@ -1,7 +1,7 @@
 package org.bakingprocess.food;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.FoodComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,9 +17,9 @@ public record SimpleFoodComponent(int Hunger, float SaturationModifier) {
      * @param foodComponent Minecraft原版食物组件
      * @return SimpleFoodComponent实例
      */
-    public static SimpleFoodComponent fromFoodComponent(FoodComponent foodComponent) {
+    public static SimpleFoodComponent fromFoodComponent(FoodProperties foodComponent) {
         return new SimpleFoodComponent(
-                foodComponent.getHunger(),
+                foodComponent.getNutrition(),
                 foodComponent.getSaturationModifier()
         );
     }
@@ -29,8 +29,8 @@ public record SimpleFoodComponent(int Hunger, float SaturationModifier) {
      * @param first 第一个食物属性
      * @param second 第二个食物属性
      */
-    public static SimpleFoodComponent computeFoodComponent(FoodComponent first, FoodComponent second) {
-        int hunger = second.getHunger() + first.getHunger();
+    public static SimpleFoodComponent computeFoodComponent(FoodProperties first, FoodProperties second) {
+        int hunger = second.getNutrition() + first.getNutrition();
         float saturationModifier = (second.getSaturationModifier() + first.getSaturationModifier()) / 2;
         return new SimpleFoodComponent(hunger, saturationModifier);
     }
@@ -89,10 +89,10 @@ public record SimpleFoodComponent(int Hunger, float SaturationModifier) {
      * 转换为Minecraft原版FoodComponent.Builder
      * @return FoodComponent.Builder实例
      */
-    public FoodComponent.Builder toFoodComponentBuilder() {
-        return new FoodComponent.Builder()
-                .hunger(this.Hunger)
-                .saturationModifier(this.SaturationModifier);
+    public FoodProperties.Builder toFoodComponentBuilder() {
+        return new FoodProperties.Builder()
+                .nutrition(this.Hunger)
+                .saturationMod(this.SaturationModifier);
     }
 
     /**
@@ -126,8 +126,8 @@ public record SimpleFoodComponent(int Hunger, float SaturationModifier) {
      * 尝试为玩家增加饥饿值
      * @param player 目标玩家
      */
-    public void eat(PlayerEntity player) {
-        player.getHungerManager().add(
+    public void eat(Player player) {
+        player.getFoodData().eat(
                 Hunger(), SaturationModifier());
     }
 }

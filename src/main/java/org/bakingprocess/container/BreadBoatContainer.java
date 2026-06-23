@@ -1,10 +1,10 @@
 package org.bakingprocess.container;
 
-import net.minecraft.item.FoodComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemStack;
 import org.bakingprocess.item.BreadBoatItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,10 +41,10 @@ public class BreadBoatContainer extends ContainerType {
 
     @Override
     public @Nullable Content extractContent(ItemStack stack) {
-        if (stack.getNbt() != null && stack.hasNbt()
-                && stack.getNbt().contains(SOUP_KEY, NbtElement.STRING_TYPE)) {
-            String soupKey = stack.getNbt().getString(SOUP_KEY);
-            return TWRegistries.CONTENT.get(Identifier.tryParse(soupKey));
+        if (stack.getTag() != null && stack.hasTag()
+                && stack.getTag().contains(SOUP_KEY, Tag.TAG_STRING)) {
+            String soupKey = stack.getTag().getString(SOUP_KEY);
+            return TWRegistries.CONTENT.get(ResourceLocation.tryParse(soupKey));
         }
 
         return null;
@@ -56,8 +56,8 @@ public class BreadBoatContainer extends ContainerType {
 
         // 清空容器
         if (content == null) {
-            if (stack.hasNbt()) {
-                stack.getOrCreateNbt().remove(SOUP_KEY);
+            if (stack.hasTag()) {
+                stack.getOrCreateTag().remove(SOUP_KEY);
             }
 
             return stack;
@@ -65,7 +65,7 @@ public class BreadBoatContainer extends ContainerType {
 
         // 替换内容物
         if (canContain(content)) {
-            stack.getOrCreateNbt().putString(SOUP_KEY, TWRegistries.CONTENT.getId(content).toString());
+            stack.getOrCreateTag().putString(SOUP_KEY, TWRegistries.CONTENT.getKey(content).toString());
         }
 
         return stack;
@@ -74,7 +74,7 @@ public class BreadBoatContainer extends ContainerType {
     /**
      * 允许装入硬面包船的汤类型枚举。
      */
-    public enum BreadBoatSoupType implements StringIdentifiable {
+    public enum BreadBoatSoupType implements StringRepresentable {
         BEETROOT_SOUP((FoodContent) Contents.BEETROOT_SOUP),
         MUSHROOM_STEW((FoodContent) Contents.MUSHROOM_STEW);
 
@@ -97,11 +97,11 @@ public class BreadBoatContainer extends ContainerType {
         }
 
         @Override
-        public String asString() {
-            return Objects.requireNonNull(TWRegistries.CONTENT.getId(content)).getPath();
+        public String getSerializedName() {
+            return Objects.requireNonNull(TWRegistries.CONTENT.getKey(content)).getPath();
         }
 
-        public FoodComponent getFoodComponent() {
+        public FoodProperties getFoodComponent() {
             return this.content.getFoodComponent();
         }
 

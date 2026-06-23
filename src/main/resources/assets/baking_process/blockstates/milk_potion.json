@@ -1,0 +1,61 @@
+{
+  "variants": {
+    "facing=north,number_of_food=1": {
+      "model": "baking_process:block/milk_potion",
+      "y": 180,
+      "render_type": "minecraft:cutout"
+    },
+    "facing=north,number_of_food=2": {
+      "model": "baking_process:block/milk_potion_2",
+      "y": 180,
+      "render_type": "minecraft:cutout"
+    },
+    "facing=north,number_of_food=3": {
+      "model": "baking_process:block/milk_potion_3",
+      "y": 180,
+      "render_type": "minecraft:cutout"
+    },
+    "facing=south,number_of_food=1": {
+      "model": "baking_process:block/milk_potion",
+      "render_type": "minecraft:cutout"
+    },
+    "facing=south,number_of_food=2": {
+      "model": "baking_process:block/milk_potion_2",
+      "render_type": "minecraft:cutout"
+    },
+    "facing=south,number_of_food=3": {
+      "model": "baking_process:block/milk_potion_3",
+      "render_type": "minecraft:cutout"
+    },
+    "facing=east,number_of_food=1": {
+      "model": "baking_process:block/milk_potion",
+      "y": 270,
+      "render_type": "minecraft:cutout"
+    },
+    "facing=east,number_of_food=2": {
+      "model": "baking_process:block/milk_potion_2",
+      "y": 270,
+      "render_type": "minecraft:cutout"
+    },
+    "facing=east,number_of_food=3": {
+      "model": "baking_process:block/milk_potion_3",
+      "y": 270,
+      "render_type": "minecraft:cutout"
+    },
+    "facing=west,number_of_food=1": {
+      "model": "baking_process:block/milk_potion",
+      "y": 90,
+      "render_type": "minecraft:cutout"
+    },
+    "facing=west,number_of_food=2": {
+      "model": "baking_process:block/milk_potion_2",
+      "y": 90,
+      "render_type": "minecraft:cutout"
+    },
+    "facing=west,number_of_food=3": {
+      "model": "baking_process:block/milk_potion_3",
+      "y": 90,
+      "render_type": "minecraft:cutout"
+    }
+  }
+}
