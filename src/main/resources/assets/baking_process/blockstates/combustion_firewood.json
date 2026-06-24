@@ -2,143 +2,115 @@
   "variants": {
     "combustion_state=first_ignited,facing=east": {
       "model": "baking_process:block/first_ignited",
-      "y": 90,
-      "render_type": "minecraft:cutout"
+      "y": 90
     },
     "combustion_state=first_ignited,facing=north": {
       "model": "baking_process:block/first_ignited",
-      "y": 0,
-      "render_type": "minecraft:cutout"
+      "y": 0
     },
     "combustion_state=first_ignited,facing=south": {
       "model": "baking_process:block/first_ignited",
-      "y": 180,
-      "render_type": "minecraft:cutout"
+      "y": 180
     },
     "combustion_state=first_ignited,facing=west": {
       "model": "baking_process:block/first_ignited",
-      "y": 270,
-      "render_type": "minecraft:cutout"
+      "y": 270
     },
     "combustion_state=first_half,facing=east": {
       "model": "baking_process:block/first_half",
-      "y": 90,
-      "render_type": "minecraft:cutout"
+      "y": 90
     },
     "combustion_state=first_half,facing=north": {
       "model": "baking_process:block/first_half",
-      "y": 0,
-      "render_type": "minecraft:cutout"
+      "y": 0
     },
     "combustion_state=first_half,facing=south": {
       "model": "baking_process:block/first_half",
-      "y": 180,
-      "render_type": "minecraft:cutout"
+      "y": 180
     },
     "combustion_state=first_half,facing=west": {
       "model": "baking_process:block/first_half",
-      "y": 270,
-      "render_type": "minecraft:cutout"
+      "y": 270
     },
     "combustion_state=first_extinguished,facing=east": {
       "model": "baking_process:block/first_extinguished",
-      "y": 90,
-      "render_type": "minecraft:cutout"
+      "y": 90
     },
     "combustion_state=first_extinguished,facing=north": {
       "model": "baking_process:block/first_extinguished",
-      "y": 0,
-      "render_type": "minecraft:cutout"
+      "y": 0
     },
     "combustion_state=first_extinguished,facing=south": {
       "model": "baking_process:block/first_extinguished",
-      "y": 180,
-      "render_type": "minecraft:cutout"
+      "y": 180
     },
     "combustion_state=first_extinguished,facing=west": {
       "model": "baking_process:block/first_extinguished",
-      "y": 270,
-      "render_type": "minecraft:cutout"
+      "y": 270
     },
     "combustion_state=again_ignited,facing=east": {
       "model": "baking_process:block/again_ignited",
-      "y": 90,
-      "render_type": "minecraft:cutout"
+      "y": 90
     },
     "combustion_state=again_ignited,facing=north": {
       "model": "baking_process:block/again_ignited",
-      "y": 0,
-      "render_type": "minecraft:cutout"
+      "y": 0
     },
     "combustion_state=again_ignited,facing=south": {
       "model": "baking_process:block/again_ignited",
-      "y": 180,
-      "render_type": "minecraft:cutout"
+      "y": 180
     },
     "combustion_state=again_ignited,facing=west": {
       "model": "baking_process:block/again_ignited",
-      "y": 270,
-      "render_type": "minecraft:cutout"
+      "y": 270
     },
     "combustion_state=again_half,facing=east": {
       "model": "baking_process:block/again_half",
-      "y": 90,
-      "render_type": "minecraft:cutout"
+      "y": 90
     },
     "combustion_state=again_half,facing=north": {
       "model": "baking_process:block/again_half",
-      "y": 0,
-      "render_type": "minecraft:cutout"
+      "y": 0
     },
     "combustion_state=again_half,facing=south": {
       "model": "baking_process:block/again_half",
-      "y": 180,
-      "render_type": "minecraft:cutout"
+      "y": 180
     },
     "combustion_state=again_half,facing=west": {
       "model": "baking_process:block/again_half",
-      "y": 270,
-      "render_type": "minecraft:cutout"
+      "y": 270
     },
     "combustion_state=reignited,facing=east": {
       "model": "baking_process:block/reignited",
-      "y": 90,
-      "render_type": "minecraft:cutout"
+      "y": 90
     },
     "combustion_state=reignited,facing=north": {
       "model": "baking_process:block/reignited",
-      "y": 0,
-      "render_type": "minecraft:cutout"
+      "y": 0
     },
     "combustion_state=reignited,facing=south": {
       "model": "baking_process:block/reignited",
-      "y": 180,
-      "render_type": "minecraft:cutout"
+      "y": 180
     },
     "combustion_state=reignited,facing=west": {
       "model": "baking_process:block/reignited",
-      "y": 270,
-      "render_type": "minecraft:cutout"
+      "y": 270
     },
     "combustion_state=again_extinguished,facing=east": {
       "model": "baking_process:block/again_extinguished",
-      "y": 90,
-      "render_type": "minecraft:cutout"
+      "y": 90
     },
     "combustion_state=again_extinguished,facing=north": {
       "model": "baking_process:block/again_extinguished",
-      "y": 0,
-      "render_type": "minecraft:cutout"
+      "y": 0
     },
     "combustion_state=again_extinguished,facing=south": {
       "model": "baking_process:block/again_extinguished",
-      "y": 180,
-      "render_type": "minecraft:cutout"
+      "y": 180
     },
     "combustion_state=again_extinguished,facing=west": {
       "model": "baking_process:block/again_extinguished",
-      "y": 270,
-      "render_type": "minecraft:cutout"
+      "y": 270
     }
   }
 }

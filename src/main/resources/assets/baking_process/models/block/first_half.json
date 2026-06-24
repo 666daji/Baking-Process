@@ -1,6 +1,7 @@
 {
 	"format_version": "1.21.6",
 	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
 	"texture_size": [64, 64],
 	"textures": {
 		"1": "block/campfire_fire",
@@ -104,17 +105,20 @@
 		{
 			"name": "group",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				{
 					"name": "group",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [0, 1, 2, 3, 4]
 				},
 				{
 					"name": "group",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [5, 6]
 				}

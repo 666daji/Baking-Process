@@ -16,6 +16,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.client.model.data.ModelData;
 import org.bakingprocess.block.CuttingBoardBlock;
 import org.bakingprocess.block.entity.CuttingBoardBlockEntity;
 import org.bakingprocess.block.process.CuttingProcess;
@@ -134,17 +135,21 @@ public class CuttingBoardBlockEntityRenderer extends UpPlaceBlockEntityRenderer<
         }
 
         // 渲染切割模型
-        modelRenderer.tesselateBlock(
-                entity.getLevel(),
-                model,
-                entity.getBlockState(),
-                entity.getBlockPos(),
-                matrices,
-                vertexConsumers.getBuffer(RenderType.cutout()),
-                true,
-                RandomSource.create(),
-                entity.getBlockState().getSeed(entity.getBlockPos()),
-                OverlayTexture.NO_OVERLAY
-        );
+        if (entity.getLevel() != null) {
+            modelRenderer.tesselateBlock(
+                    entity.getLevel(),
+                    model,
+                    entity.getBlockState(),
+                    entity.getBlockPos(),
+                    matrices,
+                    vertexConsumers.getBuffer(RenderType.cutout()),
+                    true,
+                    RandomSource.create(),
+                    entity.getBlockState().getSeed(entity.getBlockPos()),
+                    OverlayTexture.NO_OVERLAY,
+                    ModelData.EMPTY,
+                    RenderType.cutout()
+            );
+        }
     }
 }

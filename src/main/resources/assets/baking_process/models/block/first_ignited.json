@@ -1,10 +1,12 @@
 {
+	"format_version": "1.21.11",
 	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "baking_process:block/firewood",
-		"1": "minecraft:block/campfire_fire",
-		"particle": "minecraft:block/oak_log"
+		"1": "block/campfire_fire",
+		"particle": "block/oak_log"
 	},
 	"elements": [
 		{
@@ -90,11 +92,13 @@
 		{
 			"name": "group",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				{
 					"name": "group",
 					"origin": [8, 8, 8],
+					"scope": 0,
 					"color": 0,
 					"children": [0, 1, 2, 3]
 				}
@@ -103,6 +107,7 @@
 		{
 			"name": "group",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [4, 5]
 		}
