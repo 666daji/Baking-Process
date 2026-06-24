@@ -3,6 +3,7 @@ package org.bakingprocess.client.render.block.blockentity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -10,6 +11,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraftforge.client.model.data.ModelData;
 import org.bakingprocess.block.entity.PotsBlockEntity;
 import org.bakingprocess.block.process.KneadingProcess;
 import org.bakingprocess.client.render.model.ModModelLoader;
@@ -48,7 +50,8 @@ public class PotsBlockEntityRenderer implements BlockEntityRenderer<PotsBlockEnt
                     vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(entity.getBlockState())),
                     null,
                     modelManager.getModel(MODEL_KNEAD_2),
-                    1.0f, 1.0f, 1.0f, light, overlay);
+                    1.0f, 1.0f, 1.0f, light, overlay,
+                    ModelData.EMPTY, RenderType.cutout());
             matrices.popPose();
             return;
         }

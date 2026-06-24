@@ -195,6 +195,7 @@ dependencies {
     implementation fg.deobf("maven.modrinth:jade:${project.jade_version}")
 
     implementation fg.deobf("maven.modrinth:tw-core:${project.tw_core_version}")
+//    implementation fg.deobf("org.twcore:tw-core:${project.tw_core_version}")
     implementation fg.deobf("maven.modrinth:decorative-food:${project.decorative_food_version}")
 }
 
