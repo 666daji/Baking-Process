@@ -135,7 +135,7 @@ public class CutRecipeSerializer implements RecipeSerializer<CutRecipe> {
     }
 
     @Override
-    public void write(FriendlyByteBuf buf, CutRecipe recipe) {
+    public void toNetwork(FriendlyByteBuf buf, CutRecipe recipe) {
         // 写入输入物品
         recipe.getInput().toNetwork(buf);
 

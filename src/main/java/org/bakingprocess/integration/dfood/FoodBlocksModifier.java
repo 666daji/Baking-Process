@@ -1,5 +1,12 @@
 package org.bakingprocess.integration.dfood;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.dfood.block.FoodBlock;
 import org.dfood.block.FoodBlocks;
 import org.dfood.block.entity.SuspiciousStewBlockEntity;
@@ -24,10 +31,10 @@ public class FoodBlocksModifier {
                     newBlockEntity.load(blockEntityData);
                 }
             }
-            blockState.getBlock().use(world, player, hand, hit);
-            return InteractionResult.field_5812;
+            blockState.use(world, player, hand, hit);
+            return InteractionResult.SUCCESS;
         }
-        return InteractionResult.field_5811;
+        return InteractionResult.PASS;
     };
 
     /** 可以使用空瓶子从水桶中盛出水 */
@@ -35,11 +42,11 @@ public class FoodBlocksModifier {
         ItemStack handStack = player.getItemInHand(hand);
 
         // 检查是否手持空瓶子
-        if (handStack.getItem() == Items.field_8469) {
+        if (handStack.getItem() == Items.POTION) {
             if (world.isClientSide) {
                 // 客户端播放声音
-                world.playSound(player, pos, SoundEvents.field_14779, player.getSoundSource(), 1.0F, 1.0F);
-                return InteractionResult.field_5812;
+                world.playSound(player, pos, SoundEvents.BUCKET_FILL, player.getSoundSource(), 1.0F, 1.0F);
+                return InteractionResult.SUCCESS;
             }
 
             // 转换为残损水桶状态
@@ -47,14 +54,14 @@ public class FoodBlocksModifier {
             world.setBlock(pos, newState, 3);
 
             // 播放声音
-            world.playSound(player, pos, SoundEvents.field_14779, player.getSoundSource(), 1.0F, 1.0F);
+            world.playSound(player, pos, SoundEvents.BUCKET_FILL, player.getSoundSource(), 1.0F, 1.0F);
 
             // 调用新方块的使用方法
-            newState.getBlock().use(world, player, hand, hit);
-            return InteractionResult.field_5812;
+            newState.use(world, player, hand, hit);
+            return InteractionResult.SUCCESS;
         }
 
-        return InteractionResult.field_5811;
+        return InteractionResult.PASS;
     };
 
     public static void FoodBlockAdd() {

@@ -1,4 +1,4 @@
-﻿package org.bakingprocess.registry;
+package org.bakingprocess.registry;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;

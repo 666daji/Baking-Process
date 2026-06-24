@@ -19,10 +19,11 @@ import org.bakingprocess.BakingProcess;
 import org.bakingprocess.block.GrindingStoneBlock;
 import org.bakingprocess.block.entity.GrindingStoneBlockEntity;
 import org.bakingprocess.client.render.model.ModModelLayers;
+import org.twcore.TWCore;
 import org.twcore.client.api.animation.WithAnimationBlockEntityRenderer;
 
 public class GrindingStoneBlockEntityRenderer extends WithAnimationBlockEntityRenderer<GrindingStoneBlockEntity> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(BakingProcess.MOD_ID, "textures/blockentity/grinding_stone.png");
+    private static final ResourceLocation TEXTURE = TWCore.createResourceLocation(BakingProcess.MOD_ID, "textures/blockentity/grinding_stone.png");
     private static final float MODEL_Y_TRANSLATION = 1.5f;
     private static final float MODEL_X_ROTATION = 180.0f;
     private static final float ITEM_Y_BASE = 0.45f;

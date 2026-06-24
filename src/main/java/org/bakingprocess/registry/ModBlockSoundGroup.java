@@ -1,4 +1,4 @@
-﻿package org.bakingprocess.registry;
+package org.bakingprocess.registry;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.SoundType;

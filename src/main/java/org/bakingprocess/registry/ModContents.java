@@ -1,4 +1,4 @@
-﻿package org.bakingprocess.registry;
+package org.bakingprocess.registry;
 
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -9,11 +9,10 @@ import org.bakingprocess.content.ShapedDoughContent;
 import org.bakingprocess.food.ModFoodComponents;
 import org.twcore.TWCore;
 import org.twcore.content.Content;
-import org.twcore.registry.TWRegistries;
+import org.twcore.registry.Contents;
 
 public class ModContents {
-    public static final DeferredRegister<Content> CONTENTS =
-            DeferredRegister.create(TWRegistries.CONTENT.get(), BakingProcess.MOD_ID);
+    public static final DeferredRegister<Content> CONTENTS = DeferredRegister.create(Contents.CONTENT.getRegistryKey(), BakingProcess.MOD_ID);
 
     public static final String DISHES = "dishes";
     public static final String SHAPED_DOUGH = "shaped_dough";

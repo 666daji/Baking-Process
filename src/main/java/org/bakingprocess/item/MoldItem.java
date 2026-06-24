@@ -1,22 +1,12 @@
 package org.bakingprocess.item;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import org.bakingprocess.block.entity.GrindingStoneBlockEntity;
-import org.bakingprocess.block.entity.MoldBlockEntity;
-import org.bakingprocess.client.render.block.blockentity.MoldBlockEntityRenderer;
-import org.bakingprocess.client.render.item.renderer.ItemRenderers;
 import org.bakingprocess.client.render.item.renderer.MoldItemRenderer;
 import org.bakingprocess.content.ShapedDoughContent;
 import org.twcore.api.content.ContainerUtil;

@@ -1,4 +1,4 @@
-﻿package org.bakingprocess.registry;
+package org.bakingprocess.registry;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -8,7 +8,10 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.bakingprocess.BakingProcess;
+import org.bakingprocess.integration.dfood.AssistedBlocks;
 import org.bakingprocess.block.entity.*;
+import org.bakingprocess.block.entity.BakingComplexFoodBlockEntity;
+import org.bakingprocess.block.entity.BakingSuspiciousStewBlockEntity;
 
 import java.util.Arrays;
 
@@ -38,11 +41,18 @@ public class ModBlockEntityTypes {
     public static final RegistryObject<BlockEntityType<FlourSackBlockEntity>> FLOUR_SACK = register(
             "flour_sack", FlourSackBlockEntity::new, ModBlocks.FLOUR_SACK);
 
+    // 整合
+    public static final RegistryObject<BlockEntityType<BakingSuspiciousStewBlockEntity>> SUSPICIOUS_STEW = register(
+            "suspicious_stew", BakingSuspiciousStewBlockEntity::new,
+            AssistedBlocks.CRIPPLED_SUSPICIOUS_STEW);
+    public static final RegistryObject<BlockEntityType<BakingComplexFoodBlockEntity>> COMPLEX_FOOD = register(
+            "complex_food", BakingComplexFoodBlockEntity::new,
+            ModBlocks.BREAD_SPATULA, ModBlocks.KITCHEN_KNIFE);
+
     // 其他
     public static final RegistryObject<BlockEntityType<CombustionFirewoodBlockEntity>> COMBUSTION_FIREWOOD = register(
             "combustion_firewood", CombustionFirewoodBlockEntity::new, ModBlocks.COMBUSTION_FIREWOOD);
 
-    @SafeVarargs
     private static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> register(
             String name, BlockEntityType.BlockEntitySupplier<T> factory, RegistryObject<? extends Block>... blocks) {
         return BLOCK_ENTITY_TYPES.register(name, () -> {

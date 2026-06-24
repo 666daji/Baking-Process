@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.RegistryObject;
 import org.bakingprocess.item.BreadBoatItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +15,7 @@ import org.twcore.content.FoodContent;
 import org.twcore.registry.Contents;
 import org.twcore.registry.TWRegistries;
 
-import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * 硬面包船容器类型。
@@ -44,7 +45,7 @@ public class BreadBoatContainer extends ContainerType {
         if (stack.getTag() != null && stack.hasTag()
                 && stack.getTag().contains(SOUP_KEY, Tag.TAG_STRING)) {
             String soupKey = stack.getTag().getString(SOUP_KEY);
-            return TWRegistries.CONTENT.get(ResourceLocation.tryParse(soupKey));
+            return TWRegistries.CONTENT.get().getValue(ResourceLocation.tryParse(soupKey));
         }
 
         return null;
@@ -65,7 +66,7 @@ public class BreadBoatContainer extends ContainerType {
 
         // 替换内容物
         if (canContain(content)) {
-            stack.getOrCreateTag().putString(SOUP_KEY, TWRegistries.CONTENT.getKey(content).toString());
+            stack.getOrCreateTag().putString(SOUP_KEY, TWRegistries.CONTENT.get().getKey(content).toString());
         }
 
         return stack;
@@ -75,34 +76,39 @@ public class BreadBoatContainer extends ContainerType {
      * 允许装入硬面包船的汤类型枚举。
      */
     public enum BreadBoatSoupType implements StringRepresentable {
-        BEETROOT_SOUP((FoodContent) Contents.BEETROOT_SOUP),
-        MUSHROOM_STEW((FoodContent) Contents.MUSHROOM_STEW);
+        BEETROOT_SOUP(Contents.BEETROOT_SOUP),
+        MUSHROOM_STEW(Contents.MUSHROOM_STEW);
 
-        private final FoodContent content;
+        private final Supplier<Content> content;
+        private final String id;
 
-        BreadBoatSoupType(FoodContent content) {
-            if (content.isIn(Contents.SOUP)) {
-                this.content = content;
-            } else {
-                throw new IllegalArgumentException();
-            }
+        BreadBoatSoupType(Supplier<Content> content, String id) {
+            this.content = content;
+            this.id = id;
+        }
+
+        BreadBoatSoupType(RegistryObject<Content> content) {
+            this(content, content.getId().getPath());
         }
 
         /**
          * 获取对应的内容物。
          * @return 对应的内容物
          */
-        public FoodContent getContent() {
-            return content;
+        public Content getContent() {
+            return content.get();
         }
 
         @Override
         public String getSerializedName() {
-            return Objects.requireNonNull(TWRegistries.CONTENT.getKey(content)).getPath();
+            return id;
         }
 
         public FoodProperties getFoodComponent() {
-            return this.content.getFoodComponent();
+            if (content.get() instanceof FoodContent foodContent) {
+                return foodContent.getFoodComponent();
+            }
+            return null;
         }
 
         /**
@@ -118,7 +124,7 @@ public class BreadBoatContainer extends ContainerType {
             }
 
             for (BreadBoatSoupType type : values()) {
-                if (type.content.equals(content)) {
+                if (type.content.get().equals(content)) {
                     return type;
                 }
             }

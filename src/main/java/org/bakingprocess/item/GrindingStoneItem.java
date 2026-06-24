@@ -18,12 +18,15 @@ public class GrindingStoneItem extends BlockItem {
 
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        BlockEntityWithoutLevelRenderer itemRenderer = ItemRenderers.createSimpleBlockEntityRenderer(GrindingStoneItem.this.getBlock(), GrindingStoneBlockEntity::new);
-
         consumer.accept(new IClientItemExtensions() {
+            BlockEntityWithoutLevelRenderer itemRenderer;
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (itemRenderer == null) {
+                    itemRenderer = ItemRenderers.createSimpleBlockEntityRenderer(GrindingStoneItem.this.getBlock(), GrindingStoneBlockEntity::new);
+                }
+
                 return itemRenderer;
             }
         });

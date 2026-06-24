@@ -1,4 +1,4 @@
-﻿package org.bakingprocess.integration.dfood;
+package org.bakingprocess.integration.dfood;
 
 import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.alchemy.Potions;

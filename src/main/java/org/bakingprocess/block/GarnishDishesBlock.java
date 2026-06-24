@@ -35,12 +35,12 @@ public class GarnishDishesBlock extends UpPlaceBlock {
     private static final DoubleBlockCombiner.Combiner<DishesBlockEntity, Optional<Container>> INVENTORY_RETRIEVER =
             new DoubleBlockCombiner.Combiner<>() {
                 @Override
-                public Optional<Container> getFromBoth(DishesBlockEntity first, DishesBlockEntity second) {
+                public Optional<Container> acceptDouble(DishesBlockEntity first, DishesBlockEntity second) {
                     return Optional.of(new CompoundContainer(first, second));
                 }
 
                 @Override
-                public Optional<Container> getFrom(DishesBlockEntity single) {
+                public Optional<Container> acceptSingle(DishesBlockEntity single) {
                     return Optional.of(single);
                 }
 

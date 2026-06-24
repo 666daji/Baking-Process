@@ -75,7 +75,7 @@ public class MoldBlock extends BaseEntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        if (state.getBlock() == ModBlocks.TOAST_EMBRYO_MOL.get()D.get()) {
+        if (state.getBlock() == ModBlocks.TOAST_EMBRYO_MOLD.get()) {
             return state.getValue(FACING).getAxis() ==
                     Direction.Axis.Z ? TOAST_EMBRYO_MOLD_SHAPE_Z : TOAST_EMBRYO_MOLD_SHAPE_X;
         }

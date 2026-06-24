@@ -1,11 +1,10 @@
-{
+﻿{
   "required": true,
   "minVersion": "0.8",
   "package": "org.bakingprocess.mixin",
-  "compatibilityLevel": "JAVA_17",
-  "mixins": [
-    "DFoodBlockEntityMixin"
-  ],
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "baking_process.refmap.json",
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   },
@@ -16,3 +15,4 @@
     "client.BlockModelRendererMixin"
   ]
 }
+

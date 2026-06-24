@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
-import org.dfood.util.IntPropertyManager;
+import org.twcore.api.util.IntPropertyManager;
 
 import java.util.Collections;
 import java.util.List;

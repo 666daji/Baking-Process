@@ -33,7 +33,7 @@ public class MoldContainer extends ContainerType{
     public @Nullable Content extractContent(ItemStack stack) {
         ResourceLocation id = ResourceLocation.tryParse(stack.getOrCreateTag().getString(DOUGH_KEY));
         if (id != null) {
-            return TWRegistries.CONTENT.get(id);
+            return TWRegistries.CONTENT.get().getValue(id);
         }
 
         return null;
@@ -53,7 +53,7 @@ public class MoldContainer extends ContainerType{
         }
 
         // 替换内容物
-        stack.getOrCreateTag().putString(DOUGH_KEY, Objects.requireNonNull(TWRegistries.CONTENT.getKey(content)).toString());
+        stack.getOrCreateTag().putString(DOUGH_KEY, Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(content)).toString());
         return stack;
     }
 }

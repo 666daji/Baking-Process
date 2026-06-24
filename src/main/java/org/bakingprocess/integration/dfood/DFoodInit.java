@@ -6,7 +6,7 @@ import org.dfood.shape.Shapes;
 public class DFoodInit {
     public static void init(IEventBus modEventBus) {
         FoodBlocksModifier.FoodBlockAdd();
-        AssistedBlocks.registerAssistedBlocks();
+        AssistedBlocks.registerAll(modEventBus);
 
         // 使用后的方块
         Shapes.shapeMap.put("baking_process:crippled_rabbit_stew",new int[][]{

@@ -55,17 +55,15 @@ versionRange = "${forge_version_range}" #mandatory
 ordering = "NONE"
 # Side this dependency is applied on - BOTH, CLIENT, or SERVER
 side = "BOTH"# Here's another dependency
-# TW的核心
 [[dependencies."${mod_id}"]]
 modId = "tw_core"
 mandatory = true
-versionRange = "${core_version_range}"
+versionRange = "[1.20.1-1.0.2-forge,)"
 side = "BOTH"
-# TW的装饰性食物
 [[dependencies."${mod_id}"]]
-modId = "dfoof"
+modId = "dfood"
 mandatory = true
-versionRange = "${decorative_food_version_range}"
+versionRange = "[1.20.1-1.1.7-forge,)"
 side = "BOTH"
 [[dependencies."${mod_id}"]]
 modId = "minecraft"

@@ -10,12 +10,14 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.bakingprocess.recipe.PlatingRecipe;
+import org.twcore.TWCore;
 import org.twcore.api.process.PlayerAction;
 import org.twcore.content.Content;
 import org.twcore.registry.TWRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 摆盘配方序列化器，用于JSON格式的摆盘配方解析。
@@ -73,7 +75,7 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
             throw new JsonParseException("Invalid result ID: " + resultId);
         }
 
-        Content output = TWRegistries.CONTENT.get(result);
+        Content output = TWRegistries.CONTENT.get().getValue(result);
         if (output == null) {
             throw new JsonParseException("No content found: " + resultId);
         }
@@ -99,7 +101,7 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
         }
 
         // 3. 读取输出结果
-        Content output = TWRegistries.CONTENT.get(buf.readResourceLocation());
+        Content output = TWRegistries.CONTENT.get().getValue(buf.readResourceLocation());
         if (output == null) {
             throw new IllegalArgumentException("No output found");
         }
@@ -109,7 +111,7 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
     }
 
     @Override
-    public void write(FriendlyByteBuf buf, PlatingRecipe recipe) {
+    public void toNetwork(FriendlyByteBuf buf, PlatingRecipe recipe) {
         // 1. 写入容器物品ID
         buf.writeResourceLocation(BuiltInRegistries.ITEM.getKey(recipe.getContainer()));
 
@@ -121,6 +123,6 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
         }
 
         // 3. 写入输出内容ID
-        buf.writeResourceLocation(TWRegistries.CONTENT.getKey(recipe.getDishes()));
+        buf.writeResourceLocation(Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(recipe.getDishes())));
     }
 }

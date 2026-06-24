@@ -1,4 +1,4 @@
-﻿package org.bakingprocess.registry;
+package org.bakingprocess.registry;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -17,7 +17,7 @@ public class ModItemGroups {
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BakingProcess.MOD_ID);
 
     public static final RegistryObject<CreativeModeTab> MAIN_TAB = CREATIVE_TABS.register("main",
-            () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, -1)
+            () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemgroup.baking_process"))
                     .icon(() -> new ItemStack(ModItems.GRINDING_STONE.get()))
                     .displayItems(((displayContext, entries) -> {
@@ -102,7 +102,7 @@ public class ModItemGroups {
                     .build());
 
     public static final RegistryObject<CreativeModeTab> ALL_DISH_TAB = CREATIVE_TABS.register("all_dish",
-            () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, -1)
+            () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemgroup.baking_process.plating"))
                     .icon(() -> new ItemStack(ModItems.GRINDING_STONE.get()))
                     .displayItems(((displayContext, entries) ->

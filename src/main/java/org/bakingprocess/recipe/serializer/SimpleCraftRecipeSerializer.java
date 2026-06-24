@@ -166,7 +166,7 @@ public abstract class SimpleCraftRecipeSerializer<T extends SimpleCraftRecipe> i
      * @param recipe 要序列化的配方对象
      */
     @Override
-    public void write(FriendlyByteBuf buf, T recipe) {
+    public void toNetwork(FriendlyByteBuf buf, T recipe) {
         // 1. 写入原料
         recipe.getInput().toNetwork(buf);
 

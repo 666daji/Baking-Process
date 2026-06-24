@@ -1,4 +1,4 @@
-﻿package org.bakingprocess;
+package org.bakingprocess;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;

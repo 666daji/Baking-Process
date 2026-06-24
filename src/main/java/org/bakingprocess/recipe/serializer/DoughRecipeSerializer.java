@@ -97,7 +97,7 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
         for (Map.Entry<String, JsonElement> entry : liquidsObj.entrySet()) {
             try {
                 ResourceLocation contentId = ResourceLocation.tryParse(entry.getKey());
-                Content content = TWRegistries.CONTENT.get(contentId);
+                Content content = TWRegistries.CONTENT.get().getValue(contentId);
 
                 if (content == null) {
                     throw new JsonSyntaxException("Unknown content identifiers: " + entry.getKey());
@@ -175,7 +175,7 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
             ResourceLocation contentId = buf.readResourceLocation();
             int count = buf.readVarInt();
 
-            Content content = TWRegistries.CONTENT.get(contentId);
+            Content content = TWRegistries.CONTENT.get().getValue(contentId);
             if (content != null && content.isIn(Contents.BASE_LIQUID)) {
                 liquidRequirements.put(content, count);
             }
@@ -197,7 +197,7 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
     }
 
     @Override
-    public void write(FriendlyByteBuf buf, DoughRecipe recipe) {
+    public void toNetwork(FriendlyByteBuf buf, DoughRecipe recipe) {
         // 1. 写入输出物品
         buf.writeItem(recipe.getResultItem(null));
 
@@ -211,7 +211,7 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
         // 3. 写入液体要求
         buf.writeVarInt(recipe.getLiquidRequirements().size());
         for (Map.Entry<Content, Integer> entry : recipe.getLiquidRequirements().entrySet()) {
-            buf.writeResourceLocation(TWRegistries.CONTENT.getKey(entry.getKey()));
+            buf.writeResourceLocation(TWRegistries.CONTENT.get().getKey(entry.getKey()));
             buf.writeVarInt(entry.getValue());
         }
 

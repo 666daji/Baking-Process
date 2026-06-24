@@ -52,7 +52,7 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     }
 
     @Override
-    public void write(FriendlyByteBuf buf, StoveRecipe recipe) {
+    public void toNetwork(FriendlyByteBuf buf, StoveRecipe recipe) {
         // 将组件转换为 "type|value" 字符串后直接写入
         buf.writeUtf(componentToString(recipe.getInput()));
         buf.writeUtf(componentToString(recipe.getOutput()));
@@ -67,7 +67,7 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     private static String componentToString(Either<ItemStack, Content> component) {
         return component.map(
                 stack -> "item|" + BuiltInRegistries.ITEM.getKey(stack.getItem()),
-                content -> "content|" + TWRegistries.CONTENT.getKey(content)
+                content -> "content|" + TWRegistries.CONTENT.get().getKey(content)
         );
     }
 
@@ -142,7 +142,7 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
             throw new IllegalArgumentException("Invalid content ID format: '" + contentId + "'");
         }
 
-        Content content = TWRegistries.CONTENT.get(identifier);
+        Content content = TWRegistries.CONTENT.get().getValue(identifier);
         if (content == null) {
             throw new IllegalArgumentException("Content not found: " + contentId);
         }
