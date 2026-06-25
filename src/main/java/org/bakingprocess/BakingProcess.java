@@ -5,7 +5,6 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -18,6 +17,7 @@ import org.bakingprocess.client.render.gui.tooltip.FlourSackTooltipComponent;
 import org.bakingprocess.client.render.model.ModModelLayers;
 import org.bakingprocess.client.render.model.ModModelLoader;
 import org.bakingprocess.integration.dfood.DFoodInit;
+import org.bakingprocess.integration.dfood.FoodBlocksModifier;
 import org.bakingprocess.item.FlourSackItem;
 import org.bakingprocess.registry.ModBlockEntityTypes;
 import org.bakingprocess.registry.ModItems;
@@ -42,18 +42,18 @@ public class BakingProcess {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         DFoodInit.init(modEventBus);
         RegistryInit.init(modEventBus);
-        MinecraftForge.EVENT_BUS.register(this);
+        modEventBus.addListener(BakingProcess::register);
 
         LOGGER.info("TW`s Baking Process is initializing!");
     }
 
-    @SubscribeEvent
     public static void register(TwCoreRegisterEvent event) {
         TwModManager.IMPL.register(BakingProcess.MOD_ID, 1);
 
         AddItemPlayerAction.REMAPPING.put(ModItems.SALMON_CUBES.get(), "msa");
         ((AbstractMappedContainer) ContainerTypes.POTION.get()).registerContentMapping(Contents.MILK.get(), ModItems.MILK_POTION.get());
         Item2BlockSounds.registerParser(BakingProcessUtils::getSoundGroupFromItem);
+        FoodBlocksModifier.FoodBlockAdd();
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

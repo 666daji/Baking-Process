@@ -42,7 +42,7 @@ public class FoodBlocksModifier {
         ItemStack handStack = player.getItemInHand(hand);
 
         // 检查是否手持空瓶子
-        if (handStack.getItem() == Items.POTION) {
+        if (handStack.getItem() == Items.GLASS_BOTTLE) {
             if (world.isClientSide) {
                 // 客户端播放声音
                 world.playSound(player, pos, SoundEvents.BUCKET_FILL, player.getSoundSource(), 1.0F, 1.0F);

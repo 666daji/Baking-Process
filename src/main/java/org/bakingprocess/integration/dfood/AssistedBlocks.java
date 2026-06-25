@@ -82,11 +82,13 @@ public class AssistedBlocks {
                                                                 Supplier<BlockBehaviour.Properties> settingsSupplier,
                                                                 BiFunction<BlockBehaviour.Properties, Integer, Block> blockCreator,
                                                                 int maxUse) {
-        return BLOCKS.register(name, () -> {
+        RegistryObject<Block> result = BLOCKS.register(name, () -> {
             IntPropertyManager.preCache("number_of_use", maxUse);
-            Block block = blockCreator.apply(settingsSupplier.get(), maxUse);
-            return block;
+            return blockCreator.apply(settingsSupplier.get(), maxUse);
         });
+
+        assistedBlocks.add(result);
+        return result;
     }
 
     public static void registerAll(IEventBus modEventBus) {

@@ -5,7 +5,6 @@ import org.dfood.shape.Shapes;
 
 public class DFoodInit {
     public static void init(IEventBus modEventBus) {
-        FoodBlocksModifier.FoodBlockAdd();
         AssistedBlocks.registerAll(modEventBus);
 
         // 使用后的方块

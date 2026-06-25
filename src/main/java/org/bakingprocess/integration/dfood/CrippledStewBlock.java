@@ -80,7 +80,7 @@ public class CrippledStewBlock extends CrippledBlock {
     }
 
     public static BlockState getStewState(BlockState state) {
-        for (Block block : (Block[]) AssistedBlocks.assistedBlocks.stream().map(RegistryObject::get).toArray()) {
+        for (Block block : AssistedBlocks.assistedBlocks.stream().map(RegistryObject::get).toArray(Block[]::new)) {
             if (block instanceof CrippledStewBlock crippledStewBlock && crippledStewBlock.isBaseBlock(state)) {
                 return crippledStewBlock.defaultBlockState()
                         .setValue(CrippledStewBlock.FACING, state.getValue(CrippledStewBlock.FACING))

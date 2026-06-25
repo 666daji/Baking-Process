@@ -35,8 +35,8 @@ public class CrippledBucketBlock extends CrippledBlock {
     private static final FoodShapeHandle foodShapeHandle = FoodShapeHandle.getInstance();
 
     /**
-     * 药水类型，用于确定给予玩家的瓶子内容物�?
-     * 为null时表示奶桶�?
+     * 药水类型，用于确定给予玩家的瓶子内容物
+     * 为null时表示奶桶
      */
     @Nullable
     private final Potion potionType;
@@ -60,14 +60,18 @@ public class CrippledBucketBlock extends CrippledBlock {
             int i = state.getValue(NUMBER_OF_USE);
             world.playSound(player, pos, SoundEvents.BOTTLE_FILL, player.getSoundSource(), 1.0F, 1.0F);
 
-            // 消耗空瓶子并给予水�?
+            // 消耗空瓶子并给予水瓶
             if (!player.isCreative()) {
                 handStack.shrink(1);
             }
-            ItemStack waterBottle = PotionUtils.setPotion(new ItemStack(Items.POTION), this.potionType);
+            ItemStack waterBottle;
+
             if (this.potionType == null) {
                 waterBottle = new ItemStack(ModItems.MILK_POTION.get());
+            } else {
+                waterBottle = PotionUtils.setPotion(new ItemStack(Items.POTION), this.potionType);
             }
+
             if (!player.addItem(waterBottle)) {
                 player.drop(waterBottle, false);
             }
@@ -77,7 +81,7 @@ public class CrippledBucketBlock extends CrippledBlock {
             if (i < 3) {
                 world.setBlock(pos, state.setValue(NUMBER_OF_USE, i + 1), Block.UPDATE_ALL);
             } else {
-                // 水用完了，变成空�?
+                // 水用完了，变成空桶
                 world.setBlock(pos, getUseFinishesState(world, pos, state, player), Block.UPDATE_ALL);
             }
 
@@ -99,7 +103,7 @@ public class CrippledBucketBlock extends CrippledBlock {
     }
 
     public static BlockState getWaterBucketState(BlockState state) {
-        for (Block block : (Block[]) AssistedBlocks.assistedBlocks.stream().map(RegistryObject::get).toArray()) {
+        for (Block block : AssistedBlocks.assistedBlocks.stream().map(RegistryObject::get).toArray(Block[]::new)) {
             if (block instanceof CrippledBucketBlock crippledBucketBlock && crippledBucketBlock.isBaseBlock(state)) {
                 return crippledBucketBlock.defaultBlockState()
                         .setValue(CrippledBucketBlock.FACING, state.getValue(CrippledBucketBlock.FACING))

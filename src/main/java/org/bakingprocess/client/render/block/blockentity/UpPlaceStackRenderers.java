@@ -81,7 +81,7 @@ public class UpPlaceStackRenderers {
 
             context.matrices().pushPose();
 
-            // 应用菜刀特定的变�?
+            // 应用菜刀特定的变换
             context.matrices().translate(0.5, 0.0, 0.5);
             context.matrices().mulPose(Axis.YP.rotationDegrees(-facing.toYRot()));
             context.matrices().translate(-0.5, -0.1, -0.5);
