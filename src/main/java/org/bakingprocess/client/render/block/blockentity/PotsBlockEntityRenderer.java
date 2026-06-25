@@ -77,7 +77,8 @@ public class PotsBlockEntityRenderer implements BlockEntityRenderer<PotsBlockEnt
                     matrices,
                     vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(entity.getBlockState())),
                     true, RandomSource.create(),
-                    entity.getBlockState().getSeed(entity.getBlockPos()), OverlayTexture.NO_OVERLAY
+                    entity.getBlockState().getSeed(entity.getBlockPos()), OverlayTexture.NO_OVERLAY,
+                    ModelData.EMPTY, RenderType.cutout()
             );
         }
 
