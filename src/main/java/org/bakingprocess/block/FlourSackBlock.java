@@ -2,8 +2,9 @@ package org.bakingprocess.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -12,7 +13,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.bakingprocess.block.entity.FlourSackBlockEntity;
-import org.bakingprocess.item.FlourSackItem;
 import org.dfood.block.ComplexFoodBlock;
 import org.dfood.block.FoodBlockBuilder;
 import org.jetbrains.annotations.Nullable;
@@ -49,9 +49,9 @@ public class FlourSackBlock extends ComplexFoodBlock implements EntityBlock {
 
     @Override
     public boolean isSame(ItemStack stack, BlockState state, @Nullable BlockEntity blockEntity) {
-        CompoundTag nbt = stack.getTag();
+        ItemContainerContents nbt = stack.get(DataComponents.CONTAINER);
 
-        if (nbt == null || !nbt.contains(FlourSackItem.STORED_ITEM_KEY)) {
+        if (nbt == null) {
             return false;
         }
 

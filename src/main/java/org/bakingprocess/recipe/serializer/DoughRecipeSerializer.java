@@ -3,11 +3,15 @@ package org.bakingprocess.recipe.serializer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -15,7 +19,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.recipe.DoughRecipe;
 import org.twcore.content.Content;
-import org.twcore.registry.Contents;
 import org.twcore.registry.TWRegistries;
 
 import java.util.HashMap;
@@ -68,163 +71,142 @@ import java.util.Map;
  */
 public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
 
-    /**
-     * <h3>从JSON对象读取面团配方</h3>
-     */
-    @Override
-    public DoughRecipe fromJson(ResourceLocation id, JsonObject json) {
-        // 1. 读取输出物品
-        JsonObject outputObj = GsonHelper.getAsJsonObject(json, "output");
-        ItemStack output = new ItemStack(
-                BuiltInRegistries.ITEM.get(new ResourceLocation(
-                        GsonHelper.getAsString(outputObj, "item")
-                )),
-                GsonHelper.getAsInt(outputObj, "count", 1)
-        );
+    private static final Codec<FlourItem.FlourType> FLOUR_TYPE_CODEC =
+            Codec.STRING.xmap(FlourItem.FlourType::fromId, FlourItem.FlourType::getSerializedName);
 
-        // 2. 读取面粉要求（面粉类型 -> 数量）
-        Map<FlourItem.FlourType, Integer> flourRequirements = new HashMap<>();
-        JsonObject floursObj = GsonHelper.getAsJsonObject(json, "flours");
-        for (Map.Entry<String, JsonElement> entry : floursObj.entrySet()) {
-            FlourItem.FlourType flourType = FlourItem.FlourType.fromId(entry.getKey());
-            int count = entry.getValue().getAsInt();
-            flourRequirements.put(flourType, count);
+    private static final Codec<Content> CONTENT_CODEC =
+            ResourceLocation.CODEC.xmap(
+                    id -> {
+                        Content content = TWRegistries.CONTENT.get().getValue(id);
+                        if (content == null) throw new IllegalArgumentException("Unknown content: " + id);
+                        return content;
+                    },
+                    content -> TWRegistries.CONTENT.get().getKey(content)
+            );
+
+    private static final Codec<Map<FlourItem.FlourType, Integer>> FLOUR_MAP_CODEC =
+            Codec.unboundedMap(FLOUR_TYPE_CODEC, Codec.INT).xmap(HashMap::new, HashMap::new);
+
+    private static final Codec<Map<Content, Integer>> LIQUID_MAP_CODEC =
+            Codec.unboundedMap(CONTENT_CODEC, Codec.INT).xmap(HashMap::new, HashMap::new);
+
+    public static final MapCodec<DoughRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            instance.group(
+                    ItemStack.CODEC.fieldOf("output").forGetter(recipe -> recipe.getResultItem(null)),
+
+                    FLOUR_MAP_CODEC.fieldOf("flours").forGetter(DoughRecipe::getFlourRequirements),
+
+                    LIQUID_MAP_CODEC.fieldOf("liquids").forGetter(DoughRecipe::getLiquidRequirements),
+
+                    // 将 extra_items 作为原始 JSON 保留，通过 Dynamic 转换为 JsonElement
+                    Codec.PASSTHROUGH
+                            .xmap(dynamic -> dynamic.convert(JsonOps.INSTANCE).getValue(),
+                                    json -> new Dynamic<>(JsonOps.INSTANCE, json))
+                            .optionalFieldOf("extra_items", new JsonObject())
+                            .forGetter(recipe -> new JsonObject()) // 序列化时返回空对象，无影响
+            ).apply(instance, DoughRecipeSerializer::createRecipe)
+    );
+
+    private static DoughRecipe createRecipe(ItemStack output,
+                                            Map<FlourItem.FlourType, Integer> flours,
+                                            Map<Content, Integer> liquids,
+                                            JsonElement extraItemsJson) {
+        Map<Ingredient, Integer> extraRequirements = parseExtraItems(extraItemsJson);
+        return new DoughRecipe(output, flours, liquids, extraRequirements);
+    }
+
+    private static Map<Ingredient, Integer> parseExtraItems(JsonElement jsonElement) {
+        Map<Ingredient, Integer> result = new HashMap<>();
+        if (jsonElement == null || !jsonElement.isJsonObject()) {
+            return result;
         }
+        JsonObject obj = jsonElement.getAsJsonObject();
 
-        // 3. 读取液体要求（内容物标识符 -> 数量）
-        Map<Content, Integer> liquidRequirements = new HashMap<>();
-        JsonObject liquidsObj = GsonHelper.getAsJsonObject(json, "liquids");
-        for (Map.Entry<String, JsonElement> entry : liquidsObj.entrySet()) {
-            try {
-                ResourceLocation contentId = ResourceLocation.tryParse(entry.getKey());
-                Content content = TWRegistries.CONTENT.get().getValue(contentId);
-
-                if (content == null) {
-                    throw new JsonSyntaxException("Unknown content identifiers: " + entry.getKey());
-                }
-
-                if (!content.isIn(Contents.BASE_LIQUID)) {
-                    throw new JsonSyntaxException("The liquid contents must belong to the basal liquid grouping: " + entry.getKey());
-                }
-
-                int count = entry.getValue().getAsInt();
-                liquidRequirements.put(content, count);
-            } catch (Exception e) {
-                throw new JsonSyntaxException("Invalid liquid content identifier: " + entry.getKey(), e);
-            }
-        }
-
-        // 4. 读取额外物品要求
-        Map<Ingredient, Integer> extraRequirements = new HashMap<>();
-        JsonObject extrasObj = GsonHelper.getAsJsonObject(json, "extra_items", new JsonObject());
-
-        // 方法1：支持数组格式（推荐）
-        if (extrasObj.has("items") && extrasObj.get("items").isJsonArray()) {
-            // 4.1 数组格式：支持相同物品的多个实例
-            JsonArray itemsArray = extrasObj.getAsJsonArray("items");
+        if (obj.has("items") && obj.get("items").isJsonArray()) {
+            JsonArray items = obj.getAsJsonArray("items");
             Map<String, Integer> itemCounts = new HashMap<>();
-
-            // 统计每个物品的总数量
-            for (JsonElement element : itemsArray) {
-                JsonObject itemObj = element.getAsJsonObject();
-                String itemId = GsonHelper.getAsString(itemObj, "item");
-                int count = GsonHelper.getAsInt(itemObj, "count", 1);
-                // 使用merge方法合并相同物品的数量
+            for (JsonElement itemElement : items) {
+                JsonObject itemObj = itemElement.getAsJsonObject();
+                String itemId = itemObj.get("item").getAsString();
+                int count = itemObj.has("count") ? itemObj.get("count").getAsInt() : 1;
                 itemCounts.merge(itemId, count, Integer::sum);
             }
-
-            // 创建Ingredient并合并数量
-            for (Map.Entry<String, Integer> entry : itemCounts.entrySet()) {
-                ResourceLocation itemIdentifier = new ResourceLocation(entry.getKey());
-                Item item = BuiltInRegistries.ITEM.get(itemIdentifier);
-                Ingredient ingredient = Ingredient.of(item);
-                extraRequirements.put(ingredient, entry.getValue());
+            for (var entry : itemCounts.entrySet()) {
+                ResourceLocation id = ResourceLocation.parse(entry.getKey());
+                Item item = BuiltInRegistries.ITEM.get(id);
+                result.put(Ingredient.of(item), entry.getValue());
             }
-        } else {
-            // 4.2 旧格式兼容（不推荐使用）
-            for (Map.Entry<String, JsonElement> entry : extrasObj.entrySet()) {
+        }
+        else {
+            for (var entry : obj.entrySet()) {
                 JsonObject itemObj = entry.getValue().getAsJsonObject();
-                Ingredient ingredient = Ingredient.fromJson(itemObj);
-                int count = GsonHelper.getAsInt(itemObj, "count", 1);
-                extraRequirements.put(ingredient, count);
+                Ingredient ingredient = Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, itemObj).getOrThrow();
+                int count = itemObj.has("count") ? itemObj.get("count").getAsInt() : 1;
+                result.merge(ingredient, count, Integer::sum);
             }
         }
-
-        // 5. 创建并返回配方对象
-        return new DoughRecipe(id, output, flourRequirements, liquidRequirements, extraRequirements);
+        return result;
     }
 
-    @Override
-    public DoughRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-        // 1. 读取输出物品
-        ItemStack output = buf.readItem();
+    public static final StreamCodec<RegistryFriendlyByteBuf, DoughRecipe> PACKET_CODEC =
+            StreamCodec.ofMember(DoughRecipeSerializer::encode, DoughRecipeSerializer::decode);
 
-        // 2. 读取面粉要求
-        int flourCount = buf.readVarInt();
-        Map<FlourItem.FlourType, Integer> flourRequirements = new HashMap<>(flourCount);
-        for (int i = 0; i < flourCount; i++) {
-            FlourItem.FlourType flourType = buf.readEnum(FlourItem.FlourType.class);
-            int count = buf.readVarInt();
-            flourRequirements.put(flourType, count);
-        }
-
-        // 3. 读取液体要求
-        int liquidCount = buf.readVarInt();
-        Map<Content, Integer> liquidRequirements = new HashMap<>(liquidCount);
-        for (int i = 0; i < liquidCount; i++) {
-            ResourceLocation contentId = buf.readResourceLocation();
-            int count = buf.readVarInt();
-
-            Content content = TWRegistries.CONTENT.get().getValue(contentId);
-            if (content != null && content.isIn(Contents.BASE_LIQUID)) {
-                liquidRequirements.put(content, count);
-            }
-        }
-
-        // 4. 读取额外物品要求
-        int extraCount = buf.readVarInt();
-        Map<Ingredient, Integer> extraRequirements = new HashMap<>(extraCount);
-        for (int i = 0; i < extraCount; i++) {
-            String itemId = buf.readUtf();
-            int count = buf.readVarInt();
-            Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(itemId));
-            Ingredient ingredient = Ingredient.of(item);
-            extraRequirements.put(ingredient, count);
-        }
-
-        // 5. 创建并返回配方对象
-        return new DoughRecipe(id, output, flourRequirements, liquidRequirements, extraRequirements);
-    }
-
-    @Override
-    public void toNetwork(FriendlyByteBuf buf, DoughRecipe recipe) {
-        // 1. 写入输出物品
-        buf.writeItem(recipe.getResultItem(null));
-
-        // 2. 写入面粉要求
-        buf.writeVarInt(recipe.getFlourRequirements().size());
-        for (Map.Entry<FlourItem.FlourType, Integer> entry : recipe.getFlourRequirements().entrySet()) {
+    private static void encode(DoughRecipe recipe, RegistryFriendlyByteBuf buf) {
+        ItemStack.STREAM_CODEC.encode(buf, recipe.getResultItem(null));
+        Map<FlourItem.FlourType, Integer> flours = recipe.getFlourRequirements();
+        buf.writeVarInt(flours.size());
+        for (var entry : flours.entrySet()) {
             buf.writeEnum(entry.getKey());
             buf.writeVarInt(entry.getValue());
         }
-
-        // 3. 写入液体要求
-        buf.writeVarInt(recipe.getLiquidRequirements().size());
-        for (Map.Entry<Content, Integer> entry : recipe.getLiquidRequirements().entrySet()) {
+        Map<Content, Integer> liquids = recipe.getLiquidRequirements();
+        buf.writeVarInt(liquids.size());
+        for (var entry : liquids.entrySet()) {
             buf.writeResourceLocation(TWRegistries.CONTENT.get().getKey(entry.getKey()));
             buf.writeVarInt(entry.getValue());
         }
-
-        // 4. 写入额外物品要求
-        buf.writeVarInt(recipe.getExtraRequirements().size());
-        for (Map.Entry<Ingredient, Integer> entry : recipe.getExtraRequirements().entrySet()) {
-            // 获取物品ID（简化处理，假设Ingredient只包含单个物品）
-            ItemStack[] items = entry.getKey().getItems();
-            if (items.length > 0) {
-                ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(items[0].getItem());
-                buf.writeUtf(itemId.toString());
-                buf.writeVarInt(entry.getValue());
-            }
+        Map<Ingredient, Integer> extras = recipe.getExtraRequirements();
+        buf.writeVarInt(extras.size());
+        for (var entry : extras.entrySet()) {
+            Ingredient.CONTENTS_STREAM_CODEC.encode(buf, entry.getKey());
+            buf.writeVarInt(entry.getValue());
         }
+    }
+
+    private static DoughRecipe decode(RegistryFriendlyByteBuf buf) {
+        ItemStack output = ItemStack.STREAM_CODEC.decode(buf);
+        int flourCount = buf.readVarInt();
+        Map<FlourItem.FlourType, Integer> flours = new HashMap<>(flourCount);
+        for (int i = 0; i < flourCount; i++) {
+            FlourItem.FlourType type = buf.readEnum(FlourItem.FlourType.class);
+            int count = buf.readVarInt();
+            flours.put(type, count);
+        }
+        int liquidCount = buf.readVarInt();
+        Map<Content, Integer> liquids = new HashMap<>(liquidCount);
+        for (int i = 0; i < liquidCount; i++) {
+            ResourceLocation id = buf.readResourceLocation();
+            int count = buf.readVarInt();
+            Content content = TWRegistries.CONTENT.get().getValue(id);
+            if (content != null) liquids.put(content, count);
+        }
+        int extraCount = buf.readVarInt();
+        Map<Ingredient, Integer> extras = new HashMap<>(extraCount);
+        for (int i = 0; i < extraCount; i++) {
+            Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
+            int count = buf.readVarInt();
+            extras.put(ingredient, count);
+        }
+        return new DoughRecipe(output, flours, liquids, extras);
+    }
+
+    @Override
+    public MapCodec<DoughRecipe> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, DoughRecipe> streamCodec() {
+        return PACKET_CODEC;
     }
 }

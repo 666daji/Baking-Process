@@ -2,6 +2,7 @@ package org.bakingprocess.client.render.block.blockentity;
 
 import com.mojang.math.Axis;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.Blocks;
@@ -35,7 +36,7 @@ public class UpPlaceStackRenderers {
             context.renderBlockStateOrItem(state);
         });
 
-        // 面包
+        // 面包船
         UpPlaceStackRenderer.register(ModItems.HARD_BREAD_BOAT.get(), context -> {
             BlockState state = context.getDefaultBlockState();
             Content content = ContainerUtil.extractContent(context.stack());
@@ -74,7 +75,7 @@ public class UpPlaceStackRenderers {
     public static UpPlaceStackRenderer createKitchenKnifeRenderer() {
         return context -> {
             BakedModel model = context.getModelManager()
-                    .getModel(ModModelLoader.BOARD_KITCHEN_KNIFE);
+                    .getModel(new ModelResourceLocation(ModModelLoader.BOARD_KITCHEN_KNIFE, ""));
 
             Direction facing = context.getFacing();
             BlockState state = context.getDefaultBlockState();

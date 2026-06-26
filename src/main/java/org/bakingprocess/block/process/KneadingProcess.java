@@ -1,10 +1,25 @@
 package org.bakingprocess.block.process;
 
-import org.dfood.sound.ModSoundGroups;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.bakingprocess.item.FlourItem;
 import org.bakingprocess.recipe.DoughRecipe;
 import org.bakingprocess.registry.ModItems;
 import org.bakingprocess.registry.ModRecipeTypes;
+import org.dfood.sound.ModSoundGroups;
 import org.twcore.api.content.ContainerStack;
 import org.twcore.api.content.ContainerUtil;
 import org.twcore.api.process.AbstractProcess;
@@ -16,24 +31,11 @@ import org.twcore.registry.Contents;
 import org.twcore.registry.TWRegistries;
 
 import java.util.*;
-import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * 揉面流程实现类，管理所有状态数据。
  */
-public class KneadingProcess<T extends BlockEntity & Container> extends AbstractProcess<T> implements Container {
+public class KneadingProcess<T extends BlockEntity & Container> extends AbstractProcess<T> implements RecipeInput {
     /** 可加入盆中的额外物品集合 */
     public static final Set<Item> CAN_ADD_OTHER = Set.of(ModItems.SALT_CUBES.get(), ModItems.SALT_FLOUR.get(), Items.SUGAR, ModItems.SUGAR_FLOUR.get(), Items.EGG);
     public static final Set<Item> CAN_ADD_FLOUR = Set.of(ModItems.WHEAT_FLOUR.get(), ModItems.COCOA_FLOUR.get());
@@ -225,9 +227,9 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
                 // 先创建物品的副本，用于存储
                 ItemStack extraCopy = new ItemStack(heldStack.getItem(), 1);
 
-                // 如果需要保留NBT数据，可以这样复制
-                if (heldStack.getTag() != null && heldStack.hasTag()) {
-                    extraCopy.setTag(heldStack.getTag().copy());
+                // 如果需要保留组件数据，可以这样复制
+                if (heldStack.getComponentsPatch() != null) {
+                    extraCopy.applyComponentsAndValidate(heldStack.getComponentsPatch());
                 }
 
                 // 消耗1个额外物品
@@ -280,7 +282,7 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
                 return StepResult.fail(STEP_KNEAD, InteractionResult.PASS);
             }
 
-            context.playSound(ModSoundGroups.BREAD.getPlaceSound());
+            context.playSound(ModSoundGroups.BREAD.getBreakSound());
 
             // 服务器端执行揉面逻辑
             if (context.isServerSide()) {
@@ -321,18 +323,18 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
 
     private ItemStack craftDough(Level world) {
         // 查找匹配的配方
-        Optional<DoughRecipe> recipe = world.getRecipeManager()
+        Optional<RecipeHolder<DoughRecipe>> recipe = world.getRecipeManager()
                 .getRecipeFor(ModRecipeTypes.DOUGH_MAKING.get(), this, world);
 
         if (recipe.isPresent()) {
             // 消耗所有原料
-            clearContent();
+            clearExtra();
             flourCounts.clear();
             liquidCounts.clear();
             kneadingCount = 0;
             processedSkip = false;
 
-            return recipe.get().getResultItem(world.registryAccess()).copy();
+            return recipe.get().value().getResultItem(world.registryAccess()).copy();
         }
 
         return ItemStack.EMPTY;
@@ -404,7 +406,7 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
 
     @Override
     protected void onStart(Level world, T blockEntit) {
-        clearContent();
+        clearExtra();
         flourCounts.clear();
         liquidCounts.clear();
         kneadingCount = 0;
@@ -413,7 +415,7 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
 
     @Override
     protected void onReset() {
-        clearContent();
+        clearExtra();
         flourCounts.clear();
         liquidCounts.clear();
         kneadingCount = 0;
@@ -423,11 +425,11 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
     // ============ NBT持久化 ============
 
     @Override
-    public void writeToNbt(CompoundTag nbt) {
-        super.writeToNbt(nbt);
+    public void writeToNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.writeToNbt(nbt, registryLookup);
 
         // 保存额外物品库存
-        ContainerHelper.saveAllItems(nbt, extraInventory);
+        ContainerHelper.saveAllItems(nbt, extraInventory, registryLookup);
 
         // 保存面粉计数
         CompoundTag floursNbt = new CompoundTag();
@@ -454,8 +456,8 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
     }
 
     @Override
-    public void readFromNbt(CompoundTag nbt) {
-        super.readFromNbt(nbt);
+    public void readFromNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.readFromNbt(nbt, registryLookup);
 
         // 清空现有数据
         extraInventory.clear();
@@ -463,7 +465,7 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
         liquidCounts.clear();
 
         // 读取额外物品库存
-        ContainerHelper.loadAllItems(nbt, extraInventory);
+        ContainerHelper.loadAllItems(nbt, extraInventory, registryLookup);
 
         // 读取面粉计数
         if (nbt.contains("flours")) {
@@ -494,7 +496,15 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
     // ============ Inventory接口实现 ============
 
     @Override
-    public int getContainerSize() {
+    public ItemStack getItem(int slot) {
+        if (slot < 0 || slot >= extraInventory.size()) {
+            return ItemStack.EMPTY;
+        }
+        return extraInventory.get(slot);
+    }
+
+    @Override
+    public int size() {
         return TOTAL_SLOTS;
     }
 
@@ -505,46 +515,11 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
                 return false;
             }
         }
-        return true;
+
+        return liquidCounts.isEmpty() && flourCounts.isEmpty();
     }
 
-    @Override
-    public ItemStack getItem(int slot) {
-        if (slot < 0 || slot >= extraInventory.size()) {
-            return ItemStack.EMPTY;
-        }
-        return extraInventory.get(slot);
-    }
-
-    @Override
-    public ItemStack removeItem(int slot, int amount) {
-        return ContainerHelper.removeItem(extraInventory, slot, amount);
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        return ContainerHelper.takeItem(extraInventory, slot);
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot >= 0 && slot < extraInventory.size()) {
-            extraInventory.set(slot, stack);
-        }
-    }
-
-    @Override
-    public void setChanged() {
-
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return true;
-    }
-
-    @Override
-    public void clearContent() {
+    public void clearExtra() {
         extraInventory.clear();
     }
 

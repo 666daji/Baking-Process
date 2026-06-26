@@ -38,8 +38,8 @@ public class BakingProcess {
     public static final String MOD_ID = "baking_process";
     public static final Logger LOGGER = LoggerFactory.getLogger("TW's Baking Process");
 
-    public BakingProcess() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public BakingProcess(FMLJavaModLoadingContext context) {
+        IEventBus modEventBus = context.getModEventBus();
         DFoodInit.init(modEventBus);
         RegistryInit.init(modEventBus);
         modEventBus.addListener(BakingProcess::register);

@@ -1,11 +1,10 @@
 package org.bakingprocess.recipe;
 
 import com.mojang.datafixers.util.Either;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -14,15 +13,13 @@ import org.bakingprocess.registry.ModRecipeTypes;
 import org.twcore.api.content.ContainerUtil;
 import org.twcore.content.Content;
 
-public class StoveRecipe implements Recipe<Container> {
-    protected final ResourceLocation id;
+public class StoveRecipe implements Recipe<RecipeInput> {
     protected final Either<ItemStack, Content> input;
     protected final Either<ItemStack, Content> output;
     protected final int bakingTime;
     protected final int MaxInputCount;
 
-    public StoveRecipe(ResourceLocation id, Either<ItemStack, Content> input, Either<ItemStack, Content> output, int MaxInputCount, int bakingTime) {
-        this.id = id;
+    public StoveRecipe(Either<ItemStack, Content> input, Either<ItemStack, Content> output, int MaxInputCount, int bakingTime) {
         this.input = input;
         this.output = output;
         this.MaxInputCount = MaxInputCount;
@@ -34,7 +31,7 @@ public class StoveRecipe implements Recipe<Container> {
     }
 
     @Override
-    public boolean matches(Container inventory, Level world) {
+    public boolean matches(RecipeInput inventory, Level world) {
         ItemStack stack = inventory.getItem(0);
 
         return input.map(inputStack -> ItemStack.isSameItem(stack, inputStack),
@@ -42,7 +39,7 @@ public class StoveRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack assemble(Container inventory, RegistryAccess registryManager) {
+    public ItemStack assemble(RecipeInput inventory, HolderLookup.Provider registryManager) {
         ItemStack stack = inventory.getItem(0);
         int count = Math.min(stack.getCount(), MaxInputCount);
 
@@ -58,14 +55,9 @@ public class StoveRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryManager) {
+    public ItemStack getResultItem(HolderLookup.Provider registryManager) {
         return this.output.map(outputStack -> outputStack,
                 outputContent -> ItemStack.EMPTY);
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return this.id;
     }
 
     @Override

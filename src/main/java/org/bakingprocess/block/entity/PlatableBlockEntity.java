@@ -2,11 +2,12 @@ package org.bakingprocess.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import org.bakingprocess.block.process.PlatingProcess;
@@ -48,7 +49,7 @@ import java.util.List;
  * @see PlatingProcess
  * @see PlayerAction
  */
-public interface PlatableBlockEntity extends Container {
+public interface PlatableBlockEntity extends RecipeInput {
 
     // ==================== 容器信息方法 ====================
 
@@ -194,7 +195,7 @@ public interface PlatableBlockEntity extends Container {
      * @param hand 玩家的手
      * @param hit 操作的上下文
      */
-    void onPlatingComplete(Level world, BlockPos pos, PlatingRecipe recipe, Player player, InteractionHand hand, HitResult hit);
+    void onPlatingComplete(Level world, BlockPos pos, RecipeHolder<PlatingRecipe> recipe, Player player, InteractionHand hand, HitResult hit);
 
     /**
      * 当盘子中的食物被吃完时调用。
@@ -212,86 +213,24 @@ public interface PlatableBlockEntity extends Container {
     // ==================== Inventory 接口适配 ====================
 
     /**
-     * 设置指定槽位的物品堆栈。
-     *
-     * <p>此方法将物品堆栈转换为默认操作并执行。主要用于：
-     * <ul>
-     *   <li>从 NBT 恢复状态时重建操作序列</li>
-     *   <li>外部系统与摆盘方块交互</li>
-     * </ul>
-     *
-     * <p><strong>注意：</strong>此方法不执行操作的消耗逻辑，仅用于状态恢复。</p>
-     *
-     * @param slot 槽位索引
-     * @param stack 要设置的物品堆栈
-     */
-    @Override
-    default void setItem(int slot, ItemStack stack) {
-        if (slot < 0 || slot >= getContainerSize()) {
-            return;
-        }
-
-        // 将物品堆栈转换为 AddItemPlayerAction
-        if (!stack.isEmpty()) {
-            PlayerAction action = createActionFromItemStack(stack);
-            if (action != null) {
-                performAction(slot, action);
-            }
-        } else {
-            // 如果堆栈为空，移除该槽位的操作
-            removeAction(slot);
-        }
-    }
-
-    /**
-     * 从指定槽位移除物品堆栈。
-     *
-     * <p>此方法移除指定槽位的操作，并返回对应的物品堆栈表示。</p>
-     *
-     * @param slot 槽位索引
-     * @return 被移除操作对应的物品堆栈
-     */
-    @Override
-    default ItemStack removeItemNoUpdate(int slot) {
-        PlayerAction action = removeAction(slot);
-        return action != null ? action.toItemStack() : ItemStack.EMPTY;
-    }
-
-    /**
-     * 从指定槽位移除指定数量的物品堆栈。
-     *
-     * <p>对于摆盘系统，操作是不可分割的，因此此方法与 {@link #removeItemNoUpdate(int)} 行为相同。</p>
-     *
-     * @param slot 槽位索引
-     * @param amount 要移除的数量（对于操作系统，此参数被忽略）
-     * @return 被移除操作对应的物品堆栈
-     */
-    @Override
-    default ItemStack removeItem(int slot, int amount) {
-        return removeItemNoUpdate(slot);
-    }
-
-    /**
-     * 检查玩家是否可以使用此方块实体。
-     *
-     * <p>默认实现允许所有玩家使用。子类可以重写此方法以添加权限检查。</p>
-     *
-     * @param player 要检查的玩家
-     * @return 如果玩家可以使用此方块实体，则返回 {@code true}
-     */
-    @Override
-    default boolean stillValid(Player player) {
-        return true;
-    }
-
-    /**
      * 清空所有槽位。
      *
      * <p>此方法清空所有已执行的操作。</p>
      */
-    @Override
-    default void clearContent() {
+    default void clear() {
         clearPerformedActions();
+    }
+
+    /**
+     * 检查方块实体是否为空。
+     *
+     * <p>如果没有任何已执行的操作，则视为空。</p>
+     *
+     * @return 如果没有任何操作则返回 {@code true}
+     */
+    @Override
+    default boolean isEmpty() {
+        return getPerformedActions().isEmpty();
     }
 
     /**
@@ -310,18 +249,6 @@ public interface PlatableBlockEntity extends Container {
             return action != null ? action.toItemStack() : ItemStack.EMPTY;
         }
         return ItemStack.EMPTY;
-    }
-
-    /**
-     * 检查方块实体是否为空。
-     *
-     * <p>如果没有任何已执行的操作，则视为空。</p>
-     *
-     * @return 如果没有任何操作则返回 {@code true}
-     */
-    @Override
-    default boolean isEmpty() {
-        return getPerformedActions().isEmpty();
     }
 
     // ==================== 便捷默认方法 ====================
@@ -352,12 +279,12 @@ public interface PlatableBlockEntity extends Container {
      * 获取最大可记录操作数量。
      *
      * <p>这是一个可选方法，用于限制单个摆盘的容量。
-     * 默认返回 {@link #getContainerSize()} 表示和对应的方块实体容量相关。</p>
+     * 默认返回 {@link #size()} 表示和对应的方块实体容量相关。</p>
      *
      * @return 最大可执行步骤数量
      */
     default int getMaxSteps() {
-        return getContainerSize();
+        return size();
     }
 
     /**

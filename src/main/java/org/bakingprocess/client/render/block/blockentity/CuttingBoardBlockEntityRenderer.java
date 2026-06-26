@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +22,7 @@ import org.bakingprocess.block.CuttingBoardBlock;
 import org.bakingprocess.block.entity.CuttingBoardBlockEntity;
 import org.bakingprocess.block.process.CuttingProcess;
 import org.bakingprocess.client.render.model.ModModelLoader;
+import org.jetbrains.annotations.NotNull;
 import org.twcore.client.api.render.UpPlaceBlockEntityRenderer;
 
 import java.util.HashMap;
@@ -62,7 +64,7 @@ public class CuttingBoardBlockEntityRenderer extends UpPlaceBlockEntityRenderer<
 
         // 构建切割模型ID
         ResourceLocation modelId = ModModelLoader.createCuttingModel(itemId, cutCount);
-        BakedModel model = manager.getModel(modelId);
+        BakedModel model = manager.getModel(new ModelResourceLocation(modelId, "") );
 
         // 检查是否是有效模型（不是错误模型）
         if (model == manager.getMissingModel()) {
@@ -74,7 +76,7 @@ public class CuttingBoardBlockEntityRenderer extends UpPlaceBlockEntityRenderer<
 
     @Override
     public void render(CuttingBoardBlockEntity entity, float tickDelta, PoseStack matrices,
-                       MultiBufferSource vertexConsumers, int light, int overlay) {
+                       @NotNull MultiBufferSource vertexConsumers, int light, int overlay) {
         CuttingProcess<CuttingBoardBlockEntity> cuttingProcess = entity.getCuttingProcess();
         ItemStack currentStack = cuttingProcess.isActive()?
                 cuttingProcess.getState().inputStack():
@@ -147,8 +149,7 @@ public class CuttingBoardBlockEntityRenderer extends UpPlaceBlockEntityRenderer<
                     RandomSource.create(),
                     entity.getBlockState().getSeed(entity.getBlockPos()),
                     OverlayTexture.NO_OVERLAY,
-                    ModelData.EMPTY,
-                    RenderType.cutout()
+                    ModelData.EMPTY, RenderType.cutout()
             );
         }
     }

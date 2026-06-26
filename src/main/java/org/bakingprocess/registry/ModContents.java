@@ -1,5 +1,6 @@
 package org.bakingprocess.registry;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -7,7 +8,6 @@ import org.bakingprocess.BakingProcess;
 import org.bakingprocess.content.DishesContent;
 import org.bakingprocess.content.ShapedDoughContent;
 import org.bakingprocess.food.ModFoodComponents;
-import org.twcore.TWCore;
 import org.twcore.content.Content;
 import org.twcore.registry.Contents;
 
@@ -54,20 +54,20 @@ public class ModContents {
     // 定型面团
     public static final RegistryObject<Content> TOAST_EMBRYO = register("toast_embryo",
             () -> new ShapedDoughContent(SHAPED_DOUGH,
-                    TWCore.createResourceLocation(BakingProcess.MOD_ID, "toast_dough"),
-                    TWCore.createResourceLocation(BakingProcess.MOD_ID, "toast_embryo_mold")));
+                    ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "toast_dough"),
+                    ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "toast_embryo_mold")));
     public static final RegistryObject<Content> TOAST = register("toast",
             () -> new ShapedDoughContent(SHAPED_DOUGH,
-                    TWCore.createResourceLocation(BakingProcess.MOD_ID, "toast"),
-                    TWCore.createResourceLocation(BakingProcess.MOD_ID, "toast_embryo_mold")));
+                    ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "toast"),
+                    ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "toast_embryo_mold")));
     public static final RegistryObject<Content> CAKE_EMBRYO = register("cake_embryo",
             () -> new ShapedDoughContent(SHAPED_DOUGH,
-                    TWCore.createResourceLocation(BakingProcess.MOD_ID, "cake_dough"),
-                    TWCore.createResourceLocation(BakingProcess.MOD_ID, "cake_embryo_mold")));
+                    ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "cake_dough"),
+                    ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "cake_embryo_mold")));
     public static final RegistryObject<Content> BAKED_CAKE_EMBRYO = register("baked_cake_embryo",
             () -> new ShapedDoughContent(SHAPED_DOUGH,
-                    TWCore.createResourceLocation(BakingProcess.MOD_ID, "baked_cake_embryo"),
-                    TWCore.createResourceLocation(BakingProcess.MOD_ID, "cake_embryo_mold")));
+                    ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "baked_cake_embryo"),
+                    ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "cake_embryo_mold")));
 
     private static RegistryObject<Content> register(String name, java.util.function.Supplier<Content> supplier) {
         return CONTENTS.register(name, supplier);

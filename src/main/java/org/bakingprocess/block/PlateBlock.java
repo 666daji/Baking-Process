@@ -1,16 +1,5 @@
 package org.bakingprocess.block;
 
-import org.bakingprocess.block.entity.PlateBlockEntity;
-import org.bakingprocess.content.DishesContent;
-import org.bakingprocess.registry.ModContents;
-import org.bakingprocess.registry.ModItems;
-import org.jetbrains.annotations.Nullable;
-import org.twcore.api.content.ContainerUtil;
-import org.twcore.content.Content;
-import org.twcore.content.ContentCategories;
-
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -41,6 +30,17 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.bakingprocess.block.entity.PlateBlockEntity;
+import org.bakingprocess.content.DishesContent;
+import org.bakingprocess.registry.ModContents;
+import org.bakingprocess.registry.ModItems;
+import org.jetbrains.annotations.Nullable;
+import org.twcore.api.content.ContainerUtil;
+import org.twcore.content.Content;
+import org.twcore.content.ContentCategories;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 表示一个可以摆盘的盘子方块
@@ -61,7 +61,8 @@ public class PlateBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        InteractionHand hand = player.getUsedItemHand();
         BlockEntity entity = world.getBlockEntity(pos);
         ItemStack handStack = player.getItemInHand(hand);
 
@@ -115,7 +116,7 @@ public class PlateBlock extends Block implements EntityBlock {
             return plateBlockEntity.tryPlating(player, hand, hit);
         }
 
-        return super.use(state, world, pos, player, hand, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Override
@@ -159,7 +160,7 @@ public class PlateBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter world, List<Component> tooltip, TooltipFlag options) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         Content content = ContainerUtil.extractContent(stack);
 
         if (content != null) {

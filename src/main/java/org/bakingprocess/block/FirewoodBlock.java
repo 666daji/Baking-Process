@@ -81,12 +81,14 @@ public class FirewoodBlock extends FoodBlock {
      * 使用打火石点燃柴火堆
      */
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        InteractionHand hand = player.getUsedItemHand();
+
         if (state.getBlock() instanceof FirewoodBlock firewoodBlock && player.getItemInHand(hand).getItem() == Items.FLINT_AND_STEEL){
             boolean bl = firewoodBlock.tryIgnite(state, world, pos, player);
             return bl? InteractionResult.SUCCESS: InteractionResult.PASS;
         }
-        return super.use(state, world, pos, player, hand, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     /**

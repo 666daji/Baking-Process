@@ -1,10 +1,30 @@
 package org.bakingprocess.block.process;
 
+import com.mojang.serialization.DataResult;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.level.Level;
 import org.bakingprocess.BakingProcess;
 import org.bakingprocess.recipe.CutRecipe;
 import org.bakingprocess.registry.ModItems;
 import org.bakingprocess.registry.ModRecipeTypes;
 import org.bakingprocess.registry.ModSounds;
+import org.bakingprocess.util.BakingProcessUtils;
 import org.twcore.api.block.UpPlaceBlockEntity;
 import org.twcore.api.process.AbstractProcess;
 import org.twcore.process.step.Step;
@@ -16,19 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.Container;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.level.Level;
 
 /**
  * 切菜流程处理器，支持特定物品在特定切割次数的特殊交互。
@@ -68,7 +75,7 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
     public static final String STEP_COOKED_SALMON_7 = "cut_cooked_salmon_7";
 
     /** 当前活跃的切割配方 */
-    private CutRecipe currentRecipe;
+    private RecipeHolder<CutRecipe> currentRecipe;
     /** 当前已完成的切割次数（从0开始） */
     private int currentCut;
     /** 配方要求的总切割次数 */
@@ -279,7 +286,7 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
     private void consumeToolDurability(StepExecutionContext<T> context) {
         ItemStack tool = context.getHeldItemStack();
         if (!context.isCreateMode() && tool.isDamageableItem()) {
-            tool.hurtAndBreak(1, context.player(), p -> p.broadcastBreakEvent(context.hand()));
+            tool.hurtAndBreak(1, context.player(), LivingEntity.getSlotForHand(context.hand()));
         }
     }
 
@@ -292,7 +299,7 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
     private void updateInventory(Container inventory, int cutIndex) {
         if (currentRecipe == null || inventory == null) return;
 
-        NonNullList<ItemStack> state = currentRecipe.getCutState(cutIndex);
+        NonNullList<ItemStack> state = currentRecipe.value().getCutState(cutIndex);
         int slots = Math.min(state.size(), 5);
 
         for (int i = 0; i < slots; i++) {
@@ -350,15 +357,16 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
     protected void onStart(Level world, T blockEntity) {
         currentCut = 0;
         inputStack = blockEntity.getItem(0);
+        RecipeInput input = BakingProcessUtils.createRecipeInput(blockEntity);
 
-        Optional<CutRecipe> recipe = world.getRecipeManager()
-                .getRecipeFor(ModRecipeTypes.CUT.get(), blockEntity, world);
+        Optional<RecipeHolder<CutRecipe>> recipe = world.getRecipeManager()
+                .getRecipeFor(ModRecipeTypes.CUT.get(), input, world);
 
         if (recipe.isPresent()) {
             blockEntity.clearContent();
             currentRecipe = recipe.get();
-            savedRecipeId = currentRecipe.getId().toString();
-            totalCuts = currentRecipe.getTotalCuts();
+            savedRecipeId = currentRecipe.id().toString();
+            totalCuts = currentRecipe.value().getTotalCuts();
         }
     }
 
@@ -388,34 +396,35 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
     // ============ NBT持久化 ============
 
     @Override
-    public void writeToNbt(CompoundTag nbt) {
-        super.writeToNbt(nbt);
+    public void writeToNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.writeToNbt(nbt, registryLookup);
 
         nbt.putInt("CurrentCut", currentCut);
         nbt.putInt("TotalCuts", totalCuts);
 
         if (!inputStack.isEmpty()) {
-            CompoundTag inputNbt = new CompoundTag();
-            inputStack.save(inputNbt);
-            nbt.put("InputItem", inputNbt);
+            DataResult<Tag> result = ItemStack.CODEC.encodeStart(
+                    registryLookup.createSerializationContext(NbtOps.INSTANCE), inputStack);
+            result.ifSuccess(nbtElement -> nbt.put("InputItem", nbtElement));
         }
 
         if (currentRecipe != null) {
-            nbt.putString("RecipeId", currentRecipe.getId().toString());
+            nbt.putString("RecipeId", currentRecipe.id().toString());
         } else {
             nbt.putString("RecipeId", savedRecipeId);
         }
     }
 
     @Override
-    public void readFromNbt(CompoundTag nbt) {
-        super.readFromNbt(nbt);
+    public void readFromNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.readFromNbt(nbt, registryLookup);
 
         currentCut = nbt.getInt("CurrentCut");
         totalCuts = nbt.getInt("TotalCuts");
 
         if (nbt.contains("InputItem")) {
-            inputStack = ItemStack.of(nbt.getCompound("InputItem"));
+            Optional<ItemStack> result = ItemStack.parse(registryLookup, nbt.getCompound("InputItem"));
+            inputStack = result.orElseThrow();
         }
 
         if (nbt.contains("RecipeId")) {
@@ -430,7 +439,7 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
      *
      * @return 当前配方，如果没有则返回null
      */
-    public CutRecipe getCurrentRecipe() {
+    public RecipeHolder<CutRecipe> getCurrentRecipe() {
         return currentRecipe;
     }
 
@@ -450,12 +459,12 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
      *
      * @param recipe 切割配方
      */
-    public void setCurrentRecipe(CutRecipe recipe) {
+    public void setCurrentRecipe(RecipeHolder<CutRecipe> recipe) {
         this.currentRecipe = recipe;
 
         if (recipe != null) {
-            this.totalCuts = recipe.getTotalCuts();
-            this.savedRecipeId = recipe.getId().toString();
+            this.totalCuts = recipe.value().getTotalCuts();
+            this.savedRecipeId = recipe.id().toString();
         } else {
             this.totalCuts = 0;
             this.savedRecipeId = "";
@@ -484,11 +493,11 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
         }
 
         try {
-            ResourceLocation id = new ResourceLocation(recipeId);
-            Optional<? extends Recipe<?>> recipe = world.getRecipeManager().byKey(id);
+            ResourceLocation id = ResourceLocation.parse(recipeId);
+            Optional<RecipeHolder<?>> recipe = world.getRecipeManager().byKey(id);
 
-            if (recipe.isPresent() && recipe.get() instanceof CutRecipe cutRecipe) {
-                setCurrentRecipe(cutRecipe);
+            if (recipe.isPresent() && recipe.get().value() instanceof CutRecipe) {
+                setCurrentRecipe((RecipeHolder<CutRecipe>) recipe.get());
             }
         } catch (Exception e) {
             BakingProcess.LOGGER.warn("Ineffective Recipe:{}", recipeId);
@@ -505,7 +514,7 @@ public class CuttingProcess<T extends UpPlaceBlockEntity> extends AbstractProces
 
         // 配方信息
         if (currentRecipe != null) {
-            info.append("当前配方: ").append(currentRecipe.getId().getPath()).append("\n");
+            info.append("当前配方: ").append(currentRecipe.id().getPath()).append("\n");
             info.append("配方步骤数: ").append(totalCuts).append("\n");
         } else {
             info.append("当前配方: <无>\n");

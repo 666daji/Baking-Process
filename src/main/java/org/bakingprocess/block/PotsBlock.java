@@ -1,5 +1,6 @@
 package org.bakingprocess.block;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -24,13 +25,18 @@ import org.twcore.api.sound.Item2BlockSounds;
 
 public class PotsBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-
+    public static final MapCodec<PotsBlock> CODEC = simpleCodec(PotsBlock::new);
     public static final VoxelShape SHAPE = Block.box(1.0, 0.0, 1.0, 15.0, 5.0, 15.0);
 
     public PotsBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState()
                 .setValue(FACING, net.minecraft.core.Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -70,9 +76,10 @@ public class PotsBlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos,
-                              Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos,
+                              Player player, BlockHitResult hit) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
+        InteractionHand hand = player.getUsedItemHand();
 
         if (blockEntity instanceof PotsBlockEntity potsBlockEntity) {
             if (world.isClientSide) {

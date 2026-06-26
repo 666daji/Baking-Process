@@ -4,13 +4,13 @@
     "item": "baking_process:hard_bread"
   },
   "output": {
-    "item": "baking_process:hard_bread_boat",
+    "id": "baking_process:hard_bread_boat",
     "count": 1
   },
   "totalCuts": 1,
   "defaultState": {
     "0": {
-      "item": "baking_process:hard_bread_boat",
+      "id": "baking_process:hard_bread_boat",
       "count": 1
     }
   },

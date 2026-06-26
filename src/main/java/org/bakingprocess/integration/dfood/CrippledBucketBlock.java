@@ -1,13 +1,15 @@
 package org.bakingprocess.integration.dfood;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -35,13 +37,13 @@ public class CrippledBucketBlock extends CrippledBlock {
     private static final FoodShapeHandle foodShapeHandle = FoodShapeHandle.getInstance();
 
     /**
-     * 药水类型，用于确定给予玩家的瓶子内容物
-     * 为null时表示奶桶
+     * 药水类型，用于确定给予玩家的瓶子内容物。
+     * 为null时表示奶桶。
      */
     @Nullable
-    private final Potion potionType;
+    private final Holder<Potion> potionType;
 
-    public CrippledBucketBlock(Properties settings, int maxUse, Block baseBlock, @Nullable Potion potionType) {
+    public CrippledBucketBlock(Properties settings, int maxUse, Block baseBlock, @Nullable Holder<Potion> potionType) {
         super(settings, maxUse, baseBlock, new ItemStack(Items.BUCKET));
         this.potionType = potionType;
     }
@@ -64,14 +66,13 @@ public class CrippledBucketBlock extends CrippledBlock {
             if (!player.isCreative()) {
                 handStack.shrink(1);
             }
-            ItemStack waterBottle;
+            ItemStack waterBottle = new ItemStack(Items.POTION);
 
             if (this.potionType == null) {
                 waterBottle = new ItemStack(ModItems.MILK_POTION.get());
             } else {
-                waterBottle = PotionUtils.setPotion(new ItemStack(Items.POTION), this.potionType);
+                waterBottle.set(DataComponents.POTION_CONTENTS, new PotionContents(potionType));
             }
-
             if (!player.addItem(waterBottle)) {
                 player.drop(waterBottle, false);
             }

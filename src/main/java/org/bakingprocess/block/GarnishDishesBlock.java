@@ -1,5 +1,6 @@
 package org.bakingprocess.block;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -31,6 +32,7 @@ public class GarnishDishesBlock extends UpPlaceBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final EnumProperty<DishesType> TYPE = EnumProperty.create("type", DishesType.class);
     private static final VoxelShape BASE_SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 1.5, 16.0);
+    public static final MapCodec<GarnishDishesBlock> CODEC = simpleCodec(GarnishDishesBlock::new);
 
     private static final DoubleBlockCombiner.Combiner<DishesBlockEntity, Optional<Container>> INVENTORY_RETRIEVER =
             new DoubleBlockCombiner.Combiner<>() {
@@ -55,6 +57,11 @@ public class GarnishDishesBlock extends UpPlaceBlock {
         this.registerDefaultState(this.defaultBlockState()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(TYPE, DishesType.SINGLE));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override

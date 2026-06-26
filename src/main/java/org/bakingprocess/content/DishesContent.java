@@ -10,7 +10,7 @@ public class DishesContent extends FoodContent {
      * 此时玩家不能食用该菜肴。
      */
     public static final FoodProperties RAW_DISHES = new FoodProperties.Builder()
-            .nutrition(0).saturationMod(0).build();
+            .nutrition(0).saturationModifier(0).build();
 
     protected final int eatCount;
 

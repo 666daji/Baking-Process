@@ -3,19 +3,16 @@
   "category": "misc",
   "pattern": [
     "   ",
-    "AAA",
-    "B B"
+    " A ",
+    "   "
   ],
   "key": {
     "A": {
       "tag": "minecraft:wooden_slabs"
-    },
-    "B": {
-      "item": "minecraft:stick"
     }
   },
   "result": {
-    "item": "baking_process:wooden_shelf",
+    "id": "baking_process:cutting_board",
     "count": 2
   }
 }

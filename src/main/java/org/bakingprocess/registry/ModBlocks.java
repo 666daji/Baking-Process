@@ -1,5 +1,6 @@
 package org.bakingprocess.registry;
 
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -244,10 +245,10 @@ public class ModBlocks {
 
     // 矿物
     public static final RegistryObject<Block> SALT_ORE = register("salt_ore",
-            () -> new DropExperienceBlock(BlockBehaviour.Properties.of()
+            () -> new DropExperienceBlock(UniformInt.of(2, 5), BlockBehaviour.Properties.of()
                     .sound(SoundType.STONE).strength(1.5F, 6.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> DEEPSLATE_SALT_ORE = register("deepslate_salt_ore",
-            () -> new DropExperienceBlock(BlockBehaviour.Properties.of()
+            () -> new DropExperienceBlock(UniformInt.of(2, 5), BlockBehaviour.Properties.of()
                     .sound(SoundType.STONE).strength(2.0F, 6.0F).requiresCorrectToolForDrops()));
 
     // 园艺联动

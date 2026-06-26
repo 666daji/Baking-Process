@@ -4,7 +4,7 @@
     "item": "minecraft:apple"
   },
   "output": {
-    "item": "baking_process:apple_slices",
+    "id": "baking_process:apple_slices",
     "count": 1
   },
   "totalCuts": 6,
@@ -12,13 +12,13 @@
   "cutStates": {
     "5": {
       "0": {
-        "item": "baking_process:apple_slices",
+        "id": "baking_process:apple_slices",
         "count": 1
       }
     },
     "6": {
       "0": {
-        "item": "baking_process:apple_slices",
+        "id": "baking_process:apple_slices",
         "count": 1
       }
     }

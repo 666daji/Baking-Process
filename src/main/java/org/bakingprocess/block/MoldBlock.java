@@ -1,5 +1,6 @@
 package org.bakingprocess.block;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -36,13 +37,20 @@ public class MoldBlock extends BaseEntityBlock {
     public static final VoxelShape CAKE_EMBRYO_MOLD_SHAPE = Block.box(0, 0, 0, 16, 9, 16);
     public static final VoxelShape TOAST_EMBRYO_MOLD_SHAPE_X = Block.box(3, 0, 0, 13, 8, 16);
     public static final VoxelShape TOAST_EMBRYO_MOLD_SHAPE_Z = Block.box(0, 0, 3, 16, 8, 13);
+    public static final MapCodec<MoldBlock> CODEC = simpleCodec(MoldBlock::new);
 
     public MoldBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        InteractionHand hand = player.getUsedItemHand();
         BlockEntity entity = world.getBlockEntity(pos);
         if (!(entity instanceof MoldBlockEntity moldBlockEntity)) {
             return InteractionResult.PASS;

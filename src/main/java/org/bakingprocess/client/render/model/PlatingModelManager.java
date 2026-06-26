@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.bakingprocess.BakingProcess;
 import org.jetbrains.annotations.Nullable;
-import org.twcore.TWCore;
 import org.twcore.api.process.PlayerAction;
 import org.twcore.content.Content;
 
@@ -270,7 +269,7 @@ public class PlatingModelManager {
 
         // 生成完整的模型标识符
         String path = pathBuilder.toString();
-        return TWCore.createResourceLocation(BakingProcess.MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, path);
     }
 
     /**

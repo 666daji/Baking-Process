@@ -7,7 +7,7 @@
     }
   ],
   "result": {
-    "item": "baking_process:small_bread_embryo",
+    "id": "baking_process:small_bread_embryo",
     "count": 3
   }
 }

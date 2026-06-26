@@ -39,11 +39,14 @@ public class ModBlockColors {
         // 检查是否是放在木架子上的粉尘袋
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof UpPlaceBlockEntity shelfBlockEntity) {
+            // 处理架子上的粉尘袋染色
             return getShelfFlourSackColor(shelfBlockEntity, state);
         }
         else if (blockEntity instanceof FlourSackBlockEntity flourSackBlockEntity) {
+            // 直接放置的粉尘袋
             return getDirectFlourSackColor(flourSackBlockEntity, tintIndex);
         } else {
+            // 未知的方块实体类型
             return -1;
         }
     }
@@ -66,13 +69,13 @@ public class ModBlockColors {
             return FlourSackBlockEntity.DEFAULT_FLOUR_COLOR;
         }
 
+        // 直接从物品堆栈的NBT中获取粉尘颜色
         return getFlourColorFromItemStack(shelfStack);
     }
 
     private static int getDirectFlourSackColor(FlourSackBlockEntity flourSackBlockEntity, int tintIndex) {
-        int sackCount = flourSackBlockEntity.getNbtCount();
-
-        if (tintIndex >= 0 && tintIndex < sackCount) {
+        // 根据tintIndex获取对应位置的粉尘颜色
+        if (tintIndex >= 0) {
             return flourSackBlockEntity.getFlourColor(tintIndex);
         }
 
@@ -82,6 +85,7 @@ public class ModBlockColors {
 
     private static int getFlourColorFromItemStack(ItemStack flourSackStack) {
         try {
+            // 获取粉尘袋中存储的物品
             Optional<ItemStack> flourStackOptional = FlourSackItem.getBundledStack(flourSackStack);
 
             if (flourStackOptional.isPresent()) {
@@ -123,11 +127,11 @@ public class ModBlockColors {
      * 计算混合液体颜色
      * 基于所有液体的颜色和计数，计算加权平均颜色
      *
-     * @return 混合后的液体颜色，如果没有液体返回1
+     * @return 混合后的液体颜色，如果没有液体返回默认颜色-1
      */
     private static int getMixedLiquidColor(KneadingProcess<?> process) {
         if (process == null || !process.isActive()) {
-            return -1;
+            return -1; // 默认无颜色
         }
 
         Map<Content, Integer> liquidCounts = process.getLiquidCounts();
@@ -163,9 +167,10 @@ public class ModBlockColors {
         }
 
         if (totalCount == 0) {
-            return -1;
+            return -1; // 没有有效的液体颜色
         }
 
+        // 计算加权平均并取平方根
         int mixedRed = (int) Math.sqrt(totalRed / totalCount);
         int mixedGreen = (int) Math.sqrt(totalGreen / totalCount);
         int mixedBlue = (int) Math.sqrt(totalBlue / totalCount);

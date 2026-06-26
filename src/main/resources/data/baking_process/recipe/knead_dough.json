@@ -1,7 +1,7 @@
 {
   "type": "baking_process:dough_making",
   "output": {
-    "item": "baking_process:salty_dough",
+    "id": "baking_process:dough",
     "count": 1
   },
   "flours": {
@@ -11,11 +11,6 @@
     "tw_core:water": 3
   },
   "extra_items": {
-    "items": [
-      {
-        "item": "baking_process:salt_flour",
-        "count": 2
-      }
-    ]
+    "items": []
   }
 }

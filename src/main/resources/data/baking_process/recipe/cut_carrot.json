@@ -4,7 +4,7 @@
     "item": "minecraft:carrot"
   },
   "output": {
-    "item": "baking_process:carrot_slices",
+    "id": "baking_process:carrot_slices",
     "count": 1
   },
   "totalCuts": 12,
@@ -12,37 +12,37 @@
   "cutStates": {
     "9": {
       "0": {
-        "item": "baking_process:carrot_slices",
+        "id": "baking_process:carrot_slices",
         "count": 2
       },
       "1": {
-        "item": "baking_process:carrot_head",
+        "id": "baking_process:carrot_head",
         "count": 1
       }
     },
     "10": {
       "0": {
-        "item": "baking_process:carrot_slices",
+        "id": "baking_process:carrot_slices",
         "count": 2
       },
       "1": {
-        "item": "baking_process:carrot_head",
+        "id": "baking_process:carrot_head",
         "count": 1
       }
     },
     "11": {
       "0": {
-        "item": "baking_process:carrot_slices",
+        "id": "baking_process:carrot_slices",
         "count": 2
       },
       "1": {
-        "item": "baking_process:carrot_head",
+        "id": "baking_process:carrot_head",
         "count": 1
       }
     },
     "12": {
       "0": {
-        "item": "baking_process:carrot_slices",
+        "id": "baking_process:carrot_slices",
         "count": 1
       }
     }

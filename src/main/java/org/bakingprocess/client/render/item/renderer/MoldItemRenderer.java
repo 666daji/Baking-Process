@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +43,7 @@ public class MoldItemRenderer extends BlockEntityWithoutLevelRenderer {
 
         // 如果有定型面团内容，渲染它
         if (content instanceof ShapedDoughContent shapedDough) {
-            BakedModel model = manager.getModel(ModModelLoader.createShapedDoughModel(shapedDough));
+            BakedModel model = manager.getModel(new ModelResourceLocation(ModModelLoader.createShapedDoughModel(shapedDough), "") );
             blockRenderer.getModelRenderer().renderModel(matrices.last(),
                     vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(state)), state, model, 1, 1, 1, light, overlay);
         }

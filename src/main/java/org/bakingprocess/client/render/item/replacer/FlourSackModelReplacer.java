@@ -7,8 +7,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.bakingprocess.BakingProcess;
+import org.bakingprocess.client.render.model.ModModelLoader;
 import org.bakingprocess.item.FlourSackItem;
-import org.twcore.TWCore;
 import org.twcore.client.api.render.ReplaceItemModel;
 
 import java.util.Optional;
@@ -33,16 +33,13 @@ public class FlourSackModelReplacer {
 
                 if (flourName != null) {
                     // 使用 MOD_ID 常量创建自定义模型标识符
-                    ModelResourceLocation customModelId = new ModelResourceLocation(
-                            TWCore.createResourceLocation(BakingProcess.MOD_ID, flourName),
-                            "inventory"
-                    );
+                    ResourceLocation customModelId = ModModelLoader.createItemModel(flourName);
 
                     // 获取模型
-                    BakedModel customModel = manager.getModel(customModelId);
+                    BakedModel customModel = manager.getModel(new ModelResourceLocation(customModelId, "") );
 
                     // 如果找到了自定义模型且不是缺失模型，则返回自定义模型
-                    if (!customModel.equals(manager.getMissingModel())) {
+                    if (customModel != null && !customModel.equals(manager.getMissingModel())) {
                         return customModel;
                     }
                 }

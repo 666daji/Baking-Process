@@ -4,13 +4,13 @@
     "item": "minecraft:potato"
   },
   "output": {
-    "item": "baking_process:potato_cubes",
+    "id": "baking_process:potato_cubes",
     "count": 1
   },
   "totalCuts": 1,
   "defaultState": {
     "0": {
-      "item": "baking_process:potato_cubes",
+      "id": "baking_process:potato_cubes",
       "count": 1
     }
   },

@@ -1,14 +1,9 @@
 package org.bakingprocess.recipe;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.bakingprocess.registry.ModRecipeSerializers;
 import org.bakingprocess.registry.ModRecipeTypes;
@@ -18,17 +13,15 @@ import java.util.Map;
 /**
  * 支持多步骤切割的切菜配方
  */
-public class CutRecipe implements Recipe<Container> {
-    private final ResourceLocation id;
+public class CutRecipe implements Recipe<RecipeInput> {
     private final Ingredient input;
-    private final int totalCuts; // 总共需要切的次�?
-    private final Map<Integer, NonNullList<ItemStack>> cutStateMap; // 第几刀对应的库存状�?
-    private final NonNullList<ItemStack> defaultState; // 默认库存状态（5个槽位）
+    private final int totalCuts;
+    private final Map<Integer, NonNullList<ItemStack>> cutStateMap;
+    private final NonNullList<ItemStack> defaultState;
 
-    public CutRecipe(ResourceLocation id, Ingredient input, int totalCuts,
+    public CutRecipe(Ingredient input, int totalCuts,
                      Map<Integer, NonNullList<ItemStack>> cutStateMap,
                      NonNullList<ItemStack> defaultState) {
-        this.id = id;
         this.input = input;
         this.totalCuts = totalCuts;
         this.cutStateMap = cutStateMap;
@@ -36,14 +29,13 @@ public class CutRecipe implements Recipe<Container> {
     }
 
     @Override
-    public boolean matches(Container inventory, Level world) {
+    public boolean matches(RecipeInput inventory, Level world) {
         // 只检查主槽位（索引0）
         return input.test(inventory.getItem(0));
     }
 
     @Override
-    public ItemStack assemble(Container inventory, RegistryAccess registryManager) {
-        // 返回最后一刀时的库存状态第一个物品
+    public ItemStack assemble(RecipeInput input, HolderLookup.Provider registryManager) {
         NonNullList<ItemStack> finalState = getCutState(totalCuts);
         if (!finalState.isEmpty() && !finalState.get(0).isEmpty()) {
             return finalState.get(0).copy();
@@ -57,8 +49,7 @@ public class CutRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryManager) {
-        // 返回最后一刀时的库存状态第一个物品
+    public ItemStack getResultItem(HolderLookup.Provider registryManager) {
         NonNullList<ItemStack> finalState = getCutState(totalCuts);
         if (!finalState.isEmpty() && !finalState.get(0).isEmpty()) {
             return finalState.get(0).copy();
@@ -67,17 +58,11 @@ public class CutRecipe implements Recipe<Container> {
     }
 
     public ItemStack getOutput() {
-        // 返回最后一刀时的库存状态第一个物品
         NonNullList<ItemStack> finalState = getCutState(totalCuts);
         if (!finalState.isEmpty() && !finalState.get(0).isEmpty()) {
             return finalState.get(0).copy();
         }
         return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return id;
     }
 
     @Override

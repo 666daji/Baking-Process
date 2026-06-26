@@ -4,7 +4,7 @@
     "item": "minecraft:cooked_cod"
   },
   "output": {
-    "item": "baking_process:cooked_cod_cubes",
+    "id": "baking_process:cooked_cod_cubes",
     "count": 1
   },
   "totalCuts": 9,
@@ -12,37 +12,37 @@
   "cutStates": {
     "6": {
       "0": {
-        "item": "baking_process:cooked_cod_head",
+        "id": "baking_process:cooked_cod_head",
         "count": 1
       },
       "1": {
-        "item": "baking_process:cooked_cod_cubes",
+        "id": "baking_process:cooked_cod_cubes",
         "count": 2
       }
     },
     "7": {
       "0": {
-        "item": "baking_process:cooked_cod_head",
+        "id": "baking_process:cooked_cod_head",
         "count": 1
       },
       "1": {
-        "item": "baking_process:cooked_cod_cubes",
+        "id": "baking_process:cooked_cod_cubes",
         "count": 2
       }
     },
     "8": {
       "0": {
-        "item": "baking_process:cooked_cod_head",
+        "id": "baking_process:cooked_cod_head",
         "count": 1
       },
       "1": {
-        "item": "baking_process:cooked_cod_cubes",
+        "id": "baking_process:cooked_cod_cubes",
         "count": 1
       }
     },
     "9": {
       "0": {
-        "item": "baking_process:cooked_cod_head",
+        "id": "baking_process:cooked_cod_head",
         "count": 1
       }
     }

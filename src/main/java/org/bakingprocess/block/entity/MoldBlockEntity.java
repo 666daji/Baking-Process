@@ -1,13 +1,7 @@
 package org.bakingprocess.block.entity;
 
-import org.bakingprocess.content.ShapedDoughContent;
-import org.bakingprocess.registry.ModBlockEntityTypes;
-import org.jetbrains.annotations.Nullable;
-import org.twcore.content.Content;
-import org.twcore.registry.TWRegistries;
-
-import java.util.Objects;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
@@ -17,6 +11,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.bakingprocess.content.ShapedDoughContent;
+import org.bakingprocess.registry.ModBlockEntityTypes;
+import org.jetbrains.annotations.Nullable;
+import org.twcore.content.Content;
+import org.twcore.registry.TWRegistries;
+
+import java.util.Objects;
 
 public class MoldBlockEntity extends BlockEntity{
     private static final String CONTENT_KEY = "shaped_dough";
@@ -29,14 +30,14 @@ public class MoldBlockEntity extends BlockEntity{
     }
 
     @Override
-    public void saveAdditional(CompoundTag nbt) {
+    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         if (shapedDough != null) {
             nbt.putString(CONTENT_KEY, Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(shapedDough)).toString());
         }
     }
 
     @Override
-    public void load(CompoundTag nbt) {
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         if (nbt.contains(CONTENT_KEY, Tag.TAG_STRING)) {
             Content content = TWRegistries.CONTENT.get().getValue(ResourceLocation.tryParse(nbt.getString(CONTENT_KEY)));
             if (content instanceof ShapedDoughContent dough) {
@@ -102,8 +103,8 @@ public class MoldBlockEntity extends BlockEntity{
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
+        return this.saveWithoutMetadata(registryLookup);
     }
 
     @Override

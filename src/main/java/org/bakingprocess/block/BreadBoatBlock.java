@@ -1,6 +1,7 @@
 package org.bakingprocess.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -10,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -39,7 +41,7 @@ public class BreadBoatBlock extends SimpleFoodBlock {
 
     public final int maxUse;
 
-    public BreadBoatBlock(Properties settings, VoxelShape shape, int maxUse, @Nullable EnforceAsItem cItem) {
+    public BreadBoatBlock(BlockBehaviour.Properties settings, VoxelShape shape, int maxUse, @Nullable EnforceAsItem cItem) {
         super(settings, true, shape, false, cItem);
         this.maxUse = maxUse;
         this.BITES = IntPropertyManager.create("bites", 0, maxUse);
@@ -48,7 +50,8 @@ public class BreadBoatBlock extends SimpleFoodBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        InteractionHand hand = player.getUsedItemHand();
         // 如果玩家可以吃东西，尝试喝汤
         if (player.canEat(false)) {
             return tryDrinkSoup(world, pos, state, player);
@@ -56,7 +59,7 @@ public class BreadBoatBlock extends SimpleFoodBlock {
 
         // 如果还没被食用，执行父类逻辑
         if (state.getValue(BITES) == 0) {
-            return super.use(state, world, pos, player, hand, hit);
+            return super.useWithoutItem(state, world, pos, player, hit);
         }
 
         return InteractionResult.PASS;
@@ -77,7 +80,7 @@ public class BreadBoatBlock extends SimpleFoodBlock {
     @Nullable
     protected static SimpleFoodComponent getFoodComponent(BlockState state) {
         BreadBoatContainer.BreadBoatSoupType soupType = state.getValue(SOUP_TYPE);
-        FoodProperties containerFood = state.getBlock().asItem().getFoodProperties();
+        FoodProperties containerFood = state.getBlock().asItem().components().get(DataComponents.FOOD);
         FoodProperties soupFood = soupType.getFoodComponent();
 
         if (containerFood == null) {
@@ -145,7 +148,7 @@ public class BreadBoatBlock extends SimpleFoodBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         int currentBites = state.getValue(BITES);
         SimpleFoodComponent totalFood = getFoodComponent(state);
 
@@ -161,7 +164,7 @@ public class BreadBoatBlock extends SimpleFoodBlock {
             world.gameEvent(player, GameEvent.EAT, pos);
         }
 
-        super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
 
     @Override

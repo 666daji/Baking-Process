@@ -7,16 +7,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.event.ModelEvent;
-import org.dfood.block.FoodBlocks;
 import org.bakingprocess.BakingProcess;
 import org.bakingprocess.content.DishesContent;
 import org.bakingprocess.content.ShapedDoughContent;
-import org.bakingprocess.registry.ModContents;
 import org.bakingprocess.item.FlourItem;
+import org.bakingprocess.registry.ModContents;
 import org.bakingprocess.registry.ModItems;
+import org.dfood.block.FoodBlocks;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import org.twcore.TWCore;
 import org.twcore.api.process.PlayerAction;
 import org.twcore.content.Content;
 import org.twcore.process.playeraction.impl.AddContentPlayerAction;
@@ -35,7 +34,7 @@ public class ModModelLoader {
     private static final List<ResourceLocation> MODELS_TO_LOAD = new ArrayList<>();
 
     /** 菜刀插在案板上的效果 。*/
-    public static final ResourceLocation BOARD_KITCHEN_KNIFE = TWCore.createResourceLocation(BakingProcess.MOD_ID, "other/on_board_kitchen_knife");
+    public static final ResourceLocation BOARD_KITCHEN_KNIFE = ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "other/on_board_kitchen_knife");
 
     public static void initModels(ModelEvent.RegisterAdditional event) {
         MODELS_TO_LOAD.clear();
@@ -53,7 +52,7 @@ public class ModModelLoader {
 
         // 将所有模型添加到加载上下文
         for (ResourceLocation modelId : MODELS_TO_LOAD) {
-            event.register(modelId);
+            event.register(new ModelResourceLocation(modelId, ""));
         }
     }
 
@@ -100,7 +99,7 @@ public class ModModelLoader {
      */
     public static ResourceLocation createCookingModel(String blockPath, int foodValue) {
         String modelPath = blockPath + "_cooking_" + foodValue;
-        return TWCore.createResourceLocation(BakingProcess.MOD_ID, "other/" + modelPath);
+        return ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "other/" + modelPath);
     }
 
     // =========== 粉尘袋模型 ===========
@@ -113,9 +112,8 @@ public class ModModelLoader {
             ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(flourItem);
 
             String flourSackModelName = itemId.getPath() + "_sack";
-            ModelResourceLocation modelId = createItemModel(flourSackModelName);
+            ResourceLocation modelId = createItemModel(flourSackModelName);
             MODELS_TO_LOAD.add(modelId);
-            LOGGER.debug("Dynamically registered flour sack model: {}", modelId);
         }
     }
 
@@ -140,15 +138,15 @@ public class ModModelLoader {
      * 注册所有切割模型。
      */
     private static void registerCuttingModels() {
-        registerCuttingModelsForItem(new ResourceLocation("carrot"), 12);
-        registerCuttingModelsForItem(new ResourceLocation("apple"), 6);
-        registerCuttingModelsForItem(new ResourceLocation("cod"), 9);
-        registerCuttingModelsForItem(new ResourceLocation("cooked_cod"), 9);
-        registerCuttingModelsForItem(new ResourceLocation("salmon"), 7);
-        registerCuttingModelsForItem(new ResourceLocation("cooked_salmon"), 7);
-        registerCuttingModelsForItem(new ResourceLocation("potato"), 1);
-        registerCuttingModelsForItem(new ResourceLocation("baked_potato"), 1);
-        registerCuttingModelsForItem(TWCore.createResourceLocation(BakingProcess.MOD_ID, "hard_bread"), 1);
+        registerCuttingModelsForItem(ResourceLocation.parse("carrot"), 12);
+        registerCuttingModelsForItem(ResourceLocation.parse("apple"), 6);
+        registerCuttingModelsForItem(ResourceLocation.parse("cod"), 9);
+        registerCuttingModelsForItem(ResourceLocation.parse("cooked_cod"), 9);
+        registerCuttingModelsForItem(ResourceLocation.parse("salmon"), 7);
+        registerCuttingModelsForItem(ResourceLocation.parse("cooked_salmon"), 7);
+        registerCuttingModelsForItem(ResourceLocation.parse("potato"), 1);
+        registerCuttingModelsForItem(ResourceLocation.parse("baked_potato"), 1);
+        registerCuttingModelsForItem(ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "hard_bread"), 1);
     }
 
     /**
@@ -177,7 +175,7 @@ public class ModModelLoader {
     public static ResourceLocation createCuttingModel(ResourceLocation itemId, int cutCount) {
         String modelPath = String.format("cut_%s_%s_%d",
                 itemId.getNamespace(), itemId.getPath(), cutCount);
-        return TWCore.createResourceLocation(BakingProcess.MOD_ID, "process/" + modelPath);
+        return ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "process/" + modelPath);
     }
 
     // =========== 摆盘菜肴 ===========
@@ -372,7 +370,7 @@ public class ModModelLoader {
         String containerId = BuiltInRegistries.ITEM.getKey(baseContainer).getPath();
         String dishesId = Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(dishes)).getPath();
 
-        return TWCore.createResourceLocation(BakingProcess.MOD_ID, "dishes/" + containerId + "_" + dishesId);
+        return ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "dishes/" + containerId + "_" + dishesId);
     }
 
     /**
@@ -385,7 +383,7 @@ public class ModModelLoader {
     public static ResourceLocation createEatStageModel(Item container, DishesContent dish, int eatenCount) {
         String containerPath = BuiltInRegistries.ITEM.getKey(container).getPath();
         String dishPath = Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(dish)).getPath();
-        return TWCore.createResourceLocation(BakingProcess.MOD_ID, "dishes/eat/" + containerPath + "_" + dishPath + "_" + eatenCount);
+        return ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "dishes/eat/" + containerPath + "_" + dishPath + "_" + eatenCount);
     }
 
     // =========== 定型面团 ===========
@@ -405,7 +403,7 @@ public class ModModelLoader {
      */
     public static ResourceLocation createShapedDoughModel(ShapedDoughContent content) {
         ResourceLocation contentId = Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(content));
-        return TWCore.createResourceLocation(contentId.getNamespace(), "block/" + contentId.getPath());
+        return ResourceLocation.fromNamespaceAndPath(contentId.getNamespace(), "block/" + contentId.getPath());
     }
 
     // =========== 辅助方法 ===========
@@ -413,15 +411,15 @@ public class ModModelLoader {
     /**
      * 创建物品模型的标识符。
      */
-    public static ModelResourceLocation createItemModel(String itemPath) {
-        return new ModelResourceLocation(TWCore.createResourceLocation(BakingProcess.MOD_ID, itemPath), "inventory");
+    public static ResourceLocation createItemModel(String itemPath) {
+        return ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "item/" + itemPath);
     }
 
     /**
      * 创建步骤所需的额外模型的标识符。
      */
     public static ResourceLocation createProcessModel(String blockPath) {
-        return TWCore.createResourceLocation(BakingProcess.MOD_ID, "process/" + blockPath);
+        return ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "process/" + blockPath);
     }
 
     /**

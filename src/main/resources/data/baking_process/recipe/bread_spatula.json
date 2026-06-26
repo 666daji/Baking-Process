@@ -18,7 +18,7 @@
     }
   },
   "result": {
-    "item": "baking_process:bread_spatula",
+    "id": "baking_process:bread_spatula",
     "count": 1
   }
 }

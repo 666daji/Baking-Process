@@ -3,8 +3,10 @@ package org.bakingprocess.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -192,5 +194,25 @@ public class BakingProcessUtils {
         });
 
         return result[0];
+    }
+
+    /**
+     * 直接将库存转为配方输入。
+     *
+     * @param inventory 库存
+     * @return 对应的配方输入
+     */
+    public static RecipeInput createRecipeInput(Container inventory) {
+        return new RecipeInput() {
+            @Override
+            public ItemStack getItem(int slot) {
+                return inventory.getItem(slot);
+            }
+
+            @Override
+            public int size() {
+                return inventory.getContainerSize();
+            }
+        };
     }
 }

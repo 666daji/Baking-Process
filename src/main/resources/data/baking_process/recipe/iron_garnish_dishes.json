@@ -3,19 +3,19 @@
   "category": "misc",
   "pattern": [
     "   ",
-    "BBB",
-    " A "
+    "ABA",
+    "   "
   ],
   "key": {
     "A": {
-      "item": "minecraft:iron_ingot"
+      "item": "minecraft:iron_nugget"
     },
     "B": {
-      "item": "minecraft:iron_nugget"
+      "tag": "minecraft:wooden_slabs"
     }
   },
   "result": {
-    "item": "baking_process:iron_plate",
-    "count": 1
+    "id": "baking_process:iron_garnish_dishes",
+    "count": 2
   }
 }

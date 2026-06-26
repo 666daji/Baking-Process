@@ -17,7 +17,7 @@
     }
   },
   "result": {
-    "item": "baking_process:flour_sack",
+    "id": "baking_process:flour_sack",
     "count": 1
   }
 }

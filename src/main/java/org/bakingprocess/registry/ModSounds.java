@@ -1,12 +1,12 @@
 package org.bakingprocess.registry;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.bakingprocess.BakingProcess;
-import org.twcore.TWCore;
 
 public class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
@@ -24,7 +24,7 @@ public class ModSounds {
     private static RegistryObject<SoundEvent> register(String name) {
         return SOUND_EVENTS.register(name,
                 () -> SoundEvent.createVariableRangeEvent(
-                        TWCore.createResourceLocation(BakingProcess.MOD_ID, name)));
+                        ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, name)));
     }
 
     public static void registerAll(IEventBus modEventBus) {

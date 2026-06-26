@@ -1,5 +1,8 @@
 package org.bakingprocess.integration.dfood;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Block;
@@ -76,7 +79,7 @@ public class AssistedBlocks {
      * @param settingsSupplier 方块设置供应器
      * @param blockCreator 残缺方块的构造函数
      * @param maxUse 最大使用次数
-     * @return 注册后的RegistryObject
+     * @return 注册后的方块
      */
     private static RegistryObject<Block> registerAssistedBlock(String name,
                                                                 Supplier<BlockBehaviour.Properties> settingsSupplier,
@@ -94,10 +97,4 @@ public class AssistedBlocks {
     public static void registerAll(IEventBus modEventBus) {
         BLOCKS.register(modEventBus);
     }
-
-    /**
-     * @deprecated 使用 registerAll(IEventBus) 代替
-     */
-    @Deprecated
-    public static void registerAssistedBlocks() {}
 }

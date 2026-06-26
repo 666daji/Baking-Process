@@ -20,7 +20,7 @@ public class ModRecipeTypes {
     public static final RegistryObject<RecipeType<PlatingRecipe>> PLATING = register("plating");
 
     static <T extends Recipe<?>> RegistryObject<RecipeType<T>> register(String id) {
-        return RECIPE_TYPES.register(id, () -> new RecipeType<T>() {
+        return RECIPE_TYPES.register(id, () -> new RecipeType<>() {
             public String toString() {
                 return id;
             }

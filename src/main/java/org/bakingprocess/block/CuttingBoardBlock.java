@@ -1,5 +1,6 @@
 package org.bakingprocess.block;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -9,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,9 +30,15 @@ public class CuttingBoardBlock extends UpPlaceBlock {
     protected static final VoxelShape SHAPE_X = Block.box(0.0, 0.0, 0.5, 16.0, 1.5, 15.5);
     protected static final VoxelShape SHAPE_Z = Block.box(0.5, 0.0, 0.0, 15.5, 1.5, 16.0);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final MapCodec<CuttingBoardBlock> CODEC = simpleCodec(CuttingBoardBlock::new);
 
     public CuttingBoardBlock(Properties settings) {
         super(settings);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -75,7 +83,8 @@ public class CuttingBoardBlock extends UpPlaceBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        InteractionHand hand = player.getUsedItemHand();
         ItemStack handStack = player.getItemInHand(hand);
         BlockEntity blockEntity = world.getBlockEntity(pos);
 
@@ -86,7 +95,7 @@ public class CuttingBoardBlock extends UpPlaceBlock {
             }
 
             // 如果切割失败或条件不满足，执行父类逻辑（取出和放置）
-            return super.use(state, world, pos, player, hand, hit);
+            return super.useWithoutItem(state, world, pos, player, hit);
         }
 
         return InteractionResult.FAIL;

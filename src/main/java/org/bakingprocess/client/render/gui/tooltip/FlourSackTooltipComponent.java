@@ -1,5 +1,4 @@
 package org.bakingprocess.client.render.gui.tooltip;
-
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -7,12 +6,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.bakingprocess.BakingProcess;
 import org.bakingprocess.item.FlourSackItem;
-import org.twcore.TWCore;
 
 import java.util.Optional;
 
 public class FlourSackTooltipComponent implements ClientTooltipComponent {
-    private static final ResourceLocation TEXTURE = TWCore.createResourceLocation(BakingProcess.MOD_ID,"textures/gui/bundle.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID,"textures/gui/bundle.png");
     private static final int SLOT_SIZE = 18;
     private static final int BORDER_SIZE = 1;
     private static final int TOTAL_SIZE = SLOT_SIZE + 2 * BORDER_SIZE; // 20x20

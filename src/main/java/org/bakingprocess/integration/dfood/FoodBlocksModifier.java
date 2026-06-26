@@ -13,13 +13,13 @@ import org.dfood.block.entity.SuspiciousStewBlockEntity;
 
 public class FoodBlocksModifier {
     /** 能够让玩家像使用蛋糕那样使用炖菜。*/
-    public static final FoodBlock.OnUseHook stewEatHook = (state, world, pos, player, hand, hit) -> {
+    public static final FoodBlock.OnUseHook stewEatHook = (state, world, pos, player, hit) -> {
         if (player.canEat(false)) {
             BlockEntity currentBlockEntity = world.getBlockEntity(pos);
             CompoundTag blockEntityData = null;
             // 如果是迷之炖菜方块实体，保存其数据
             if (currentBlockEntity instanceof SuspiciousStewBlockEntity) {
-                blockEntityData = currentBlockEntity.saveWithoutMetadata();
+                blockEntityData = currentBlockEntity.saveWithoutMetadata(world.registryAccess());
             }
             BlockState blockState = CrippledStewBlock.getStewState(state);
             // 设置新的方块状态
@@ -28,24 +28,24 @@ public class FoodBlocksModifier {
             if (blockEntityData != null) {
                 BlockEntity newBlockEntity = world.getBlockEntity(pos);
                 if (newBlockEntity instanceof SuspiciousStewBlockEntity) {
-                    newBlockEntity.load(blockEntityData);
+                    newBlockEntity.loadWithComponents(blockEntityData, world.registryAccess());
                 }
             }
-            blockState.use(world, player, hand, hit);
+            blockState.useWithoutItem(world, player, hit);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     };
 
     /** 可以使用空瓶子从水桶中盛出水 */
-    protected static final FoodBlock.OnUseHook waterBucketHook = (state, world, pos, player, hand, hit) -> {
-        ItemStack handStack = player.getItemInHand(hand);
+    protected static final FoodBlock.OnUseHook waterBucketHook = (state, world, pos, player, hit) -> {
+        ItemStack handStack = player.getItemInHand(player.getUsedItemHand());
 
         // 检查是否手持空瓶子
         if (handStack.getItem() == Items.GLASS_BOTTLE) {
             if (world.isClientSide) {
                 // 客户端播放声音
-                world.playSound(player, pos, SoundEvents.BUCKET_FILL, player.getSoundSource(), 1.0F, 1.0F);
+                world.playSound(player, pos, SoundEvents.BOTTLE_FILL, player.getSoundSource(), 1.0F, 1.0F);
                 return InteractionResult.SUCCESS;
             }
 
@@ -54,10 +54,10 @@ public class FoodBlocksModifier {
             world.setBlock(pos, newState, 3);
 
             // 播放声音
-            world.playSound(player, pos, SoundEvents.BUCKET_FILL, player.getSoundSource(), 1.0F, 1.0F);
+            world.playSound(player, pos, SoundEvents.BOTTLE_FILL, player.getSoundSource(), 1.0F, 1.0F);
 
             // 调用新方块的使用方法
-            newState.use(world, player, hand, hit);
+            newState.useWithoutItem(world, player, hit);
             return InteractionResult.SUCCESS;
         }
 

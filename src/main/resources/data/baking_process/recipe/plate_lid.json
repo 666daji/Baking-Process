@@ -2,20 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "   ",
-    "ABA",
+    "AAA",
+    "A A",
     "   "
   ],
   "key": {
     "A": {
       "item": "minecraft:iron_nugget"
-    },
-    "B": {
-      "tag": "minecraft:wooden_slabs"
     }
   },
   "result": {
-    "item": "baking_process:iron_garnish_dishes",
-    "count": 2
+    "id": "baking_process:plate_lid",
+    "count": 1
   }
 }

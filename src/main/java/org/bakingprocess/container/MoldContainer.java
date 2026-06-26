@@ -1,15 +1,15 @@
 package org.bakingprocess.container;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import org.bakingprocess.content.ShapedDoughContent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twcore.container.ContainerType;
 import org.twcore.content.Content;
 import org.twcore.registry.TWRegistries;
-
-import java.util.Objects;
 
 public class MoldContainer extends ContainerType{
     public static final String DOUGH_KEY = "dough_type";
@@ -31,9 +31,11 @@ public class MoldContainer extends ContainerType{
 
     @Override
     public @Nullable Content extractContent(ItemStack stack) {
-        ResourceLocation id = ResourceLocation.tryParse(stack.getOrCreateTag().getString(DOUGH_KEY));
-        if (id != null) {
-            return TWRegistries.CONTENT.get().getValue(id);
+        CustomData nbt = stack.get(DataComponents.CUSTOM_DATA);
+
+        if (nbt != null && nbt.contains(DOUGH_KEY)) {
+            String soupKey = nbt.copyTag().getString(DOUGH_KEY);
+            return TWRegistries.CONTENT.get().getValue(ResourceLocation.tryParse(soupKey));
         }
 
         return null;
@@ -45,15 +47,20 @@ public class MoldContainer extends ContainerType{
 
         // 清空容器
         if (content == null) {
-            if (stack.hasTag()) {
-                stack.getOrCreateTag().remove(DOUGH_KEY);
+            if (stack.has(DataComponents.CUSTOM_DATA)) {
+                stack.set(DataComponents.CUSTOM_DATA, stack.get(DataComponents.CUSTOM_DATA)
+                        .update(nbtCompound -> nbtCompound.remove(DOUGH_KEY)));
             }
 
             return stack;
         }
 
         // 替换内容物
-        stack.getOrCreateTag().putString(DOUGH_KEY, Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(content)).toString());
+        if (canContain(content)) {
+            stack.set(DataComponents.CUSTOM_DATA, stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
+                    .update(nbtCompound -> nbtCompound.putString(DOUGH_KEY, TWRegistries.CONTENT.get().getKey(content).toString())));
+        }
+
         return stack;
     }
 }

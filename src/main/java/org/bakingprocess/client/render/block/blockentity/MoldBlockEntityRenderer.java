@@ -9,10 +9,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.model.data.ModelData;
 import org.bakingprocess.block.entity.MoldBlockEntity;
 import org.bakingprocess.client.render.model.ModModelLoader;
 import org.bakingprocess.content.ShapedDoughContent;
@@ -45,16 +47,15 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
                                      PoseStack matrices, MultiBufferSource vertexConsumers) {
         matrices.pushPose();
         matrices.translate(0, 0.1, 0);
-        BakedModel renderModel = modelManager.getModel(ModModelLoader.createShapedDoughModel(content));
+        BakedModel renderModel = modelManager.getModel(new ModelResourceLocation(ModModelLoader.createShapedDoughModel(content), ""));
 
-        if (renderModel != null) {
-            // 渲染切割模型
-            modelRenderer.tesselateBlock(
-                    world, renderModel, state, pos,
-                    matrices, vertexConsumers.getBuffer(RenderType.cutout()),
-                    true, RandomSource.create(), state.getSeed(pos), OverlayTexture.NO_OVERLAY
-            );
-        }
+        // 渲染切割模型
+        modelRenderer.tesselateBlock(
+                world, renderModel, state, pos,
+                matrices, vertexConsumers.getBuffer(RenderType.cutout()),
+                true, RandomSource.create(), state.getSeed(pos), OverlayTexture.NO_OVERLAY,
+                ModelData.EMPTY, RenderType.cutout()
+        );
 
         matrices.popPose();
     }

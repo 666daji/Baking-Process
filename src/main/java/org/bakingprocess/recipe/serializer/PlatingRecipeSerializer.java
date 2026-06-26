@@ -1,23 +1,20 @@
 package org.bakingprocess.recipe.serializer;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.bakingprocess.recipe.PlatingRecipe;
-import org.twcore.TWCore;
 import org.twcore.api.process.PlayerAction;
 import org.twcore.content.Content;
 import org.twcore.registry.TWRegistries;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 摆盘配方序列化器，用于JSON格式的摆盘配方解析。
@@ -49,80 +46,80 @@ import java.util.Objects;
  */
 public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> {
 
-    @Override
-    public PlatingRecipe fromJson(ResourceLocation id, JsonObject json) {
-        // 1. 读取容器物品
-        String containerId = GsonHelper.getAsString(json, "container");
-        Item container = BuiltInRegistries.ITEM.getOptional(new ResourceLocation(containerId))
-                .orElseThrow(() -> new JsonParseException("Unknown container item: " + containerId));
+    /** PlayerAction 列表的 Codec：字符串列表转换 */
+    private static final Codec<List<PlayerAction>> ACTIONS_CODEC =
+            Codec.STRING.listOf().xmap(
+                    strings -> strings.stream().map(PlayerAction::fromString).toList(),
+                    actions -> actions.stream().map(PlayerAction::toString).toList()
+            );
 
-        // 2. 读取操作列表
-        if (!json.has("actions")) {
-            throw new JsonParseException("The plating recipe must contain an 'actions' field");
-        }
+    /** Container (Item) 的 Codec：从标识符字符串加载 */
+    private static final Codec<Item> CONTAINER_CODEC =
+            ResourceLocation.CODEC.xmap(
+                    id -> BuiltInRegistries.ITEM.getOptional(id)
+                            .orElseThrow(() -> new IllegalArgumentException("Unknown container item: " + id)),
+                    BuiltInRegistries.ITEM::getKey
+            );
 
-        List<PlayerAction> actions = new ArrayList<>();
-        for (JsonElement element : GsonHelper.getAsJsonArray(json, "actions")) {
-            String actionStr = element.getAsString();
-            PlayerAction action = PlayerAction.fromString(actionStr);
-            actions.add(action);
-        }
+    /** Output (Content/DishesContent) 的 Codec */
+    private static final Codec<Content> OUTPUT_CODEC =
+            ResourceLocation.CODEC.xmap(
+                    id -> {
+                        Content content = TWRegistries.CONTENT.get().getValue(id);
+                        if (content == null) {
+                            throw new IllegalArgumentException("Unknown content: " + id);
+                        }
+                        return content;
+                    },
+                    content -> TWRegistries.CONTENT.get().getKey(content)
+            );
 
-        // 3. 读取输出结果
-        String resultId = GsonHelper.getAsString(json, "result");
-        ResourceLocation result = ResourceLocation.tryParse(resultId);
-        if (result == null) {
-            throw new JsonParseException("Invalid result ID: " + resultId);
-        }
+    public static final MapCodec<PlatingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            instance.group(
+                    CONTAINER_CODEC.fieldOf("container").forGetter(PlatingRecipe::getContainer),
+                    ACTIONS_CODEC.fieldOf("actions").forGetter(PlatingRecipe::getActions),
+                    OUTPUT_CODEC.fieldOf("result").forGetter(PlatingRecipe::getDishes)
+            ).apply(instance, PlatingRecipe::new)
+    );
 
-        Content output = TWRegistries.CONTENT.get().getValue(result);
-        if (output == null) {
-            throw new JsonParseException("No content found: " + resultId);
-        }
+    public static final StreamCodec<RegistryFriendlyByteBuf, PlatingRecipe> PACKET_CODEC =
+            StreamCodec.ofMember(PlatingRecipeSerializer::encode, PlatingRecipeSerializer::decode);
 
-        // 4. 创建并返回配方对象
-        return new PlatingRecipe(id, container, actions, output);
-    }
-
-    @Override
-    public PlatingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-        // 1. 读取容器物品
-        ResourceLocation containerId = buf.readResourceLocation();
-        Item container = BuiltInRegistries.ITEM.getOptional(containerId)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown container item: " + containerId));
-
-        // 2. 读取操作列表
-        int actionCount = buf.readVarInt();
-        List<PlayerAction> actions = new ArrayList<>(actionCount);
-        for (int i = 0; i < actionCount; i++) {
-            String actionStr = buf.readUtf();
-            PlayerAction action = PlayerAction.fromString(actionStr);
-            actions.add(action);
-        }
-
-        // 3. 读取输出结果
-        Content output = TWRegistries.CONTENT.get().getValue(buf.readResourceLocation());
-        if (output == null) {
-            throw new IllegalArgumentException("No output found");
-        }
-
-        // 4. 创建并返回配方对象
-        return new PlatingRecipe(id, container, actions, output);
-    }
-
-    @Override
-    public void toNetwork(FriendlyByteBuf buf, PlatingRecipe recipe) {
-        // 1. 写入容器物品ID
+    private static void encode(PlatingRecipe recipe, RegistryFriendlyByteBuf buf) {
         buf.writeResourceLocation(BuiltInRegistries.ITEM.getKey(recipe.getContainer()));
-
-        // 2. 写入操作列表
         List<PlayerAction> actions = recipe.getActions();
         buf.writeVarInt(actions.size());
         for (PlayerAction action : actions) {
             buf.writeUtf(action.toString());
         }
+        buf.writeResourceLocation(TWRegistries.CONTENT.get().getKey(recipe.getDishes()));
+    }
 
-        // 3. 写入输出内容ID
-        buf.writeResourceLocation(Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(recipe.getDishes())));
+    private static PlatingRecipe decode(RegistryFriendlyByteBuf buf) {
+        ResourceLocation containerId = buf.readResourceLocation();
+        Item container = BuiltInRegistries.ITEM.getOptional(containerId)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown container item: " + containerId));
+        int actionCount = buf.readVarInt();
+        List<PlayerAction> actions = new java.util.ArrayList<>(actionCount);
+        for (int i = 0; i < actionCount; i++) {
+            actions.add(PlayerAction.fromString(buf.readUtf()));
+        }
+        Content output = TWRegistries.CONTENT.get().getValue(buf.readResourceLocation());
+        if (output == null) {
+            throw new IllegalArgumentException("Unknown output content");
+        }
+        return new PlatingRecipe(container, actions, output);
+    }
+
+    // ---------- 接口实现 ----------
+
+    @Override
+    public MapCodec<PlatingRecipe> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, PlatingRecipe> streamCodec() {
+        return PACKET_CODEC;
     }
 }

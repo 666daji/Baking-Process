@@ -1,21 +1,18 @@
 package org.bakingprocess.recipe;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.Level;
 
-public abstract class SimpleCraftRecipe implements Recipe<Container> {
-    protected final ResourceLocation id;
+public abstract class SimpleCraftRecipe implements Recipe<RecipeInput> {
     protected final Ingredient input;
     public final ItemStack output;
 
-    public SimpleCraftRecipe(ResourceLocation id, Ingredient input, ItemStack output) {
-        this.id = id;
+    public SimpleCraftRecipe(Ingredient input, ItemStack output) {
         this.input = input;
         this.output = output;
     }
@@ -28,12 +25,12 @@ public abstract class SimpleCraftRecipe implements Recipe<Container> {
     }
 
     @Override
-    public boolean matches(Container inventory, Level world) {
+    public boolean matches(RecipeInput inventory, Level world) {
         return this.input.test(inventory.getItem(0));
     }
 
     @Override
-    public ItemStack assemble(Container inventory, RegistryAccess registryManager) {
+    public ItemStack assemble(RecipeInput inventory, HolderLookup.Provider registryManager) {
         return this.output.copy();
     }
 
@@ -47,12 +44,7 @@ public abstract class SimpleCraftRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryManager) {
+    public ItemStack getResultItem(HolderLookup.Provider registryManager) {
         return this.output;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return this.id;
     }
 }

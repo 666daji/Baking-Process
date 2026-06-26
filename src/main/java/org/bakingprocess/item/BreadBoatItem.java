@@ -92,7 +92,7 @@ public class BreadBoatItem extends BlockItem {
         // 如果容器中有汤并且使用物品的为玩家则喝汤
         if (soupType instanceof FoodContent soupContent && user instanceof Player player) {
             FoodProperties soup = soupContent.getFoodComponent();
-            player.getFoodData().eat(soup.getNutrition(), soup.getSaturationModifier());
+            player.getFoodData().eat(soup.nutrition(), soup.saturation());
         }
 
         return super.finishUsingItem(stack, world, user);

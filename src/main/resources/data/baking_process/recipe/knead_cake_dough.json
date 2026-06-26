@@ -1,7 +1,7 @@
 {
   "type": "baking_process:dough_making",
   "output": {
-    "item": "baking_process:cake_dough",
+    "id": "baking_process:cake_dough",
     "count": 1
   },
   "flours": {

@@ -3,6 +3,7 @@ package org.bakingprocess.registry;
 import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -19,7 +20,7 @@ public class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, BakingProcess.MOD_ID);
 
     // 工作方块
-    public static final RegistryObject<Item> GRINDING_STONE = registerFromBlock(ModBlocks.GRINDING_STONE, () -> new Item.Properties(), GrindingStoneItem::new);
+    public static final RegistryObject<Item> GRINDING_STONE = registerFromBlock(ModBlocks.GRINDING_STONE, Item.Properties::new, GrindingStoneItem::new);
     public static final RegistryObject<Item> HEAT_RESISTANT_SLATE = fromBlock(ModBlocks.HEAT_RESISTANT_SLATE);
     public static final RegistryObject<Item> FIREWOOD = fromBlock(ModBlocks.FIREWOOD);
     public static final RegistryObject<Item> IRON_PLATE = fromBlock(ModBlocks.IRON_PLATE);
@@ -31,9 +32,13 @@ public class ModItems {
     public static final RegistryObject<Item> PLATE_LID = register("plate_lid", () -> new Item(new Item.Properties()));
 
     // 厨具
-    public static final RegistryObject<Item> BREAD_SPATULA = registerFromBlock(ModBlocks.BREAD_SPATULA, () -> new Item.Properties(),
+    public static final RegistryObject<Item> BREAD_SPATULA = registerFromBlock(ModBlocks.BREAD_SPATULA,
+            () -> new Item.Properties().attributes(SwordItem.createAttributes(
+                    ModSharpKitchenwareItem.SpatulaMaterials.BREAD_SPATULA, 4, -3.5F)),
             ((block, settings) -> new ModSharpKitchenwareItem(block, settings, ModSharpKitchenwareItem.SpatulaMaterials.BREAD_SPATULA)));
-    public static final RegistryObject<Item> KITCHEN_KNIFE = registerFromBlock(ModBlocks.KITCHEN_KNIFE, () -> new Item.Properties(),
+    public static final RegistryObject<Item> KITCHEN_KNIFE = registerFromBlock(ModBlocks.KITCHEN_KNIFE,
+            () -> new Item.Properties().attributes(SwordItem.createAttributes(
+                    ModSharpKitchenwareItem.SpatulaMaterials.KITCHEN_KNIFE, 1, 1)),
             ((block, settings) -> new ModSharpKitchenwareItem(block, settings, ModSharpKitchenwareItem.SpatulaMaterials.KITCHEN_KNIFE)));
 
     // 粉尘
@@ -90,8 +95,8 @@ public class ModItems {
     public static final RegistryObject<Item> KITCHEN_WASTE = fromBlock(ModBlocks.KITCHEN_WASTE);
 
     // 模具
-    public static final RegistryObject<Item> CAKE_EMBRYO_MOLD = registerFromBlock(ModBlocks.CAKE_EMBRYO_MOLD, () -> new Item.Properties(), MoldItem::new);
-    public static final RegistryObject<Item> TOAST_EMBRYO_MOLD = registerFromBlock(ModBlocks.TOAST_EMBRYO_MOLD, () -> new Item.Properties(), MoldItem::new);
+    public static final RegistryObject<Item> CAKE_EMBRYO_MOLD = registerFromBlock(ModBlocks.CAKE_EMBRYO_MOLD, Item.Properties::new, MoldItem::new);
+    public static final RegistryObject<Item> TOAST_EMBRYO_MOLD = registerFromBlock(ModBlocks.TOAST_EMBRYO_MOLD, Item.Properties::new, MoldItem::new);
 
     // 调料
     public static final RegistryObject<Item> SALT_CUBES = fromBlock(ModBlocks.SALT_CUBES);

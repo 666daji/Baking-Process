@@ -5,7 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import org.bakingprocess.BakingProcess;
-import org.twcore.TWCore;
 
 public class ItemTags {
     public static final TagKey<Item> FISH = of("fish");
@@ -14,6 +13,6 @@ public class ItemTags {
     public static final TagKey<Item> FRUIT = of("fruit");
 
     private static TagKey<Item> of(String id) {
-        return TagKey.create(Registries.ITEM, TWCore.createResourceLocation(BakingProcess.MOD_ID, id));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, id));
     }
 }

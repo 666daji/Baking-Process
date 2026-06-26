@@ -2,8 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "A A",
-    "BAB"
+    "   ",
+    "BBB",
+    " A "
   ],
   "key": {
     "A": {
@@ -14,7 +15,7 @@
     }
   },
   "result": {
-    "item": "baking_process:iron_pots",
+    "id": "baking_process:iron_plate",
     "count": 1
   }
 }

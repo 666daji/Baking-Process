@@ -1,7 +1,6 @@
 package org.bakingprocess.recipe;
 
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -20,7 +19,6 @@ import java.util.*;
  * 面团配方
  */
 public class DoughRecipe implements Recipe<KneadingProcess<?>> {
-    private final ResourceLocation id;
     private final ItemStack output;
 
     // 使用Map来统计每种面粉的数量
@@ -32,11 +30,10 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
     // 额外物品要求：物品 -> 数量
     private final Map<Ingredient, Integer> extraRequirements;
 
-    public DoughRecipe(ResourceLocation id, ItemStack output,
+    public DoughRecipe(ItemStack output,
                        Map<FlourItem.FlourType, Integer> flourRequirements,
                        Map<Content, Integer> liquidRequirements,
                        Map<Ingredient, Integer> extraRequirements) {
-        this.id = id;
         this.output = output;
         this.flourRequirements = flourRequirements;
         this.liquidRequirements = liquidRequirements;
@@ -132,7 +129,7 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
     }
 
     @Override
-    public ItemStack assemble(KneadingProcess<?> inventory, RegistryAccess registryManager) {
+    public ItemStack assemble(KneadingProcess<?> inventory, HolderLookup.Provider registryManager) {
         return output.copy();
     }
 
@@ -142,13 +139,8 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryManager) {
+    public ItemStack getResultItem(HolderLookup.Provider registryManager) {
         return output;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return id;
     }
 
     @Override
@@ -172,5 +164,9 @@ public class DoughRecipe implements Recipe<KneadingProcess<?>> {
 
     public Map<Ingredient, Integer> getExtraRequirements() {
         return Collections.unmodifiableMap(extraRequirements);
+    }
+
+    public ItemStack getOutput() {
+        return output;
     }
 }

@@ -19,8 +19,8 @@ public record SimpleFoodComponent(int Hunger, float SaturationModifier) {
      */
     public static SimpleFoodComponent fromFoodComponent(FoodProperties foodComponent) {
         return new SimpleFoodComponent(
-                foodComponent.getNutrition(),
-                foodComponent.getSaturationModifier()
+                foodComponent.nutrition(),
+                foodComponent.saturation()
         );
     }
 
@@ -30,8 +30,8 @@ public record SimpleFoodComponent(int Hunger, float SaturationModifier) {
      * @param second 第二个食物属性
      */
     public static SimpleFoodComponent computeFoodComponent(FoodProperties first, FoodProperties second) {
-        int hunger = second.getNutrition() + first.getNutrition();
-        float saturationModifier = (second.getSaturationModifier() + first.getSaturationModifier()) / 2;
+        int hunger = second.nutrition() + first.nutrition();
+        float saturationModifier = (second.saturation() + first.saturation()) / 2;
         return new SimpleFoodComponent(hunger, saturationModifier);
     }
 
@@ -92,7 +92,7 @@ public record SimpleFoodComponent(int Hunger, float SaturationModifier) {
     public FoodProperties.Builder toFoodComponentBuilder() {
         return new FoodProperties.Builder()
                 .nutrition(this.Hunger)
-                .saturationMod(this.SaturationModifier);
+                .saturationModifier(this.SaturationModifier);
     }
 
     /**

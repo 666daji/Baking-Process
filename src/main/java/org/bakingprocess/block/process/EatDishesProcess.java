@@ -1,6 +1,6 @@
 package org.bakingprocess.block.process;
 
-import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
@@ -62,15 +62,15 @@ public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> exten
     }
 
     @Override
-    public void readFromNbt(CompoundTag nbt) {
-        super.readFromNbt(nbt);
+    public void readFromNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.readFromNbt(nbt, registryLookup);
         remainingEats = nbt.getInt("remaining_eats");
         totalEats = nbt.getInt("total_eats");
     }
 
     @Override
-    public void writeToNbt(CompoundTag nbt) {
-        super.writeToNbt(nbt);
+    public void writeToNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.writeToNbt(nbt, registryLookup);
         nbt.putInt("remaining_eats", remainingEats);
         nbt.putInt("total_eats", totalEats);
     }
@@ -134,9 +134,9 @@ public class EatDishesProcess<T extends BlockEntity & PlatableBlockEntity> exten
             perEatFood.eat(context.player());
 
             // 处理状态效果：每个效果持续时间除以 totalEats，概率不变
-            for (Pair<MobEffectInstance, Float> pair : fullFood.getEffects()) {
-                MobEffectInstance effect = pair.getFirst();
-                float probability = pair.getSecond();
+            for (FoodProperties.PossibleEffect pair : fullFood.effects()) {
+                MobEffectInstance effect = pair.effect();
+                float probability = pair.probability();
                 int newDuration = Math.max(1, effect.getDuration() / totalEats);
                 MobEffectInstance newEffect = new MobEffectInstance(
                         effect.getEffect(),

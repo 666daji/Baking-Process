@@ -1,11 +1,11 @@
 package org.bakingprocess.recipe.serializer;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -60,59 +60,101 @@ import java.util.Map;
  */
 public class CutRecipeSerializer implements RecipeSerializer<CutRecipe> {
 
-    @Override
-    public CutRecipe fromJson(ResourceLocation id, JsonObject json) {
-        // 读取输入物品
-        Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+    private static final Codec<NonNullList<ItemStack>> STATE_CODEC =
+            Codec.unboundedMap(
+                            Codec.STRING.xmap(Integer::parseInt, String::valueOf),
+                            ItemStack.CODEC
+                    )
+                    .xmap(
+                            map -> {
+                                NonNullList<ItemStack> list = NonNullList.withSize(5, ItemStack.EMPTY);
+                                map.forEach((slot, stack) -> {
+                                    if (slot >= 0 && slot < 5) {
+                                        list.set(slot, stack);
+                                    }
+                                });
+                                return list;
+                            },
+                            list -> {
+                                Map<Integer, ItemStack> map = new HashMap<>();
+                                for (int i = 0; i < list.size(); i++) {
+                                    ItemStack stack = list.get(i);
+                                    if (!stack.isEmpty()) {
+                                        map.put(i, stack);
+                                    }
+                                }
+                                return map;
+                            }
+                    );
 
-        // 读取总切菜次数
-        int totalCuts = GsonHelper.getAsInt(json, "totalCuts", 1);
+    private static final Codec<Map<Integer, NonNullList<ItemStack>>> CUT_STATES_CODEC =
+            Codec.unboundedMap(
+                            Codec.STRING.xmap(Integer::parseInt, String::valueOf),
+                            STATE_CODEC
+                    )
+                    .xmap(HashMap::new, HashMap::new);
 
-        // 读取默认库存状态
-        NonNullList<ItemStack> defaultState = readInventoryState(
-                GsonHelper.getAsJsonObject(json, "defaultState", new JsonObject())
-        );
+    public static final MapCodec<CutRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            instance.group(
+                    Ingredient.CODEC_NONEMPTY.fieldOf("input")
+                            .forGetter(CutRecipe::getInput),
 
-        // 读取特定切菜次数的库存状态映射
-        Map<Integer, NonNullList<ItemStack>> cutStateMap = new HashMap<>();
-        if (json.has("cutStates")) {
-            JsonObject cutStates = GsonHelper.getAsJsonObject(json, "cutStates");
-            for (Map.Entry<String, JsonElement> entry : cutStates.entrySet()) {
-                try {
-                    int cutIndex = Integer.parseInt(entry.getKey());
-                    JsonObject stateObject = entry.getValue().getAsJsonObject();
-                    cutStateMap.put(cutIndex, readInventoryState(stateObject));
-                } catch (NumberFormatException e) {
-                    // 忽略无效的键（非数字键）
+                    Codec.INT.optionalFieldOf("totalCuts", 1)
+                            .forGetter(CutRecipe::getTotalCuts),
+
+                    STATE_CODEC.optionalFieldOf("defaultState", NonNullList.withSize(5, ItemStack.EMPTY))
+                            .forGetter(CutRecipe::getDefaultState),
+
+                    CUT_STATES_CODEC.optionalFieldOf("cutStates", Map.of())
+                            .forGetter(CutRecipe::getCutStateMap),
+
+                    ItemStack.CODEC.optionalFieldOf("output", ItemStack.EMPTY)
+                            .forGetter(r -> ItemStack.EMPTY)
+            ).apply(instance, (input, totalCuts, defaultState, cutStateMap, ignoredOutput) -> {
+                Map<Integer, NonNullList<ItemStack>> mutableMap = new HashMap<>(cutStateMap);
+                if (!mutableMap.containsKey(totalCuts)) {
+                    mutableMap.put(totalCuts, defaultState);
                 }
+                return new CutRecipe(input, totalCuts, mutableMap, defaultState);
+            })
+    );
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, CutRecipe> PACKET_CODEC =
+            StreamCodec.ofMember(CutRecipeSerializer::encode, CutRecipeSerializer::decode);
+
+    private static void encode(CutRecipe recipe, RegistryFriendlyByteBuf buf) {
+        Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.getInput());
+        buf.writeVarInt(recipe.getTotalCuts());
+
+        NonNullList<ItemStack> defaultState = recipe.getDefaultState();
+        buf.writeVarInt(defaultState.size());
+        for (ItemStack stack : defaultState) {
+            ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, stack);
+        }
+
+        Map<Integer, NonNullList<ItemStack>> map = recipe.getCutStateMap();
+        buf.writeVarInt(map.size());
+        for (var entry : map.entrySet()) {
+            buf.writeVarInt(entry.getKey());
+            buf.writeVarInt(entry.getValue().size());
+            for (ItemStack stack : entry.getValue()) {
+                ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, stack);
             }
         }
-
-        // 确保最后一刀的状态存在，如果没有则使用默认状态
-        if (!cutStateMap.containsKey(totalCuts)) {
-            cutStateMap.put(totalCuts, defaultState);
-        }
-
-        // 创建并返回配方对象
-        return new CutRecipe(id, input, totalCuts, cutStateMap, defaultState);
     }
 
-    @Override
-    public CutRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-        // 读取输入物品
-        Ingredient input = Ingredient.fromNetwork(buf);
-
-        // 读取总切菜次数
+    private static CutRecipe decode(RegistryFriendlyByteBuf buf) {
+        Ingredient input = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
         int totalCuts = buf.readVarInt();
 
-        // 读取默认库存状态
+        // 默认状态
         int defaultSize = buf.readVarInt();
         NonNullList<ItemStack> defaultState = NonNullList.withSize(defaultSize, ItemStack.EMPTY);
         for (int i = 0; i < defaultSize; i++) {
-            defaultState.set(i, buf.readItem());
+            defaultState.set(i, ItemStack.OPTIONAL_STREAM_CODEC.decode(buf));
         }
 
-        //  读取特定切菜次数的库存状态映射
+        // 切割状态表
         int stateCount = buf.readVarInt();
         Map<Integer, NonNullList<ItemStack>> cutStateMap = new HashMap<>();
         for (int i = 0; i < stateCount; i++) {
@@ -120,74 +162,25 @@ public class CutRecipeSerializer implements RecipeSerializer<CutRecipe> {
             int stateSize = buf.readVarInt();
             NonNullList<ItemStack> state = NonNullList.withSize(stateSize, ItemStack.EMPTY);
             for (int j = 0; j < stateSize; j++) {
-                state.set(j, buf.readItem());
+                state.set(j, ItemStack.OPTIONAL_STREAM_CODEC.decode(buf));
             }
             cutStateMap.put(cutIndex, state);
         }
 
-        // 确保最后一刀的状态存在
         if (!cutStateMap.containsKey(totalCuts)) {
             cutStateMap.put(totalCuts, defaultState);
         }
 
-        // 创建并返回配方对象
-        return new CutRecipe(id, input, totalCuts, cutStateMap, defaultState);
+        return new CutRecipe(input, totalCuts, cutStateMap, defaultState);
     }
 
     @Override
-    public void toNetwork(FriendlyByteBuf buf, CutRecipe recipe) {
-        // 写入输入物品
-        recipe.getInput().toNetwork(buf);
-
-        // 写入总切菜次数
-        buf.writeVarInt(recipe.getTotalCuts());
-
-        // 写入默认库存状态
-        NonNullList<ItemStack> defaultState = recipe.getDefaultState();
-        buf.writeVarInt(defaultState.size());
-        for (ItemStack stack : defaultState) {
-            buf.writeItem(stack);
-        }
-
-        // 写入特定切菜次数的库存状态映射
-        Map<Integer, NonNullList<ItemStack>> cutStateMap = recipe.getCutStateMap();
-        buf.writeVarInt(cutStateMap.size());
-        for (Map.Entry<Integer, NonNullList<ItemStack>> entry : cutStateMap.entrySet()) {
-            buf.writeVarInt(entry.getKey());
-            buf.writeVarInt(entry.getValue().size());
-            for (ItemStack stack : entry.getValue()) {
-                buf.writeItem(stack);
-            }
-        }
+    public MapCodec<CutRecipe> codec() {
+        return CODEC;
     }
 
-    /**
-     * <h3>从JSON对象读取库存状态（5个槽位）</h3>
-     *
-     * <p>读取格式：<code>{"0": {"item": "...", "count": 1}, "2": {...}}</code></p>
-     * <p>没有指定的槽位默认为空物品堆。</p>
-     *
-     * @param jsonObject JSON对象，包含槽位索引到物品的映射
-     * @return DefaultedList<ItemStack> 包含5个槽位的库存状态
-     */
-    private NonNullList<ItemStack> readInventoryState(JsonObject jsonObject) {
-        NonNullList<ItemStack> state = NonNullList.withSize(5, ItemStack.EMPTY);
-
-        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-            try {
-                int slot = Integer.parseInt(entry.getKey());
-                if (slot >= 0 && slot < 5) {
-                    JsonObject itemObj = entry.getValue().getAsJsonObject();
-                    state.set(slot, new ItemStack(
-                            GsonHelper.getAsItem(itemObj, "item"),
-                            GsonHelper.getAsInt(itemObj, "count", 1)
-                    ));
-                }
-            } catch (NumberFormatException e) {
-                // 忽略无效的槽位键（非数字键）
-            }
-        }
-
-        return state;
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, CutRecipe> streamCodec() {
+        return PACKET_CODEC;
     }
 }

@@ -1,7 +1,7 @@
 package org.bakingprocess.item;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,10 +22,10 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +35,6 @@ import java.util.stream.Stream;
  * 专门用于存放 {@linkplain FlourItem} 的袋子。
  */
 public class FlourSackItem extends BlockItem {
-    public static final String STORED_ITEM_KEY = "StoredFlour";  // 存储完整物品堆栈
     private static final int MAX_STORAGE = 16;
     private static final int ITEM_BAR_COLOR = Mth.color(0.4F, 0.4F, 1.0F);
 
@@ -138,7 +137,7 @@ public class FlourSackItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         appendCapacityTooltip(stack, tooltip);
         appendContentTooltip(stack, tooltip);
         appendUsageTooltip(stack, tooltip);
@@ -152,7 +151,7 @@ public class FlourSackItem extends BlockItem {
         if (bundledStack.isPresent() && !bundledStack.get().isEmpty()) {
             // 将单个物品堆栈转换为Stream
             Stream<ItemStack> contents = Stream.of(bundledStack.get());
-            ItemUtils.onContainerDestroyed(entity, contents);
+            ItemUtils.onContainerDestroyed(entity, contents.toList());
         }
     }
 
@@ -238,13 +237,11 @@ public class FlourSackItem extends BlockItem {
      * 获取粉尘袋中存储的物品栈
      */
     public static Optional<ItemStack> getBundledStack(ItemStack stack) {
-        CompoundTag nbt = stack.getTag();
-        if (nbt == null || !nbt.contains(STORED_ITEM_KEY)) {
+        ItemContainerContents container = stack.get(DataComponents.CONTAINER);
+        if (container == null) {
             return Optional.empty();
         }
-
-        CompoundTag storedNbt = nbt.getCompound(STORED_ITEM_KEY);
-        return Optional.of(ItemStack.of(storedNbt));
+        return container.nonEmptyStream().findFirst();
     }
 
     /**
@@ -295,7 +292,6 @@ public class FlourSackItem extends BlockItem {
             return 0;
         }
 
-        CompoundTag nbt = bundle.getOrCreateTag();
         int currentCount = getBundleOccupancy(bundle);
         int availableSpace = MAX_STORAGE - currentCount;
         int maxToAdd = Math.min(stack.getCount(), availableSpace);
@@ -304,20 +300,20 @@ public class FlourSackItem extends BlockItem {
             return 0;
         }
 
+        Optional<ItemStack> existing = getBundledStack(bundle);
+
         // 如果粉尘袋是空的，设置物品
-        if (!nbt.contains(STORED_ITEM_KEY)) {
+        if (existing.isEmpty()) {
             ItemStack copy = stack.copyWithCount(maxToAdd);
-            CompoundTag storedNbt = new CompoundTag();
-            copy.save(storedNbt);
-            nbt.put(STORED_ITEM_KEY, storedNbt);
+            bundle.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(List.of(copy)));
             return maxToAdd;
         }
         // 如果已经有物品，检查是否可以合并
         else {
-            ItemStack existingStack = ItemStack.of(nbt.getCompound(STORED_ITEM_KEY));
+            ItemStack existingStack = existing.get();
 
-            // 检查是否为同一物品（包括NBT）
-            if (ItemStack.isSameItemSameTags(existingStack, stack)) {
+            // 检查是否为同一物品
+            if (ItemStack.matches(existingStack, stack)) {
                 int newTotal = existingStack.getCount() + maxToAdd;
                 if (newTotal > MAX_STORAGE) {
                     maxToAdd = MAX_STORAGE - existingStack.getCount();
@@ -325,10 +321,8 @@ public class FlourSackItem extends BlockItem {
                     newTotal = MAX_STORAGE;
                 }
 
-                existingStack.setCount(newTotal);
-                CompoundTag storedNbt = new CompoundTag();
-                existingStack.save(storedNbt);
-                nbt.put(STORED_ITEM_KEY, storedNbt);
+                ItemStack updatedStack = existingStack.copyWithCount(newTotal);
+                bundle.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(List.of(updatedStack)));
                 return maxToAdd;
             } else {
                 // 不同种类的粉，不能添加
@@ -352,7 +346,7 @@ public class FlourSackItem extends BlockItem {
     private static Optional<ItemStack> removeAllStack(ItemStack stack) {
         Optional<ItemStack> bundledStack = getBundledStack(stack);
         if (bundledStack.isPresent() && !bundledStack.get().isEmpty()) {
-            stack.removeTagKey(STORED_ITEM_KEY);
+            stack.remove(DataComponents.CONTAINER);
             return bundledStack;
         }
         return Optional.empty();
@@ -361,26 +355,23 @@ public class FlourSackItem extends BlockItem {
     /**
      * 从粉尘袋中取出指定数量的物品
      */
-    private static Optional<ItemStack> removeSomeStack(ItemStack stack, int amount) {
-        Optional<ItemStack> bundledStack = getBundledStack(stack);
+    private static Optional<ItemStack> removeSomeStack(ItemStack bundle, int amount) {
+        Optional<ItemStack> bundledStack = getBundledStack(bundle);
         if (bundledStack.isPresent() && !bundledStack.get().isEmpty()) {
             ItemStack storedStack = bundledStack.get();
             int storedCount = storedStack.getCount();
 
             if (amount >= storedCount) {
                 // 取出全部
-                stack.removeTagKey(STORED_ITEM_KEY);
+                bundle.remove(DataComponents.CONTAINER);
                 return Optional.of(storedStack);
             } else {
                 // 取出部分
                 ItemStack removedStack = storedStack.copyWithCount(amount);
-                storedStack.setCount(storedCount - amount);
+                ItemStack remainingStack = storedStack.copyWithCount(storedCount - amount);
 
-                // 更新存储的NBT
-                CompoundTag nbt = stack.getOrCreateTag();
-                CompoundTag storedNbt = new CompoundTag();
-                storedStack.save(storedNbt);
-                nbt.put(STORED_ITEM_KEY, storedNbt);
+                // 更新容器组件
+                bundle.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(List.of(remainingStack)));
 
                 return Optional.of(removedStack);
             }

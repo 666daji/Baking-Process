@@ -7,6 +7,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.bakingprocess.container.BreadBoatContainer;
@@ -19,7 +20,7 @@ public class EmptyBreadBoatBlock extends SimpleFoodBlock {
     /** 对应的装了内容物的方块 */
     protected final BreadBoatBlock targetBlock;
 
-    public EmptyBreadBoatBlock(Properties settings, BreadBoatBlock targetBlock) {
+    public EmptyBreadBoatBlock(BlockBehaviour.Properties settings, BreadBoatBlock targetBlock) {
         super(settings, true, targetBlock.simpleShape, targetBlock.useItemTranslationKey, null);
         this.targetBlock = targetBlock;
     }
@@ -42,7 +43,8 @@ public class EmptyBreadBoatBlock extends SimpleFoodBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        InteractionHand hand = player.getUsedItemHand();
         ItemStack handStack = player.getItemInHand(hand);
         Content content = ContainerUtil.extractContent(handStack);
         BreadBoatContainer.BreadBoatSoupType soupType = BreadBoatContainer.BreadBoatSoupType.fromContent(content);
@@ -68,6 +70,6 @@ public class EmptyBreadBoatBlock extends SimpleFoodBlock {
             }
         }
 
-        return super.use(state, world, pos, player, hand, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 }

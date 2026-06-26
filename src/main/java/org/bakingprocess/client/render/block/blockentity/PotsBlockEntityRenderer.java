@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraftforge.client.model.data.ModelData;
@@ -49,7 +50,7 @@ public class PotsBlockEntityRenderer implements BlockEntityRenderer<PotsBlockEnt
             renderer.renderModel(matrices.last(),
                     vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(entity.getBlockState())),
                     null,
-                    modelManager.getModel(MODEL_KNEAD_2),
+                    modelManager.getModel(new ModelResourceLocation(MODEL_KNEAD_2, "")),
                     1.0f, 1.0f, 1.0f, light, overlay,
                     ModelData.EMPTY, RenderType.cutout());
             matrices.popPose();
@@ -70,16 +71,18 @@ public class PotsBlockEntityRenderer implements BlockEntityRenderer<PotsBlockEnt
         // 根据渲染状态选择对应的模型
         ResourceLocation modelId = getModelForRenderState(kneadingState);
         if (modelId != null) {
-            renderer.tesselateBlock(
-                    entity.getLevel(),
-                    modelManager.getModel(modelId),
-                    entity.getBlockState(), entity.getBlockPos(),
-                    matrices,
-                    vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(entity.getBlockState())),
-                    true, RandomSource.create(),
-                    entity.getBlockState().getSeed(entity.getBlockPos()), OverlayTexture.NO_OVERLAY,
-                    ModelData.EMPTY, RenderType.cutout()
-            );
+            if (entity.getLevel() != null) {
+                renderer.tesselateBlock(
+                        entity.getLevel(),
+                        modelManager.getModel(new ModelResourceLocation(modelId, "")),
+                        entity.getBlockState(), entity.getBlockPos(),
+                        matrices,
+                        vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(entity.getBlockState())),
+                        true, RandomSource.create(),
+                        entity.getBlockState().getSeed(entity.getBlockPos()), OverlayTexture.NO_OVERLAY,
+                        ModelData.EMPTY, RenderType.cutout()
+                );
+            }
         }
 
         matrices.popPose();

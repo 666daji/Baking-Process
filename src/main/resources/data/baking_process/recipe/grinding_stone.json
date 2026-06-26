@@ -21,7 +21,7 @@
     }
   },
   "result": {
-    "item": "baking_process:grinding_stone",
+    "id": "baking_process:grinding_stone",
     "count": 1
   }
 }

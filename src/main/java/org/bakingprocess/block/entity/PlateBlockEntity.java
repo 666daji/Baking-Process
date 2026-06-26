@@ -1,23 +1,7 @@
 package org.bakingprocess.block.entity;
 
-import org.bakingprocess.BakingProcess;
-import org.bakingprocess.block.PlateBlock;
-import org.bakingprocess.block.process.EatDishesProcess;
-import org.bakingprocess.block.process.PlatingProcess;
-import org.bakingprocess.content.DishesContent;
-import org.bakingprocess.recipe.PlatingRecipe;
-import org.bakingprocess.registry.ModBlockEntityTypes;
-import org.bakingprocess.registry.ModItems;
-import org.jetbrains.annotations.Nullable;
-import org.twcore.api.process.PlayerAction;
-import org.twcore.content.Content;
-import org.twcore.process.playeraction.PlayerActionListUtil;
-import org.twcore.registry.TWRegistries;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
@@ -31,11 +15,30 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.bakingprocess.BakingProcess;
+import org.bakingprocess.block.PlateBlock;
+import org.bakingprocess.block.process.EatDishesProcess;
+import org.bakingprocess.block.process.PlatingProcess;
+import org.bakingprocess.content.DishesContent;
+import org.bakingprocess.recipe.PlatingRecipe;
+import org.bakingprocess.registry.ModBlockEntityTypes;
+import org.bakingprocess.registry.ModItems;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
+import org.twcore.api.process.PlayerAction;
+import org.twcore.content.Content;
+import org.twcore.process.playeraction.PlayerActionListUtil;
+import org.twcore.registry.TWRegistries;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity {
     /** 方块库存的最大容量，同时也是摆盘流程的最大步骤数量。 */
@@ -253,18 +256,18 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
     // ==================== NBT 序列化 ====================
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
 
         // 清除当前状态
         this.performedActions.clear();
 
         if (nbt.contains("eat_process")) {
-            platingProcess.readFromNbt(nbt.getCompound("plating_process"));
+            platingProcess.readFromNbt(nbt.getCompound("plating_process"), registryLookup);
         }
 
         if (nbt.contains("eat_process")) {
-            eatProcess.readFromNbt(nbt.getCompound("eat_process"));
+            eatProcess.readFromNbt(nbt.getCompound("eat_process"), registryLookup);
         }
 
         // 读取菜肴
@@ -279,15 +282,15 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt) {
-        super.saveAdditional(nbt);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
 
         CompoundTag platingNbt = new CompoundTag();
-        platingProcess.writeToNbt(platingNbt);
+        platingProcess.writeToNbt(platingNbt, registryLookup);
         nbt.put("plating_process", platingNbt);
 
         CompoundTag eatNbt = new CompoundTag();
-        eatProcess.writeToNbt(eatNbt);
+        eatProcess.writeToNbt(eatNbt, registryLookup);
         nbt.put("eat_process", eatNbt);
 
         if (outcome != null) {
@@ -311,9 +314,9 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
     }
 
     @Override
-    public void onPlatingComplete(Level world, BlockPos pos, PlatingRecipe recipe, Player player, InteractionHand hand, HitResult hit) {
+    public void onPlatingComplete(Level world, BlockPos pos, @UnknownNullability RecipeHolder<PlatingRecipe> recipe, Player player, InteractionHand hand, HitResult hit) {
         // 设置菜肴
-        setOutcome(recipe.getDishes());
+        setOutcome(recipe.value().getDishes());
 
         // 消耗一个完成物品
         if (!player.isCreative()) {
@@ -337,7 +340,7 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
     }
 
     @Override
-    public int getContainerSize() {
+    public int size() {
         return MAX_STEPS;
     }
 
@@ -380,8 +383,8 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
+        return this.saveWithoutMetadata(registryLookup);
     }
 
     @Override

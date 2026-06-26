@@ -10,21 +10,18 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.ModelData;
-import org.bakingprocess.BakingProcess;
 import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.block.entity.PlateBlockEntity;
 import org.bakingprocess.client.render.model.ModModelLoader;
 import org.bakingprocess.client.render.model.PlatingModelManager;
 import org.bakingprocess.content.DishesContent;
 import org.dfood.block.FoodBlock;
-import org.twcore.TWCore;
-
-import java.util.Optional;
 
 public class PlateBlockEntityRenderer implements BlockEntityRenderer<PlateBlockEntity> {
     private final ModelManager modelManager;
@@ -62,34 +59,34 @@ public class PlateBlockEntityRenderer implements BlockEntityRenderer<PlateBlockE
         }
 
         // 获取模型
-        BakedModel renderModel = modelManager.getModel(Optional.ofNullable(renderModelId).orElse(TWCore.createResourceLocation(BakingProcess.MOD_ID, "missing")));
+        BakedModel renderModel = null;
+        if (renderModelId != null) {
+            renderModel = modelManager.getModel(new ModelResourceLocation(renderModelId, ""));
+        }
 
         // 渲染最终模型
-        if (!renderModel.equals(modelManager.getMissingModel())) {
-            matrices.pushPose();
-            matrices.translate(0.5, 0, 0.5);
-            float facing = state.getValue(FoodBlock.FACING).toYRot();
-            matrices.mulPose(Axis.YP.rotationDegrees(facing));
-            matrices.translate(-0.5, 0, -0.5);
+        matrices.pushPose();
+        matrices.translate(0.5, 0, 0.5);
+        float facing = state.getValue(FoodBlock.FACING).toYRot();
+        matrices.mulPose(Axis.YP.rotationDegrees(facing));
+        matrices.translate(-0.5, 0, -0.5);
 
-            if (entity.getLevel() != null) {
-                modelRenderer.tesselateBlock(
-                        entity.getLevel(),
-                        renderModel,
-                        state,
-                        entity.getBlockPos(),
-                        matrices,
-                        vertexConsumers.getBuffer(RenderType.cutout()),
-                        true,
-                        RandomSource.create(),
-                        state.getSeed(entity.getBlockPos()),
-                        OverlayTexture.NO_OVERLAY,
-                        ModelData.EMPTY,
-                        RenderType.cutout()
-                );
-            }
-
-            matrices.popPose();
+        if (entity.getLevel() != null && renderModel != null) {
+            modelRenderer.tesselateBlock(
+                    entity.getLevel(),
+                    renderModel,
+                    state,
+                    entity.getBlockPos(),
+                    matrices,
+                    vertexConsumers.getBuffer(RenderType.cutout()),
+                    true,
+                    RandomSource.create(),
+                    state.getSeed(entity.getBlockPos()),
+                    OverlayTexture.NO_OVERLAY,
+                    ModelData.EMPTY, RenderType.cutout()
+            );
         }
+
+        matrices.popPose();
     }
 }

@@ -10,7 +10,7 @@
     }
   ],
   "result": {
-    "item": "baking_process:firewood",
+    "id": "baking_process:firewood",
     "count": 2
   }
 }

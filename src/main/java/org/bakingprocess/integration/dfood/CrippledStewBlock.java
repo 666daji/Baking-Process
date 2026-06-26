@@ -49,7 +49,7 @@ public class CrippledStewBlock extends CrippledBlock {
             return InteractionResult.PASS;
         } else {
             world.playSound(player, pos, SoundEvents.GENERIC_DRINK, player.getSoundSource(), 1.0F, 1.0F);
-            player.getFoodData().eat(foodComponent.getNutrition() / 4, foodComponent.getSaturationModifier() / 4.0F);
+            player.getFoodData().eat(foodComponent.nutrition() / 4, foodComponent.saturation() / 4.0F);
             int i = state.getValue(NUMBER_OF_USE);
             world.gameEvent(player, GameEvent.EAT, pos);
             if (i < useNumber) {
@@ -68,15 +68,16 @@ public class CrippledStewBlock extends CrippledBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        super.playerWillDestroy(world,pos, state, player);
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        BlockState result = playerWillDestroy(world,pos, state, player);
         if (!world.isClientSide && state.getValue(NUMBER_OF_USE) > 0) {
-            int hunger = foodComponent.getNutrition() / 4;
-            float saturation = foodComponent.getSaturationModifier() / 4.0F;
+            int hunger = foodComponent.nutrition() / 4;
+            float saturation = foodComponent.saturation() / 4.0F;
             int numberOfEat = state.getValue(NUMBER_OF_USE);
             player.getFoodData().eat(hunger * numberOfEat, saturation * numberOfEat);
             world.gameEvent(player, GameEvent.EAT, pos);
         }
+        return result;
     }
 
     public static BlockState getStewState(BlockState state) {
