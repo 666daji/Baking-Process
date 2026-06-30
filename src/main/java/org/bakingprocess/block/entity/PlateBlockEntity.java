@@ -272,7 +272,7 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
 
         // 读取菜肴
         if (nbt.contains(OUTCOME_KEY, Tag.TAG_STRING)) {
-            Content content = TWRegistries.CONTENT.get().getValue(ResourceLocation.tryParse(nbt.getString(OUTCOME_KEY)));
+            Content content = TWRegistries.CONTENT.get(ResourceLocation.tryParse(nbt.getString(OUTCOME_KEY)));
             setOutcome((DishesContent) content);
         } else {
             // 读取操作列表
@@ -294,7 +294,7 @@ public class PlateBlockEntity extends BlockEntity implements PlatableBlockEntity
         nbt.put("eat_process", eatNbt);
 
         if (outcome != null) {
-            nbt.putString(OUTCOME_KEY, Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(outcome)).toString());
+            nbt.putString(OUTCOME_KEY, Objects.requireNonNull(TWRegistries.CONTENT.getKey(outcome)).toString());
         } else {
             // 写入操作列表
             PlayerActionListUtil.writeActionsToNbt(nbt, performedActions);

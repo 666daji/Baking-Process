@@ -1,6 +1,6 @@
 package org.bakingprocess.registry;
 
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.neoforged.bus.api.IEventBus;
 
 public class RegistryInit {
     public static void init(IEventBus modEventBus) {

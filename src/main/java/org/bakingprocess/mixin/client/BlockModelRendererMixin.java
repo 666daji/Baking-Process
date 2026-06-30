@@ -34,7 +34,7 @@ public class BlockModelRendererMixin {
             if (foodValue > 1) {
                 ModelManager manager = Minecraft.getInstance().getModelManager();
                 ResourceLocation renderModelId = ModModelLoader.createCookingModel(BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath(), foodValue);
-                BakedModel model1 = manager.getModel(new ModelResourceLocation(renderModelId, "") );
+                BakedModel model1 = manager.getModel(ModelResourceLocation.standalone(renderModelId) );
 
                 // 只在成功获取到有效模型时才执行旋转并返回新模型
                 if (model1 != manager.getMissingModel()) {

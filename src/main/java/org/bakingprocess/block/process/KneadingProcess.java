@@ -441,7 +441,7 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
         // 保存液体计数（LiquidType作为键）
         CompoundTag liquidsNbt = new CompoundTag();
         for (Map.Entry<Content, Integer> entry : liquidCounts.entrySet()) {
-            ResourceLocation id = TWRegistries.CONTENT.get().getKey(entry.getKey());
+            ResourceLocation id = TWRegistries.CONTENT.getKey(entry.getKey());
             if (id != null) {
                 liquidsNbt.putInt(id.toString(), entry.getValue());
             }
@@ -479,7 +479,7 @@ public class KneadingProcess<T extends BlockEntity & Container> extends Abstract
         if (nbt.contains("liquids")) {
             CompoundTag liquidsNbt = nbt.getCompound("liquids");
             for (String key : liquidsNbt.getAllKeys()) {
-                Content content = TWRegistries.CONTENT.get().getValue(ResourceLocation.tryParse(key));
+                Content content = TWRegistries.CONTENT.get(ResourceLocation.tryParse(key));
                 if (content != null && isAllowedContent(content)) {
                     liquidCounts.put(content, liquidsNbt.getInt(key));
                 }

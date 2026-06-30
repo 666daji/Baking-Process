@@ -4,9 +4,9 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.bakingprocess.BakingProcess;
 import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.item.BreadBoatItem;
@@ -16,7 +16,7 @@ public class ModItemGroups {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BakingProcess.MOD_ID);
 
-    public static final RegistryObject<CreativeModeTab> MAIN_TAB = CREATIVE_TABS.register("main",
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB = CREATIVE_TABS.register("main",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemgroup.baking_process"))
                     .icon(() -> new ItemStack(ModItems.GRINDING_STONE.get()))
@@ -101,7 +101,7 @@ public class ModItemGroups {
                     }))
                     .build());
 
-    public static final RegistryObject<CreativeModeTab> ALL_DISH_TAB = CREATIVE_TABS.register("all_dish",
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ALL_DISH_TAB = CREATIVE_TABS.register("all_dish",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemgroup.baking_process.plating"))
                     .icon(() -> new ItemStack(ModItems.GRINDING_STONE.get()))

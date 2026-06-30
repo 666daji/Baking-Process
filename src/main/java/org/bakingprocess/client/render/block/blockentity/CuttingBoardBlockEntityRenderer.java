@@ -17,7 +17,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.bakingprocess.block.CuttingBoardBlock;
 import org.bakingprocess.block.entity.CuttingBoardBlockEntity;
 import org.bakingprocess.block.process.CuttingProcess;
@@ -64,7 +64,7 @@ public class CuttingBoardBlockEntityRenderer extends UpPlaceBlockEntityRenderer<
 
         // 构建切割模型ID
         ResourceLocation modelId = ModModelLoader.createCuttingModel(itemId, cutCount);
-        BakedModel model = manager.getModel(new ModelResourceLocation(modelId, "") );
+        BakedModel model = manager.getModel(ModelResourceLocation.standalone(modelId) );
 
         // 检查是否是有效模型（不是错误模型）
         if (model == manager.getMissingModel()) {

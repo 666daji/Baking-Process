@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.bakingprocess.block.PlateBlock;
 import org.bakingprocess.block.entity.PlateBlockEntity;
 import org.bakingprocess.client.render.model.ModModelLoader;
@@ -61,7 +61,7 @@ public class PlateBlockEntityRenderer implements BlockEntityRenderer<PlateBlockE
         // 获取模型
         BakedModel renderModel = null;
         if (renderModelId != null) {
-            renderModel = modelManager.getModel(new ModelResourceLocation(renderModelId, ""));
+            renderModel = modelManager.getModel(ModelResourceLocation.standalone(renderModelId));
         }
 
         // 渲染最终模型

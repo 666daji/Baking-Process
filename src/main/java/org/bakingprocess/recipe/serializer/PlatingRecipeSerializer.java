@@ -65,13 +65,13 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
     private static final Codec<Content> OUTPUT_CODEC =
             ResourceLocation.CODEC.xmap(
                     id -> {
-                        Content content = TWRegistries.CONTENT.get().getValue(id);
+                        Content content = TWRegistries.CONTENT.get(id);
                         if (content == null) {
                             throw new IllegalArgumentException("Unknown content: " + id);
                         }
                         return content;
                     },
-                    content -> TWRegistries.CONTENT.get().getKey(content)
+                    content -> TWRegistries.CONTENT.getKey(content)
             );
 
     public static final MapCodec<PlatingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
@@ -92,7 +92,7 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
         for (PlayerAction action : actions) {
             buf.writeUtf(action.toString());
         }
-        buf.writeResourceLocation(TWRegistries.CONTENT.get().getKey(recipe.getDishes()));
+        buf.writeResourceLocation(TWRegistries.CONTENT.getKey(recipe.getDishes()));
     }
 
     private static PlatingRecipe decode(RegistryFriendlyByteBuf buf) {
@@ -104,7 +104,7 @@ public class PlatingRecipeSerializer implements RecipeSerializer<PlatingRecipe> 
         for (int i = 0; i < actionCount; i++) {
             actions.add(PlayerAction.fromString(buf.readUtf()));
         }
-        Content output = TWRegistries.CONTENT.get().getValue(buf.readResourceLocation());
+        Content output = TWRegistries.CONTENT.get(buf.readResourceLocation());
         if (output == null) {
             throw new IllegalArgumentException("Unknown output content");
         }

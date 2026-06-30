@@ -75,7 +75,7 @@ public class UpPlaceStackRenderers {
     public static UpPlaceStackRenderer createKitchenKnifeRenderer() {
         return context -> {
             BakedModel model = context.getModelManager()
-                    .getModel(new ModelResourceLocation(ModModelLoader.BOARD_KITCHEN_KNIFE, ""));
+                    .getModel(ModelResourceLocation.standalone(ModModelLoader.BOARD_KITCHEN_KNIFE));
 
             Direction facing = context.getFacing();
             BlockState state = context.getDefaultBlockState();

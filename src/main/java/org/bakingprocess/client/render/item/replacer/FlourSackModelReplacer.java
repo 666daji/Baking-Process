@@ -36,7 +36,7 @@ public class FlourSackModelReplacer {
                     ResourceLocation customModelId = ModModelLoader.createItemModel(flourName);
 
                     // 获取模型
-                    BakedModel customModel = manager.getModel(new ModelResourceLocation(customModelId, "") );
+                    BakedModel customModel = manager.getModel(ModelResourceLocation.standalone(customModelId) );
 
                     // 如果找到了自定义模型且不是缺失模型，则返回自定义模型
                     if (customModel != null && !customModel.equals(manager.getMissingModel())) {

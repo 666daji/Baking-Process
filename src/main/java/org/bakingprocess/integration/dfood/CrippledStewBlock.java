@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.bakingprocess.block.CrippledBlock;
 import org.dfood.block.FoodBlocks;
 import org.dfood.shape.FoodShapeHandle;
@@ -81,7 +81,7 @@ public class CrippledStewBlock extends CrippledBlock {
     }
 
     public static BlockState getStewState(BlockState state) {
-        for (Block block : AssistedBlocks.assistedBlocks.stream().map(RegistryObject::get).toArray(Block[]::new)) {
+        for (Block block : AssistedBlocks.assistedBlocks.stream().map(DeferredHolder::get).toArray(Block[]::new)) {
             if (block instanceof CrippledStewBlock crippledStewBlock && crippledStewBlock.isBaseBlock(state)) {
                 return crippledStewBlock.defaultBlockState()
                         .setValue(CrippledStewBlock.FACING, state.getValue(CrippledStewBlock.FACING))

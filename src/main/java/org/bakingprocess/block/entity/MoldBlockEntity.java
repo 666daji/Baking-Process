@@ -32,14 +32,14 @@ public class MoldBlockEntity extends BlockEntity{
     @Override
     public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         if (shapedDough != null) {
-            nbt.putString(CONTENT_KEY, Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(shapedDough)).toString());
+            nbt.putString(CONTENT_KEY, Objects.requireNonNull(TWRegistries.CONTENT.getKey(shapedDough)).toString());
         }
     }
 
     @Override
     public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         if (nbt.contains(CONTENT_KEY, Tag.TAG_STRING)) {
-            Content content = TWRegistries.CONTENT.get().getValue(ResourceLocation.tryParse(nbt.getString(CONTENT_KEY)));
+            Content content = TWRegistries.CONTENT.get(ResourceLocation.tryParse(nbt.getString(CONTENT_KEY)));
             if (content instanceof ShapedDoughContent dough) {
                 this.shapedDough = dough;
             }

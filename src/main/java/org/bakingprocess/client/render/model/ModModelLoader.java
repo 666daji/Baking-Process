@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
 import org.bakingprocess.BakingProcess;
 import org.bakingprocess.content.DishesContent;
 import org.bakingprocess.content.ShapedDoughContent;
@@ -52,7 +52,7 @@ public class ModModelLoader {
 
         // 将所有模型添加到加载上下文
         for (ResourceLocation modelId : MODELS_TO_LOAD) {
-            event.register(new ModelResourceLocation(modelId, ""));
+            event.register(ModelResourceLocation.standalone(modelId));
         }
     }
 
@@ -368,7 +368,7 @@ public class ModModelLoader {
      */
     public static ResourceLocation createDishesModel(Item baseContainer, Content dishes) {
         String containerId = BuiltInRegistries.ITEM.getKey(baseContainer).getPath();
-        String dishesId = Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(dishes)).getPath();
+        String dishesId = Objects.requireNonNull(TWRegistries.CONTENT.getKey(dishes)).getPath();
 
         return ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "dishes/" + containerId + "_" + dishesId);
     }
@@ -382,7 +382,7 @@ public class ModModelLoader {
      */
     public static ResourceLocation createEatStageModel(Item container, DishesContent dish, int eatenCount) {
         String containerPath = BuiltInRegistries.ITEM.getKey(container).getPath();
-        String dishPath = Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(dish)).getPath();
+        String dishPath = Objects.requireNonNull(TWRegistries.CONTENT.getKey(dish)).getPath();
         return ResourceLocation.fromNamespaceAndPath(BakingProcess.MOD_ID, "dishes/eat/" + containerPath + "_" + dishPath + "_" + eatenCount);
     }
 
@@ -402,7 +402,7 @@ public class ModModelLoader {
      * @return 对应的模型标识符
      */
     public static ResourceLocation createShapedDoughModel(ShapedDoughContent content) {
-        ResourceLocation contentId = Objects.requireNonNull(TWRegistries.CONTENT.get().getKey(content));
+        ResourceLocation contentId = Objects.requireNonNull(TWRegistries.CONTENT.getKey(content));
         return ResourceLocation.fromNamespaceAndPath(contentId.getNamespace(), "block/" + contentId.getPath());
     }
 

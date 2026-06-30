@@ -12,7 +12,7 @@ import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraftforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.bakingprocess.block.entity.PotsBlockEntity;
 import org.bakingprocess.block.process.KneadingProcess;
 import org.bakingprocess.client.render.model.ModModelLoader;
@@ -50,7 +50,7 @@ public class PotsBlockEntityRenderer implements BlockEntityRenderer<PotsBlockEnt
             renderer.renderModel(matrices.last(),
                     vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(entity.getBlockState())),
                     null,
-                    modelManager.getModel(new ModelResourceLocation(MODEL_KNEAD_2, "")),
+                    modelManager.getModel(ModelResourceLocation.standalone(MODEL_KNEAD_2)),
                     1.0f, 1.0f, 1.0f, light, overlay,
                     ModelData.EMPTY, RenderType.cutout());
             matrices.popPose();
@@ -74,7 +74,7 @@ public class PotsBlockEntityRenderer implements BlockEntityRenderer<PotsBlockEnt
             if (entity.getLevel() != null) {
                 renderer.tesselateBlock(
                         entity.getLevel(),
-                        modelManager.getModel(new ModelResourceLocation(modelId, "")),
+                        modelManager.getModel(ModelResourceLocation.standalone(modelId)),
                         entity.getBlockState(), entity.getBlockPos(),
                         matrices,
                         vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(entity.getBlockState())),

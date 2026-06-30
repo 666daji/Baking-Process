@@ -1,8 +1,5 @@
 package org.bakingprocess.integration.dfood;
 
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Block;
@@ -10,10 +7,9 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.bakingprocess.BakingProcess;
 import org.dfood.block.FoodBlocks;
 import org.dfood.sound.ModSoundGroups;
@@ -26,48 +22,48 @@ import java.util.function.Supplier;
 
 public class AssistedBlocks {
     public static final DeferredRegister<Block> BLOCKS =
-            DeferredRegister.create(ForgeRegistries.BLOCKS, BakingProcess.MOD_ID);
+            DeferredRegister.createBlocks(BakingProcess.MOD_ID);
 
-    public static Set<RegistryObject<Block>> assistedBlocks = new HashSet<>();
+    public static Set<DeferredHolder<Block, Block>> assistedBlocks = new HashSet<>();
 
     // 汤类
-    public static final RegistryObject<Block> CRIPPLED_RABBIT_STEW = registerAssistedStewBlock("crippled_rabbit_stew",
+    public static final DeferredHolder<Block, Block> CRIPPLED_RABBIT_STEW = registerAssistedStewBlock("crippled_rabbit_stew",
             () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_BROWN).strength(0.1F, 0.1F).noOcclusion()
                     .sound(SoundType.DECORATED_POT).pushReaction(PushReaction.DESTROY),
             (settings, maxUse) -> new CrippledStewBlock(settings, maxUse, Foods.RABBIT_STEW, FoodBlocks.RABBIT_STEW));
 
-    public static final RegistryObject<Block> CRIPPLED_MUSHROOM_STEW = registerAssistedStewBlock("crippled_mushroom_stew",
+    public static final DeferredHolder<Block, Block> CRIPPLED_MUSHROOM_STEW = registerAssistedStewBlock("crippled_mushroom_stew",
             () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_BROWN).strength(0.1F, 0.1F).noOcclusion()
                     .sound(SoundType.DECORATED_POT).pushReaction(PushReaction.DESTROY),
             (settings, maxUse) -> new CrippledStewBlock(settings, maxUse, Foods.MUSHROOM_STEW, FoodBlocks.MUSHROOM_STEW));
 
-    public static final RegistryObject<Block> CRIPPLED_BEETROOT_SOUP = registerAssistedStewBlock("crippled_beetroot_soup",
+    public static final DeferredHolder<Block, Block> CRIPPLED_BEETROOT_SOUP = registerAssistedStewBlock("crippled_beetroot_soup",
             () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_BROWN).strength(0.1F, 0.1F).noOcclusion()
                     .sound(SoundType.DECORATED_POT).pushReaction(PushReaction.DESTROY),
             (settings, maxUse) -> new CrippledStewBlock(settings, maxUse, Foods.BEETROOT_SOUP, FoodBlocks.BEETROOT_SOUP));
 
-    public static final RegistryObject<Block> CRIPPLED_SUSPICIOUS_STEW = registerAssistedStewBlock("crippled_suspicious_stew",
+    public static final DeferredHolder<Block, Block> CRIPPLED_SUSPICIOUS_STEW = registerAssistedStewBlock("crippled_suspicious_stew",
             () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_BROWN).strength(0.1F, 0.1F).noOcclusion()
                     .sound(SoundType.DECORATED_POT).pushReaction(PushReaction.DESTROY),
             (settings, maxUse) -> new CrippledSuspiciousStewBlock(settings, maxUse, Foods.SUSPICIOUS_STEW, FoodBlocks.SUSPICIOUS_STEW));
 
     // 桶类
-    public static final RegistryObject<Block> CRIPPLED_WATER_BUCKET = registerAssistedBlock("crippled_water_bucket",
+    public static final DeferredHolder<Block, Block> CRIPPLED_WATER_BUCKET = registerAssistedBlock("crippled_water_bucket",
             () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_BLUE).strength(0.2F, 0.2F).noOcclusion()
                     .sound(ModSoundGroups.WATER_BUCKET).pushReaction(PushReaction.DESTROY),
             (settings, maxUse) -> new CrippledBucketBlock(settings, maxUse, FoodBlocks.WATER_BUCKET, Potions.WATER), 3);
-    public static final RegistryObject<Block> CRIPPLED_MILK_BUCKET = registerAssistedBlock("crippled_milk_bucket",
+    public static final DeferredHolder<Block, Block> CRIPPLED_MILK_BUCKET = registerAssistedBlock("crippled_milk_bucket",
             () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_BLUE).strength(0.2F, 0.2F).noOcclusion()
                     .sound(ModSoundGroups.WATER_BUCKET).pushReaction(PushReaction.DESTROY),
             (settings, maxUse) -> new CrippledBucketBlock(settings, maxUse, FoodBlocks.MILK_BUCKET, null), 3);
 
-    private static RegistryObject<Block> registerAssistedStewBlock(String name,
+    private static DeferredHolder<Block, Block> registerAssistedStewBlock(String name,
                                                                     Supplier<BlockBehaviour.Properties> settingsSupplier,
                                                                     BiFunction<BlockBehaviour.Properties, Integer, Block> blockCreator) {
         return registerAssistedBlock(name, settingsSupplier, blockCreator, 4);
@@ -81,11 +77,11 @@ public class AssistedBlocks {
      * @param maxUse 最大使用次数
      * @return 注册后的方块
      */
-    private static RegistryObject<Block> registerAssistedBlock(String name,
+    private static DeferredHolder<Block, Block> registerAssistedBlock(String name,
                                                                 Supplier<BlockBehaviour.Properties> settingsSupplier,
                                                                 BiFunction<BlockBehaviour.Properties, Integer, Block> blockCreator,
                                                                 int maxUse) {
-        RegistryObject<Block> result = BLOCKS.register(name, () -> {
+        DeferredHolder<Block, Block> result = BLOCKS.register(name, () -> {
             IntPropertyManager.preCache("number_of_use", maxUse);
             return blockCreator.apply(settingsSupplier.get(), maxUse);
         });

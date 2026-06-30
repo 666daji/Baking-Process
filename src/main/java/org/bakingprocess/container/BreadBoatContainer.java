@@ -6,7 +6,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.bakingprocess.item.BreadBoatItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ public class BreadBoatContainer extends ContainerType {
 
         if (nbt != null && nbt.contains(SOUP_KEY)) {
             String soupKey = nbt.copyTag().getString(SOUP_KEY);
-            return TWRegistries.CONTENT.get().getValue(ResourceLocation.tryParse(soupKey));
+            return TWRegistries.CONTENT.get(ResourceLocation.tryParse(soupKey));
         }
 
         return null;
@@ -70,7 +70,7 @@ public class BreadBoatContainer extends ContainerType {
         // 替换内容物
         if (canContain(content)) {
             stack.set(DataComponents.CUSTOM_DATA, stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
-                    .update(nbtCompound -> nbtCompound.putString(SOUP_KEY, TWRegistries.CONTENT.get().getKey(content).toString())));
+                    .update(nbtCompound -> nbtCompound.putString(SOUP_KEY, TWRegistries.CONTENT.getKey(content).toString())));
         }
 
         return stack;
@@ -91,7 +91,7 @@ public class BreadBoatContainer extends ContainerType {
             this.id = id;
         }
 
-        BreadBoatSoupType(RegistryObject<Content> content) {
+        BreadBoatSoupType(DeferredHolder<Content, Content> content) {
             this(content, content.getId().getPath());
         }
 

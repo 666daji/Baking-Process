@@ -34,7 +34,7 @@ public class DishesContainer extends ContainerType {
 
         if (nbt != null && nbt.contains(DISHES_KEY)) {
             String soupKey = nbt.copyTag().getString(DISHES_KEY);
-            return TWRegistries.CONTENT.get().getValue(ResourceLocation.tryParse(soupKey));
+            return TWRegistries.CONTENT.get(ResourceLocation.tryParse(soupKey));
         }
 
         return null;
@@ -57,7 +57,7 @@ public class DishesContainer extends ContainerType {
         // 替换内容物
         if (canContain(content)) {
             stack.set(DataComponents.CUSTOM_DATA, stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
-                    .update(nbtCompound -> nbtCompound.putString(DISHES_KEY, TWRegistries.CONTENT.get().getKey(content).toString())));
+                    .update(nbtCompound -> nbtCompound.putString(DISHES_KEY, TWRegistries.CONTENT.getKey(content).toString())));
         }
 
         return stack;

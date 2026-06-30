@@ -2,7 +2,7 @@ package org.bakingprocess.client.render.model;
 
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import org.bakingprocess.BakingProcess;
 import org.bakingprocess.client.render.block.blockentity.GrindingStoneBlockEntityRenderer;
 

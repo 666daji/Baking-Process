@@ -14,7 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.bakingprocess.block.entity.MoldBlockEntity;
 import org.bakingprocess.client.render.model.ModModelLoader;
 import org.bakingprocess.content.ShapedDoughContent;

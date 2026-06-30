@@ -1,6 +1,6 @@
 package org.bakingprocess.integration.dfood;
 
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.neoforged.bus.api.IEventBus;
 import org.dfood.shape.Shapes;
 
 public class DFoodInit {

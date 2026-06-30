@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.bakingprocess.block.CrippledBlock;
 import org.bakingprocess.registry.ModItems;
 import org.dfood.block.FoodBlocks;
@@ -104,7 +104,7 @@ public class CrippledBucketBlock extends CrippledBlock {
     }
 
     public static BlockState getWaterBucketState(BlockState state) {
-        for (Block block : AssistedBlocks.assistedBlocks.stream().map(RegistryObject::get).toArray(Block[]::new)) {
+        for (Block block : AssistedBlocks.assistedBlocks.stream().map(DeferredHolder::get).toArray(Block[]::new)) {
             if (block instanceof CrippledBucketBlock crippledBucketBlock && crippledBucketBlock.isBaseBlock(state)) {
                 return crippledBucketBlock.defaultBlockState()
                         .setValue(CrippledBucketBlock.FACING, state.getValue(CrippledBucketBlock.FACING))

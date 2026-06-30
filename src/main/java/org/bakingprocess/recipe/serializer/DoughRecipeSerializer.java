@@ -77,11 +77,11 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
     private static final Codec<Content> CONTENT_CODEC =
             ResourceLocation.CODEC.xmap(
                     id -> {
-                        Content content = TWRegistries.CONTENT.get().getValue(id);
+                        Content content = TWRegistries.CONTENT.get(id);
                         if (content == null) throw new IllegalArgumentException("Unknown content: " + id);
                         return content;
                     },
-                    content -> TWRegistries.CONTENT.get().getKey(content)
+                    content -> TWRegistries.CONTENT.getKey(content)
             );
 
     private static final Codec<Map<FlourItem.FlourType, Integer>> FLOUR_MAP_CODEC =
@@ -162,7 +162,7 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
         Map<Content, Integer> liquids = recipe.getLiquidRequirements();
         buf.writeVarInt(liquids.size());
         for (var entry : liquids.entrySet()) {
-            buf.writeResourceLocation(TWRegistries.CONTENT.get().getKey(entry.getKey()));
+            buf.writeResourceLocation(TWRegistries.CONTENT.getKey(entry.getKey()));
             buf.writeVarInt(entry.getValue());
         }
         Map<Ingredient, Integer> extras = recipe.getExtraRequirements();
@@ -187,7 +187,7 @@ public class DoughRecipeSerializer implements RecipeSerializer<DoughRecipe> {
         for (int i = 0; i < liquidCount; i++) {
             ResourceLocation id = buf.readResourceLocation();
             int count = buf.readVarInt();
-            Content content = TWRegistries.CONTENT.get().getValue(id);
+            Content content = TWRegistries.CONTENT.get(id);
             if (content != null) liquids.put(content, count);
         }
         int extraCount = buf.readVarInt();

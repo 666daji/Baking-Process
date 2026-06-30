@@ -73,7 +73,7 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     private static String componentToString(Either<ItemStack, Content> component) {
         return component.map(
                 stack -> "item|" + BuiltInRegistries.ITEM.getKey(stack.getItem()),
-                content -> "content|" + TWRegistries.CONTENT.get().getKey(content)
+                content -> "content|" + TWRegistries.CONTENT.getKey(content)
         );
     }
 
@@ -109,7 +109,7 @@ public class StoveRecipeSerializer implements RecipeSerializer<StoveRecipe> {
     private static Either<ItemStack, Content> parseContent(String contentId) {
         ResourceLocation id = ResourceLocation.tryParse(contentId);
         if (id == null) throw new IllegalArgumentException("Invalid content ID: " + contentId);
-        Content content = TWRegistries.CONTENT.get().getValue(id);
+        Content content = TWRegistries.CONTENT.get(id);
         if (content == null) throw new IllegalArgumentException("Content not found: " + contentId);
         return Either.right(content);
     }
