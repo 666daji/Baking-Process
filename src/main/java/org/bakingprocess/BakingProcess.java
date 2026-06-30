@@ -48,7 +48,7 @@ public class BakingProcess {
     }
 
     public static void register(TwCoreRegisterEvent event) {
-        TwModManager.IMPL.register(BakingProcess.MOD_ID, 1);
+        TwModManager.IMPL.register(BakingProcess.MOD_ID, 2);
 
         AddItemPlayerAction.REMAPPING.put(ModItems.SALMON_CUBES.get(), "msa");
         ((AbstractMappedContainer) ContainerTypes.POTION.get()).registerContentMapping(Contents.MILK.get(), ModItems.MILK_POTION.get());
