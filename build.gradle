@@ -56,7 +56,7 @@ java {
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${mod_id}" }
+        rename { "${it}_baking_process" }
     }
 }
 
@@ -164,13 +164,13 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     // compile against the JEI API but do not include it at runtime
-//    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
-    // at runtime, use the full JEI jar for NeoForge
-//    runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
-//    implementation "maven.modrinth:jade:${jade_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+//     at runtime, use the full JEI jar for NeoForge
+    runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    implementation "maven.modrinth:jade:${jade_version}"
 
-//    implementation "maven.modrinth:tw-core:${project.tw_core_version}"
-    implementation "org.twcore:tw-core:${project.tw_core_version}"
+    implementation "maven.modrinth:tw-core:${project.tw_core_version}"
+//    implementation "org.twcore:tw-core:${project.tw_core_version}"
     implementation "maven.modrinth:decorative-food:${project.decorative_food_version}"
 }
 
